@@ -92,10 +92,10 @@ def measure(queue, pid_list, rapl_available, nvidia_available, outfile=None, per
         metrics = {}
         if rapl_available:
             metrics = rapl_power.get_metrics(pid_list)
-        if gpu_available:
+        if nvidia_available:
             metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
             metrics = {**metrics, **metrics_gpu}
-        if outdir:
+        if outfile:
             today_str = datetime.datetime.now().__str__()
             data = { 'date': today_str, 'metrics': metrics }
             json_str = json.dumps(data)
@@ -135,6 +135,7 @@ def init(outdir=None):
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
         outfile = open(outdir + '/power_metrics.json','w')
+        return rapl, nvidia, outfile
     return rapl, nvidia, None
 
 import networkx as nx

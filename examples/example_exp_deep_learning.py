@@ -1,4 +1,5 @@
 from power_consumption_measure import measure_utils 
+import os
 import json
 import time
 import torch
@@ -94,4 +95,4 @@ power_logs = []
 for line in  open(outfile):
     power_logs.append(json.loads(line.replace('\n','')))
 all_data = {'name': name,'global_info': summary, 'power_logs':power_logs}
-json.dump(all_data, open(outfile, 'w'))
+json.dump(all_data, open(os.path.join(outdir,'model_summary.json'), 'w'))
