@@ -21,12 +21,6 @@ def _get_domain_info(path):
 
     return name, energy_uj, max_energy_range_uj
 
-
-def _is_rapl_compatible(*args, **kwargs):
-    # TODO: for future methods can add an if-else statement here for different rapl variations
-    return os.path.exists("/sys/class/powercap/intel-rapl")
-
-
 def _walk_rapl_dir(path):
     if not os.path.exists(path):
         raise ValueError(

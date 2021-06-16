@@ -1,9 +1,7 @@
 # sudo chmod -R 555 /sys/class/powercap/intel-rapl/
-
 import os, time, numpy as np
 import json
 import psutil
-import rapl
 import warnings
 import networkx as nx
 import sys
@@ -11,6 +9,16 @@ from functools import wraps
 import traceback
 from multiprocessing import Process, Queue
 
+from . import rapl
+rapl_dir = "/sys/class/powercap/intel-rapl/"
+
+def is_rapl_compatible():
+    if not os.path.isdir(rapl_dir):
+        return (False, "cannot find directory "+rapl_dir + " maybe modify the value in rapl_power.rapl_dir")
+    if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
+        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Can you change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/ ")
+    return (True, "rapl ok")
+        
 
 def get_pids():
     """

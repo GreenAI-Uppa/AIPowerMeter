@@ -1,4 +1,4 @@
-import measure_utils 
+from power_consumption_measure import measure_utils 
 import json
 import time
 import torch
@@ -69,13 +69,13 @@ print(net)
 params = list(net.parameters())
 print(len(params))
 print(params[0].size())  # conv1's .weight
-outfile = 'result.json'
+outdir = 'results'
 
 # generating some fake data
 data = torch.randn(input_size) # has to be a minibatch: nSamples x nChannels x Height x Width
 data = data.to(device)
 
-p, q = measure_utils.measure_yourself(outdir=outdir, period=10)
+p, q = measure_utils.measure_yourself(outdir=outdir, period=5)
 
 ## starting the experiment
 print('starting to burn the planet')

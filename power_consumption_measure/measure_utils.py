@@ -9,8 +9,9 @@ import traceback
 from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
-import rapl_power
-import gpu_power
+from . import rapl_power
+from . import gpu_power
+
 STOP_MESSAGE = "Stop"
 STOPPED_MESSAGE = "Stopped"
 
@@ -69,58 +70,29 @@ def processify(func):
 
 @processify
 def measure_from_pid_list(queue, pids, outdir=None, period=1):
-    pid_list = list(pids.keys())
-    if outdir:
-        os.makedirs(outdir)
-        outfile = open(outdir + '/power_metrics.json','w')
-    print("we'll take the measure of the following pids", pid_list)
-    while True:
-        time.sleep(period)
-        metrics = rapl_power.get_metrics(pid_list)
-        if gpu_power.is_nvidia_compatible():
-            metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
-            metrics = {**metrics, **metrics_gpu}
-        if outdir:
-            today_str = datetime.datetime.now().__str__()
-            data = { 'date': today_str, 'metrics': metrics }
-            json_str = json.dumps(data)
-            outfile.write(json_str+'\n')
-        else:
-            queue.put(metrics)
-        try:
-            message = queue.get(block=False)
-            # so there are two types of expected messages. 
-            # The STOP message which is a string, and the metrics dictionnary that this function is sending
-            print('receiving message',message)
-            if isinstance(message, str):
-                print('receving stop')
-                if message == STOP_MESSAGE:
-                    queue.put(STOPPED_MESSAGE)
-                    print("sending stopped")
-                    return
-            else:# Put back the message, it is a metric and the parent process should read it 
-                queue.put(message)
-        except EmptyQueueException:
-            pass
-
+    rapl_available, nvidia_available, outfile = init(outdir)
+    measure(queue, pid_list, rapl_available, nvidia_available, outfile=outfile, period=period)
 
 @processify
 def measure_yourself(queue, outdir=None, period=1):
     """
     # {'cpu_uses': cpu_uses, 'mem_uses': mem_uses, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power} 
     """
+    rapl_available, nvidia_available, outfile = init(outdir)
     current_process = psutil.Process(os.getppid())
     pid_list = [current_process.pid] + [
         child.pid for child in current_process.children(recursive=True)
     ]
-    if outdir:
-        os.makedirs(outdir)
-        outfile = open(outdir + '/power_metrics.json','w')
+    measure(queue, pid_list, rapl_available, nvidia_available, outfile=outfile, period=period)
+
+def measure(queue, pid_list, rapl_available, nvidia_available, outfile=None, period=1):
     print("we'll take the measure of the following pids", pid_list)
     while True:
         time.sleep(period)
-        metrics = rapl_power.get_metrics(pid_list)
-        if gpu_power.is_nvidia_compatible():
+        metrics = {}
+        if rapl_available:
+            metrics = rapl_power.get_metrics(pid_list)
+        if gpu_available:
             metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
             metrics = {**metrics, **metrics_gpu}
         if outdir:
@@ -145,6 +117,25 @@ def measure_yourself(queue, outdir=None, period=1):
                 queue.put(message)
         except EmptyQueueException:
             pass
+
+def init(outdir=None):
+    rapl, msg = rapl_power.is_rapl_compatible()
+    nvidia = gpu_power.is_nvidia_compatible()
+    if not rapl and not nvidia:
+        raise Exception("\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "+ msg)
+    if not rapl:
+        print("rapl not available" + msg)
+    else:
+        print("CPU power will be measured with rapl")
+    if not nvidia:
+        print("nvidia not available, the power of the gpu won't be measured")
+    else:
+        print("GPU power will be measured with nvidia")
+    if outdir:
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+        outfile = open(outdir + '/power_metrics.json','w')
+    return rapl, nvidia, None
 
 import networkx as nx
 import psutil
