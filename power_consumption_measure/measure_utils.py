@@ -124,7 +124,7 @@ def init(outdir=None):
     if not rapl and not nvidia:
         raise Exception("\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "+ msg)
     if not rapl:
-        print("rapl not available" + msg)
+        print("rapl not available, " + msg)
     else:
         print("CPU power will be measured with rapl")
     if not nvidia:
