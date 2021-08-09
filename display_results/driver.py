@@ -7,7 +7,7 @@ class Driver():
 
     def get_curve(self, name):
         return self.e.get_curve(name)
-        
+
     def get_models(self):
         return self.e.model_card
 

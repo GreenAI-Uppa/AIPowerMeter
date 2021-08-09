@@ -14,17 +14,13 @@
             stroke-width: 5px;
          }
       </style>
-
-
 </head>
 <body>
 	<div id="q-app">
-
     <q-layout view="hHh lpR fFf">
       <q-header elevated class="bg-primary text-white" height-hint="98">
         <q-toolbar>
           <q-btn dense flat round icon="menu" @click="left = !left" />
-
           <q-toolbar-title>
             <q-avatar>
               <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
@@ -104,8 +100,6 @@
               });
           },
           set_curve(){
-            // set the dimensions and margins of the graph
-            // Get the data
             _this = this
             d3.json("http://localhost:5001/get_curves", function(error, data) {
                if (error) throw error;
@@ -165,32 +159,6 @@
       const app = Vue.createApp(app_code)
       app.use(Quasar)
       app.mount('#q-app')
-
-      /*draw_line_top(){
-        d3.json('http://localhost:5001/get_curve', function(error, data) {
-           if (error) throw error;
-           console.log(data)
-           // Scale the range of the data
-           x.domain(d3.extent(data, function(d) { return d.date; }));
-           y.domain([0, d3.max(data, function(d) { return d.value; })]);
-
-           // Add the valueline path.
-           svg.append("path")
-              .data([data])
-              .attr("class", "line")
-              .attr("d", valueline);
-
-           // Add the X Axis
-           svg.append("g")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(x));
-
-           // Add the Y Axis
-           svg.append("g")
-              .call(d3.axisLeft(y));
-        });
-      }*/
-
 </script>
 </body>
 </html>
