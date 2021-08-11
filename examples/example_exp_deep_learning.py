@@ -1,11 +1,9 @@
-from power_consumption_measure import measure_utils 
-import os
-import json
+from deep_learning_power_measure.power_measure import experiment, parsers
 import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from queue import Empty as EmptyQueueException
+
 
 class Lin(nn.Module):
     def __init__(self, input_dim):
@@ -64,8 +62,6 @@ else:
 
 net = Conv()
 net.to(device)
-print("the net")
-print(net)
 # The learnable parameters of a model are returned by net.parameters()
 params = list(net.parameters())
 print(len(params))
@@ -76,23 +72,23 @@ outdir = 'results'
 data = torch.randn(input_size) # has to be a minibatch: nSamples x nChannels x Height x Width
 data = data.to(device)
 
-p, q = measure_utils.measure_yourself(outdir=outdir, period=5)
+driver = parsers.JsonParser('/home/paul/data/power_measure')
+exp = experiment.Experiment(driver, model=net, input_size=input_size)
 
+p, q = exp.measure_yourself(period=2)
 ## starting the experiment
+n_iter = 200000
 print('starting to burn the planet')
 start_exp = time.time()
-for i in range(100000000):
+for i in range(n_iter):
     out = net(data)
     if i%10000 == 0:
-        print(i)
+        print(i,'over',n_iter,'iterations')
 end_exp = time.time()
-print('sending stop')
-q.put(measure_utils.STOP_MESSAGE)
+q.put(experiment.STOP_MESSAGE)
 
-print("wrapping stopped, computing final statistics")
-summary = measure_utils.get_summary(net)
-power_logs = []
-for line in  open(outfile):
-    power_logs.append(json.loads(line.replace('\n','')))
-all_data = {'name': name,'global_info': summary, 'power_logs':power_logs}
-json.dump(all_data, open(os.path.join(outdir,'model_summary.json'), 'w'))
+from deep_learning_power_measure.power_measure import experiment, parsers
+
+driver = parsers.JsonParser('/home/paul/data/power_measure')
+
+exp_result = experiment.ExpResults(db_driver)

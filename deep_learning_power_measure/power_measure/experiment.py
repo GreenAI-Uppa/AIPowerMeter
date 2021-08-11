@@ -1,0 +1,166 @@
+import json
+#from thop import profile
+import datetime
+from functools import wraps
+import psutil
+import os
+import sys
+import traceback
+from multiprocessing import Process, Queue
+from queue import Empty as EmptyQueueException
+import time
+from . import rapl_power
+from . import gpu_power
+from . import model_complexity
+
+STOP_MESSAGE = "Stop"
+
+def processify(func):
+    """Decorator to run a function as a process.
+    The created process is joined, so the code does not
+    run in parallel.
+    """
+    def process_func(self, q, *args, **kwargs):
+        try:
+            ret = func(self, q, *args, **kwargs)
+        except Exception as e:
+            ex_type, ex_value, tb = sys.exc_info()
+            error = ex_type, ex_value, "".join(traceback.format_tb(tb))
+            ret = None
+            q.put((ret, error))
+            raise e
+        else:
+            error = None
+        q.put((ret, error))
+
+    # register original function with different name
+    # in sys.modules so it is pickable
+    process_func.__name__ = func.__name__ + "processify_func"
+    setattr(sys.modules[__name__], process_func.__name__, process_func)
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        queue = Queue()  # not the same as a Queue.Queue()
+        p = Process(target=process_func, args=[self, queue] + list(args), kwargs=kwargs)
+        p.start()
+        return p, queue
+    return wrapper
+
+
+class Experiment():
+    def __init__(self, driver, model=None, input_size=None):
+        self.db_driver = driver
+        if model is not None:
+            summary = model_complexity.get_summary(model, input_size)
+            self.db_driver.save_model_card(summary)
+        self.rapl_available, msg = rapl_power.is_rapl_compatible()
+        self.nvidia_available = gpu_power.is_nvidia_compatible()
+        if not self.rapl_available and not self.nvidia_available:
+            raise Exception("\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "+ msg)
+        if not self.rapl_available:
+            print("rapl not available, " + msg)
+        else:
+            print("CPU power will be measured with rapl")
+        if not self.nvidia_available:
+            print("nvidia not available, the power of the gpu won't be measured")
+        else:
+            print("GPU power will be measured with nvidia")
+
+    @processify
+    def measure_from_pid_list(self, queue, pids, period=1):
+        self.measure(queue, pid_list, period=period)
+
+    @processify
+    def measure_yourself(self, queue, period=1):
+        """
+        # {'cpu_uses': cpu_uses, 'mem_uses': mem_uses, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power}
+        """
+        current_process = psutil.Process(os.getppid())
+        pid_list = [current_process.pid] + [
+            child.pid for child in current_process.children(recursive=True)
+        ]
+        self.measure(queue, pid_list, period=period)
+
+    def measure(self, queue, pid_list, period=1):
+        print("we'll take the measure of the following pids", pid_list)
+        while True:
+            time.sleep(period)
+            metrics = {}
+            if self.rapl_available:
+                metrics = rapl_power.get_metrics(pid_list)
+            if self.nvidia_available:
+                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
+                metrics = {**metrics, **metrics_gpu}
+            self.db_driver.save_power_metrics(metrics)
+            try:
+                message = queue.get(block=False)
+                # so there are two types of expected messages.
+                # The STOP message which is a string, and the metrics dictionnary that this function is sending
+                if message == STOP_MESSAGE:
+                    print("Done with measuring")
+                    return
+            except EmptyQueueException:
+                pass
+
+    def dump_exp_metric(self, metrics):
+        self.parser.save_exp_metrics(metrics)
+
+class ExpResults():
+    def __init__(self, db_driver):
+        self.db_driver = db_driver
+        self.metrics = self.db_driver.load_metrics()
+        self.model_card = self.db_driver.get_model_card(self)
+
+    def get_max_acc_and_time(self):
+        max_acc = round(max(self.metrics['test_accuracy']['values'] )* 100)/100
+        #import pdb; pdb.set_trace()
+        num_epochs_to_get_max_acc = min( [ i for (i,v) in enumerate(self.metrics['test_accuracy']['values']) if round(v * 100)/100 == max_acc  ])
+        training_time = sum(self.metrics['training_time']['values'][:num_epochs_to_get_max_acc])
+        return training_time, max_acc
+
+    #@staticmethod maybe better to be non static because it can changes in function of the Experiment instances
+    def time_to_sec(self, t):
+        return t.timestamp()
+
+    def get_curve(self, name, x=None):
+        """
+        each name is a metric which will have an x
+        if x is et to None, I take the x of the first metric, or the intersection?
+        """
+        assert name in self.metrics
+        return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.metrics[name]['dates'], self.metrics[name]['values']) ]
+
+    def cumsum(self, metric):
+        return np.cumsum([ m['value'] for m in metric ])
+
+    def integrate(self, metric):
+        r = [0]
+        for i in range(len(metric)-1):
+            x1 = metric[i]['date']
+            x2 = metric[i+1]['date']
+            y1 = metric[i]['value']
+            y2 = metric[i+1]['value']
+            v = (x2-x1)*(y2+y1)/2
+            v += r[-1]
+            r.append(v)
+        return r
+
+    def wtowh(self, xs):
+        return [ x/3600 for x in xs]
+
+    def interpolate(self, metric1, metric2):
+        x1 = [m['date'] for m in metric1]
+        x2 = [m['date'] for m in metric2]
+        x = sorted( x1 + x2)
+        y1 = [m['value'] for m in metric1]
+        y2 = [m['value'] for m in metric2]
+        y1 = np.interp(x, x1, y1)
+        y2 = np.interp(x, x2, y2)
+        metric1 = [{'date':x, 'value':v} for (x,v) in zip(x, y1) ]
+        metric2 = [{'date':x, 'value':v} for (x,v) in zip(x, y2) ]
+        return metric1, metric2
+
+    def total_energy_consumed(unit='Wh'):
+        # integration
+        delta_sec = driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][-1]) - driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][0])
+        self.metrics['nvidia_draw_absolute']
