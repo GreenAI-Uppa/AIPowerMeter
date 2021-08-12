@@ -222,29 +222,15 @@ def get_rel_power(rel_uses, power):
         power_per_process[pid] = rel_use * power
     return power_per_process
 
-def get_relative_mem_use(process_list):
+def get_relative_mem_use(mem_info_per_process):
     """
     Get the percentage of system memory which is used, with respect to the total of the memory available
     """
-    mem_info_per_process = get_mem_uses(process_list)
     total_physical_memory = psutil.virtual_memory()
-    # pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes, accounted in a way
-    # that the amount is divided evenly between the processes that share it. I.e. if a process has 10 MBs all to itself
-    # and 10 MBs shared with another process its PSS will be 15 MBs.
-    # summing these two gets us a nice fair metric for the actual memory used in the RAM hardware.
-    # The unique bits are directly attributable to the process
-    # and the shared bits we give credit based on how many processes share those bits
-
-    #  on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
-    # so with the previous example, the result would be 20Mbs instead of 15Mbs (I guess).
 
     mem_percent = {}
-    for pid, mem_info in mem_info_per_process.items():
-        if "pss" in mem_info:
-            mem_percent[pid] = mem_info["pss"] / float(total_physical_memory.total - total_physical_memory.available)
-        else:
-            # Sometimes we don't have access to PSS so just need to make due with rss
-            mem_percent[pid] = mem_info["rss"] / float(total_physical_memory.total - total_physical_memory.available)
+    for pid, mem in mem_info_per_process.items():
+        mem_percent[pid] = mem / float(total_physical_memory.total - total_physical_memory.available)
     return mem_percent
 
 def get_mem_uses(process_list):
@@ -253,6 +239,16 @@ def get_mem_uses(process_list):
         process_list : list of psutil.Process objects
     output:
         mem_info_per_process : memory consumption for each process
+
+            # pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes, accounted in a way
+            # that the amount is divided evenly between the processes that share it. I.e. if a process has 10 MBs all to itself
+            # and 10 MBs shared with another process its PSS will be 15 MBs.
+            # summing these two gets us a nice fair metric for the actual memory used in the RAM hardware.
+            # The unique bits are directly attributable to the process
+            # and the shared bits we give credit based on how many processes share those bits
+
+            #  on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
+            # so with the previous example, the result would be 20Mbs instead of 15Mbs (I guess).
     """
     mem_info_per_process = {}
     for p in process_list:
@@ -264,6 +260,12 @@ def get_mem_uses(process_list):
              mem_info_per_process[p.pid]= mem_info._asdict()
         except (psutil.ZombieProcess, psutil.NoSuchProcess):
             pass
+    for k, info in mem_info_per_process.items():
+        if "pss" in info:
+            mem_info_per_process[k] = info["pss"]
+        else:
+            # Sometimes we don't have access to PSS so just need to make due with rss
+            mem_info_per_process[k] = info["rss"]
     return mem_info_per_process
 
 def get_metrics(pid_list, pause = 2.0):
@@ -275,10 +277,11 @@ def get_metrics(pid_list, pause = 2.0):
     s1 = sample.take_sample()
     process_list = get_processes(pid_list)
     cpu_uses = get_cpu_uses(process_list, pause = pause)
-    mem_percent = get_relative_mem_use(process_list)
+    mem_info_per_process = get_mem_uses(process_list)
+    mem_uses = get_relative_mem_use(mem_info_per_process)
     s2 = sample.take_sample()
     intel_power, cpu_power, dram_power, uncore_power, psys_power = get_power(s2 - s1)
     cpu_power_use = get_rel_power(cpu_uses, cpu_power)
     dram_power_use = get_rel_power(mem_uses, dram_power)
-    metrics = {'cpu_uses': cpu_uses, 'mem_percent': mem_percent, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power}
+    metrics = {'mem_use_abs':mem_info_per_process, 'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power}
     return metrics

@@ -31,26 +31,38 @@ class JsonParser():
         assert os.path.isfile(self.model_card_file)
         return json.load(open(self.model_card_file))
 
-    def load_metrics(self):
-        metrics = {}
+    def load_cpu_metrics(self):
         if os.path.isfile(self.power_metric_filename):
+            metrics = {}
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
                 date = datetime.datetime.fromisoformat(result['date'])
-                for k, v in result['metrics'].items():
-                    if k == 'date':
-                        continue
-                    if k == 'per_gpu_average_estimated_utilization_absolute': #
-                        continue
-                    if k == 'per_gpu_performance_state':
-                        continue
+                for k, v in result['metrics']['cpu'].items():
+                    if not isinstance(v,float):
+                        v = sum(v.values())
                     if k not in metrics:
                         metrics[k] = {'dates':[], 'values':[]}
-                    if isinstance(v, dict):
-                        v = sum(v.values())
                     metrics[k]['dates'].append(date)
                     metrics[k]['values'].append(v)
-        #assert len(self.metrics['nvidia_draw_absolute']['values']) == len(self.metrics['nvidia_draw_absolute']['dates'])
+            return metrics
+
+    def load_gpu_metrics(self):
+        return None
+        if os.path.isfile(self.power_metric_filename):
+            metrics = {}
+            for line in open(self.power_metric_filename):
+                result = json.loads(line)
+                date = datetime.datetime.fromisoformat(result['date'])
+                for k, v in result['metrics']['gpu'].items():
+                    if not isinstance(v,float):
+                        v = sum(v.values())
+                    if k not in metrics:
+                        metrics[k] = {'dates':[], 'values':[]}
+                    metrics[k]['dates'].append(date)
+                    metrics[k]['values'].append(v)
+            return metrics
+
+    def load_exp_metrics(self):
         if os.path.isfile(self.exp_metric_filename):
             results = json.load(open(self.exp_metric_filename))
             for result in results:
@@ -62,4 +74,10 @@ class JsonParser():
                         self.metrics[k] = {'dates':[], 'values':[]}
                     metrics[k]['dates'].append(date)
                     metrics[k]['values'].append(result[k])
-        return metrics
+
+
+    def load_metrics(self):
+        cpu_metrics = self.load_cpu_metrics()
+        gpu_metrics = self.load_cpu_metrics()
+        exp_metrics = self.load_exp_metrics()
+        return cpu_metrics, gpu_metrics, exp_metrics

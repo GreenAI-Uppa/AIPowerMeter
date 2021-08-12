@@ -90,5 +90,5 @@ q.put(experiment.STOP_MESSAGE)
 from deep_learning_power_measure.power_measure import experiment, parsers
 
 driver = parsers.JsonParser('/home/paul/data/power_measure')
-
-exp_result = experiment.ExpResults(db_driver)
+exp_result = experiment.ExpResults(driver)
+exp_result.print()

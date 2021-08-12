@@ -87,10 +87,9 @@ class Experiment():
             time.sleep(period)
             metrics = {}
             if self.rapl_available:
-                metrics = rapl_power.get_metrics(pid_list)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list)
             if self.nvidia_available:
-                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
-                metrics = {**metrics, **metrics_gpu}
+                metrics['gpu'] = gpu_power.get_nvidia_gpu_power(pid_list)
             self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
@@ -108,7 +107,7 @@ class Experiment():
 class ExpResults():
     def __init__(self, db_driver):
         self.db_driver = db_driver
-        self.metrics = self.db_driver.load_metrics()
+        self.cpu_metrics, self.gpu_metrics, self.exp_metrics = self.db_driver.load_metrics()
         self.model_card = self.db_driver.get_model_card(self)
 
     def get_max_acc_and_time(self):
@@ -127,8 +126,18 @@ class ExpResults():
         each name is a metric which will have an x
         if x is et to None, I take the x of the first metric, or the intersection?
         """
-        assert name in self.metrics
-        return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.metrics[name]['dates'], self.metrics[name]['values']) ]
+        if self.cpu_metrics is not None:
+            if name in self.cpu_metrics:
+                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.cpu_metrics[name]['dates'], self.cpu_metrics[name]['values']) ]
+
+        if self.gpu_metrics is not None:
+            if name in self.gpu_metrics:
+                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) ]
+
+        if self.exp_metrics is not None:
+            if name in self.exp_metrics:
+                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
+        return None
 
     def cumsum(self, metric):
         return np.cumsum([ m['value'] for m in metric ])
@@ -144,6 +153,15 @@ class ExpResults():
             v += r[-1]
             r.append(v)
         return r
+
+    def total_(self, metric_name):
+        metric = self.get_curve(metric_name)
+        return self.integrate(metric)[-1]
+
+    def average_(self, metric_name):
+        metric = self.get_curve(metric_name)
+        r = self.integrate(metric)[-1]
+        return r /( metric[-1]['date'] - metric[0]['date'])
 
     def wtowh(self, xs):
         return [ x/3600 for x in xs]
@@ -164,3 +182,23 @@ class ExpResults():
         # integration
         delta_sec = driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][-1]) - driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][0])
         self.metrics['nvidia_draw_absolute']
+
+    def print(self):
+        print("============================================ EXPERIMENT SUMMARY ============================================")
+        if self.model_card is not None:
+            print("you model has ", self.model_card['total_params'],"parameters and performs",self.model_card['total_mult_adds'], "mac operations")
+        if self.cpu_metrics is not None:
+            print("on the cpu")
+            print()
+            total_psys_power = self.total_('psys_power')
+            total_intel_power = self.total_('intel_power')
+            total_dram_power = self.total_('total_dram_power')
+            total_cpu_power = self.total_('total_cpu_power')
+            rel_dram_power = self.total_('per_process_dram_power')
+            rel_cpu_power = self.total_('per_process_cpu_power')
+            mem_use_abs = self.average_('mem_use_abs')
+            print("during your experiment")
+            print("RAM consumption:", total_dram_power, "W, your consumption: ", rel_dram_power, "W, for ",mem_use_abs,"bytes")
+            print("CPU consumption:", total_cpu_power, "W, your consumption: ", rel_cpu_power, "W")
+            print("total intel power: ", total_intel_power)
+            print("total psys power: ",total_psys_power)
