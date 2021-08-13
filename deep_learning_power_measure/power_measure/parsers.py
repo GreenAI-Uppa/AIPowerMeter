@@ -37,29 +37,28 @@ class JsonParser():
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
                 date = datetime.datetime.fromisoformat(result['date'])
-                for k, v in result['metrics']['cpu'].items():
-                    if not isinstance(v,float):
-                        v = sum(v.values())
-                    if k not in metrics:
-                        metrics[k] = {'dates':[], 'values':[]}
-                    metrics[k]['dates'].append(date)
-                    metrics[k]['values'].append(v)
+                if 'cpu' in result['metrics']:
+                    for k, v in result['metrics']['cpu'].items():
+                        if not isinstance(v,float):
+                            v = sum(v.values())
+                        if k not in metrics:
+                            metrics[k] = {'dates':[], 'values':[]}
+                        metrics[k]['dates'].append(date)
+                        metrics[k]['values'].append(v)
             return metrics
 
     def load_gpu_metrics(self):
         return None
         if os.path.isfile(self.power_metric_filename):
-            metrics = {}
+            metrics = {} #Streaming Processor / Shared Processor sm
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
                 date = datetime.datetime.fromisoformat(result['date'])
-                for k, v in result['metrics']['gpu'].items():
-                    if not isinstance(v,float):
-                        v = sum(v.values())
-                    if k not in metrics:
-                        metrics[k] = {'dates':[], 'values':[]}
-                    metrics[k]['dates'].append(date)
-                    metrics[k]['values'].append(v)
+                if 'gpu' in result['metrics']:
+                    for k in ['nvidia_estimated_attributable_power_draw', 'nvidia_estimated_attributable_power_draw']:
+                        v = result[k]
+                        metrics[k]['dates'].append(date)
+                        metrics[k]['values'].append(v)
             return metrics
 
     def load_exp_metrics(self):

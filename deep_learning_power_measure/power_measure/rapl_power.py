@@ -116,6 +116,7 @@ def get_power(diff):
     total_dram_power = 0
     total_cpu_power = 0
     total_uncore_power = 0
+    psys_power = -1
     total = 0
     for d in diff.domains:
         domain = diff.domains[d]
@@ -134,7 +135,6 @@ def get_power(diff):
         # The following relationship holds: PP0 + PP1 <= PKG. DRAM is independent of the other three domains.
         # Most processors come in two packages so top level domains shold be package-1 and package-0
         total += power
-        #pint(domain.name, power)
         if domain.name == "psys":  # skip SoC aggregate reporting
             psys_power = power
             continue
