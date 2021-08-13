@@ -186,7 +186,7 @@ class ExpResults():
     def print(self):
         print("============================================ EXPERIMENT SUMMARY ============================================")
         if self.model_card is not None:
-            print("you model has ", self.model_card['total_params'],"parameters and performs",self.model_card['total_mult_adds'], "mac operations")
+            print("you model has ", self.model_card['total_params'],"parameters and performs",self.model_card['total_mult_adds'], "mac operations during its forward pass")
         if self.cpu_metrics is not None:
             print("on the cpu")
             print()
@@ -197,8 +197,14 @@ class ExpResults():
             rel_dram_power = self.total_('per_process_dram_power')
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('mem_use_abs')
-            print("during your experiment")
             print("RAM consumption:", total_dram_power, "W, your consumption: ", rel_dram_power, "W, for ",mem_use_abs,"bytes")
             print("CPU consumption:", total_cpu_power, "W, your consumption: ", rel_cpu_power, "W")
             print("total intel power: ", total_intel_power)
             print("total psys power: ",total_psys_power)
+
+            print()
+            print()
+            print("on the gpu")
+            rel_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
+            abs_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
+            print("nvidia total consumption:",abs_nvidia_power, "W, your consumption: ",rel_nvidia_power)
