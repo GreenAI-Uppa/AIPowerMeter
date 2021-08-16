@@ -201,7 +201,7 @@ class ExpResults():
             print("CPU consumption:", total_cpu_power, "W, your consumption: ", rel_cpu_power, "W")
             print("total intel power: ", total_intel_power)
             print("total psys power: ",total_psys_power)
-
+        if self.gpu_metrics is not None:
             print()
             print()
             print("on the gpu")
