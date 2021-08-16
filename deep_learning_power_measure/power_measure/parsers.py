@@ -38,7 +38,7 @@ class JsonParser():
                 date = datetime.datetime.fromisoformat(result['date'])
                 if 'cpu' in result['metrics']:
                     for k, v in result['metrics']['cpu'].items():
-                        if not isinstance(v,float):
+                        if isinstance(v, dict):
                             v = sum(v.values())
                         if k not in metrics:
                             metrics[k] = {'dates':[], 'values':[]}
@@ -47,15 +47,16 @@ class JsonParser():
             return metrics
 
     def load_gpu_metrics(self):
-        return None
         if os.path.isfile(self.power_metric_filename):
             metrics = {} #Streaming Processor / Shared Processor sm
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
-                date = datetime.datetime.fromisoformat(result['date'])
                 if 'gpu' in result['metrics']:
+                    date = datetime.datetime.fromisoformat(result['date'])
                     for k in ['nvidia_estimated_attributable_power_draw', 'nvidia_estimated_attributable_power_draw']:
-                        v = result[k]
+                        v = result['metrics']['gpu'][k]
+                        if k not in metrics:
+                            metrics[k] = {'dates':[], 'values':[]}
                         metrics[k]['dates'].append(date)
                         metrics[k]['values'].append(v)
             return metrics
@@ -76,6 +77,6 @@ class JsonParser():
 
     def load_metrics(self):
         cpu_metrics = self.load_cpu_metrics()
-        gpu_metrics = self.load_cpu_metrics()
+        gpu_metrics = self.load_gpu_metrics()
         exp_metrics = self.load_exp_metrics()
         return cpu_metrics, gpu_metrics, exp_metrics
