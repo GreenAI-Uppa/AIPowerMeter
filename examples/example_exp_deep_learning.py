@@ -74,7 +74,6 @@ data = data.to(device)
 
 driver = parsers.JsonParser('/home/paul/data/power_measure')
 exp = experiment.Experiment(driver, model=net, input_size=input_size)
-
 p, q = exp.measure_yourself(period=2)
 ## starting the experiment
 n_iter = 200000
