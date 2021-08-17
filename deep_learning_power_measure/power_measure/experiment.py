@@ -186,8 +186,9 @@ class ExpResults():
     def print(self):
         print("============================================ EXPERIMENT SUMMARY ============================================")
         if self.model_card is not None:
-            print("you model has ", self.model_card['total_params'],"parameters and performs",self.model_card['total_mult_adds'], "mac operations during its forward pass")
+            print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass")
         if self.cpu_metrics is not None:
+            print("ENERGY CONSUMPTION: ")
             print("on the cpu")
             print()
             total_psys_power = self.total_('psys_power')
