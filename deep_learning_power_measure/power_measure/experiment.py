@@ -183,6 +183,20 @@ class ExpResults():
         delta_sec = driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][-1]) - driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][0])
         self.metrics['nvidia_draw_absolute']
 
+    def humanize_bytes(self, num, suffix='B'):
+        """
+        convert a float number to a human readable string to display a number of bytes
+        (copied from https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size)
+        """
+        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f%s%s" % (num, 'Yi', suffix)
+
+    def joules_to_wh(self, n):
+        return n*3600/1000
+
     def print(self):
         print("============================================ EXPERIMENT SUMMARY ============================================")
         if self.model_card is not None:
@@ -198,8 +212,8 @@ class ExpResults():
             rel_dram_power = self.total_('per_process_dram_power')
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('mem_use_abs')
-            print("RAM consumption:", total_dram_power, "W, your consumption: ", rel_dram_power, "W, for ",mem_use_abs,"bytes")
-            print("CPU consumption:", total_cpu_power, "W, your consumption: ", rel_cpu_power, "W")
+            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for ",self.humanize_bytes(mem_use_abs))
+            print("CPU consumption:", total_cpu_power, "joules, your consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power)
             print("total psys power: ",total_psys_power)
         if self.gpu_metrics is not None:
@@ -208,4 +222,4 @@ class ExpResults():
             print("on the gpu")
             rel_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
             abs_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
-            print("nvidia total consumption:",abs_nvidia_power, "W, your consumption: ",rel_nvidia_power)
+            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power)
