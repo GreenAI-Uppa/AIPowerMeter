@@ -48,8 +48,10 @@ def processify(func):
 
 
 class Experiment():
-    def __init__(self, driver, model=None, input_size=None):
+    def __init__(self, driver, model=None, input_size=None, cont=False):
         self.db_driver = driver
+        if not cont:
+            driver.erase()
         if model is not None:
             summary = model_complexity.get_summary(model, input_size)
             self.db_driver.save_model_card(summary)
@@ -201,6 +203,7 @@ class ExpResults():
         print("============================================ EXPERIMENT SUMMARY ============================================")
         if self.model_card is not None:
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass")
+            print()
         if self.cpu_metrics is not None:
             print("ENERGY CONSUMPTION: ")
             print("on the cpu")

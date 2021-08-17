@@ -1,24 +1,25 @@
 import json, glob, os, numpy as np, datetime, shutil
 
 class JsonParser():
-    def __init__(self, folder : str, cont=False):
+    def __init__(self, folder : str):
         """
         JSonParser will save the recordings of the experiment as json files
         folder : the location where the json will be saved, it will be created if it does not exist
-        cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones 
+        cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
         self.folder = folder
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
-        else:
-            if not cont:
-                shutil.rmtree(self.folder)
-                os.makedirs(self.folder)
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
 
+    def erase(self):
+        shutil.rmtree(self.folder)
+        os.makedirs(self.folder)
+
     def save_model_card(self, model_card):
+        print('saving model', self.model_card_file)
         json.dump(model_card, open(self.model_card_file, 'w'))
 
     def save_power_metrics(self, metrics):
@@ -53,6 +54,8 @@ class JsonParser():
                             metrics[k] = {'dates':[], 'values':[]}
                         metrics[k]['dates'].append(date)
                         metrics[k]['values'].append(v)
+            if len(metrics) == 0:
+                return None
             return metrics
 
     def load_gpu_metrics(self):
@@ -68,6 +71,8 @@ class JsonParser():
                             metrics[k] = {'dates':[], 'values':[]}
                         metrics[k]['dates'].append(date)
                         metrics[k]['values'].append(v)
+            if len(metrics) == 0:
+                return None
             return metrics
 
     def load_exp_metrics(self):
