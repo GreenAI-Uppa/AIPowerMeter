@@ -47,7 +47,6 @@ class JsonParser():
             return metrics
 
     def load_gpu_metrics(self):
-        return None
         if os.path.isfile(self.power_metric_filename):
             metrics = {} #Streaming Processor / Shared Processor sm
             for line in open(self.power_metric_filename):
