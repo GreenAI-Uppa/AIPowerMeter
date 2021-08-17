@@ -1,12 +1,21 @@
-import json, glob, os, numpy as np, datetime
+import json, glob, os, numpy as np, datetime, shutil
 
 class JsonParser():
-    def __init__(self, folder):
+    def __init__(self, folder : str, cont=False):
+        """
+        JSonParser will save the recordings of the experiment as json files
+        folder : the location where the json will be saved, it will be created if it does not exist
+        cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones 
+        """
         self.folder = folder
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
+        else:
+            if not cont:
+                shutil.rmtree(self.folder)
+                os.makedirs(self.folder)
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
 
     def save_model_card(self, model_card):

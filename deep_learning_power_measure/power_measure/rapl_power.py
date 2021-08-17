@@ -186,7 +186,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
         cpu_util_system = delta_proc2 / float(st22 - st12)
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
-            print("cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, attributable_compute)
+            print("cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
             attributable_compute = 0 
         else:
             attributable_compute = cpu_util_process / cpu_util_system
