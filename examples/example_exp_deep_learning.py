@@ -23,7 +23,7 @@ net = Conv()
 
 # setting the size of the input
 # minibatch_size x nChannels x Height x Width
-input_size = 1000, 3, 128, 128
+input_size = 1, 3, 128, 128
 # generating some fake data
 data = torch.randn(input_size)
 
