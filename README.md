@@ -13,7 +13,7 @@ To check if your linux os is supporting RAPL, you can check that the following f
 /sys/class/powercap/intel-rapl/
 ```
 
-Note that it might take some months before the linux kernel add supports of recent version of intel cpus.
+If your cpu is very recent, it is worth to check the most recent linux kernels.
 
 ## Installation
 
