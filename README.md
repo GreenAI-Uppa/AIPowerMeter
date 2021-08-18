@@ -1,18 +1,21 @@
 # deep_learning_power_measure
 
-This repo contains python modules in the backstage linux powercap interface of RAPL and nvidia-smi to measure cpu and gpu energy consumption
+Record the energy consumption of your cpu and gpu. 
+
 It is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
 
-## requirements
+## Requirements
 
-RAPL is introduced in the Intel processors since SkyLake. 
+RAPL is introduced in the Intel processors starting with the SkyLake version. 
 
 To check if your linux os is supporting RAPL, you can check that the following folder is not empty.
 ```
 /sys/class/powercap/intel-rapl/
 ```
 
-## installation
+Note that it might take some months before the linux kernel add supports of recent version of intel cpus.
+
+## Installation
 
 this repo has been tested with torch 1.9.0
 ```
@@ -32,7 +35,7 @@ from deep_learning_power_measure.power_measure import experiment, parsers
 
 model = ... define your pytorch model
 input_size = ... this information enables count the number of mac operations
-driver = parsers.JsonParser("output_folder_for_power_recordings")
+driver = parsers.JsonParser("output_folder")
 exp = experiment.Experiment(driver)
 
 p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
@@ -41,4 +44,13 @@ p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
 ################
 q.put(experiment.STOP_MESSAGE)
 
+``` 
+
+This will save the recordings as json file in the `output_folder`. You can display them with: 
+
+```
+from deep_learning_power_measure.power_measure import experiment, parsers
+driver = parsers.JsonParser(output_folder)
+exp_result = experiment.ExpResults(driver)
+exp_result.print()
 ``` 
