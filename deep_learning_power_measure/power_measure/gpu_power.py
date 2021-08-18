@@ -44,12 +44,7 @@ def get_gpu_power():
     #xml = fromstring(outs)
     return outs
 
-def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
-    """
-    first, get gpu usage per process
-       nsample indicates the number of queries to nvidia
-    second get the power use of nvidia
-    """
+def get_gpu_use(nsample=1):
     #Find per process per gpu usage info
     # -c corresponds to the number of samples
     # according to the docs, this command is limited to 4 gpus
@@ -90,7 +85,15 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     out_str_final = re.sub("\s+\n", "\n", out_str_final)  # else pd will mis-align
     out_str_final = out_str_final.strip()
     df = pd.read_csv(StringIO(out_str_final), engine="python", delimiter="\t")
+    return df
 
+def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
+    """
+    first, get gpu usage per process
+       nsample indicates the number of queries to nvidia
+    second get the power use of nvidia
+    """
+    df = get_gpu_use(nsample=nsample)
     # result is a panda frame with the following columns
     # gpu   pid    sm   mem  enc  dec
     process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
@@ -107,7 +110,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     absolute_power = 0
     per_gpu_performance_states = {}
 
-    # now double loop 
+    # now double loop
     # for each gpu
     #    for each pid
     #        collect the amount of power the process's pid is consuming
