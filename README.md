@@ -32,7 +32,7 @@ sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 
 ## Usage
 
-See `examples/example_exp_deep_learning.py` to run and measure the energy consumption of one experiment. 
+See `examples/example_exp_deep_learning.py`.
 
 Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.
 
