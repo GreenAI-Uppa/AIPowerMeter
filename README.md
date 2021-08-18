@@ -59,7 +59,7 @@ exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
 ### model card
-We use a wrapper to [torchinfo](https://pypi.org/project/torchinfo/) to provide statistics about your model. 
+We use a wrapper for [torchinfo](https://pypi.org/project/torchinfo/) to extract statistics about your model. 
 To obtain them, add additional parameters:
 ```
 net = ... the model you are using for your experiment 
