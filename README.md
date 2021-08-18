@@ -19,7 +19,7 @@ Empty folder? If your cpu is very recent, it is worth to check the most recent l
 
 ## Installation
 
-this repo has been tested with torch 1.9.0
+Install pytorch, then,
 ```
 pip install -r requirements.txt
 python setup.py install
