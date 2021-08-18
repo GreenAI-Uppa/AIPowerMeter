@@ -49,10 +49,23 @@ def processify(func):
 
 class Experiment():
     def __init__(self, driver, model=None, input_size=None, cont=False):
+        """
+        wrapper class with the methods in charge of recording
+        cpu and gpu uses
+
+        driver: interface with a database to save the results
+        model and input_size : to compute a model card which will summarize the model
+            model is a pytorch model from nn.Module, and input_size is a tuple of int,
+            for instance, you can provide  input_size = (64, 3, 32, 32) if you are processing
+            3 channels images with a batch size of 64.
+        cont : whether or not to erase existing results or append new results.
+        """
         self.db_driver = driver
         if not cont:
             driver.erase()
         if model is not None:
+            if input_size is None:
+                raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
             summary = model_complexity.get_summary(model, input_size)
             self.db_driver.save_model_card(summary)
         self.rapl_available, msg = rapl_power.is_rapl_compatible()
@@ -68,6 +81,10 @@ class Experiment():
         else:
             print("GPU power will be measured with nvidia")
 
+    def save_model_card(model, input_size):
+        summary = model_complexity.get_summary(model, input_size)
+        self.db_driver.save_model_card(summary)
+
     @processify
     def measure_from_pid_list(self, queue, pids, period=1):
         self.measure(queue, pid_list, period=period)
@@ -75,7 +92,6 @@ class Experiment():
     @processify
     def measure_yourself(self, queue, period=1):
         """
-        # {'cpu_uses': cpu_uses, 'mem_uses': mem_uses, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power}
         """
         current_process = psutil.Process(os.getppid())
         pid_list = [current_process.pid] + [
@@ -123,10 +139,12 @@ class ExpResults():
     def time_to_sec(self, t):
         return t.timestamp()
 
-    def get_curve(self, name, x=None):
+    def get_curve(self, name):
         """
-        each name is a metric which will have an x
-        if x is et to None, I take the x of the first metric, or the intersection?
+        name : key to one of the metric dictionnaries
+
+        return a series of data points [{ "date": date1, "value" : value1}, {"date": date2 ,... }]
+        where the dates are in seconds and the value unit is taken from the dictionnaries without transformation.
         """
         if self.cpu_metrics is not None:
             if name in self.cpu_metrics:
