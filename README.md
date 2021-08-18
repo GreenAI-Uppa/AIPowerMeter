@@ -1,4 +1,4 @@
-# deep_learning_power_measure
+# Measure the efficiency of your deep learning
 
 Record the energy consumption of your cpu and gpu. 
 
