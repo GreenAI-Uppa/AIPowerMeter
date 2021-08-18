@@ -33,13 +33,13 @@ driver = parsers.JsonParser(args.output_folder)
 # Note that it takes the model and the input as a parameter in order to give a model summary
 exp = experiment.Experiment(driver) 
 
-# using gpu if available
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-net.to(device)
-data = data.to(device)
-
 # starting the record, and wait two seconds between each energy consumption measurement
 p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+# using gpu if available
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
+net.to(device)
+data = data.to(device)
 
 ## starting the experiment
 n_iter = 200000

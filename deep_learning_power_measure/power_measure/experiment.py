@@ -77,8 +77,8 @@ class Experiment():
         else:
             print("GPU power will be measured with nvidia")
 
-    def save_model_card(self, model, input_size):
-        summary = model_complexity.get_summary(model, input_size)
+    def save_model_card(self, model, input_size, device='cpu'):
+        summary = model_complexity.get_summary(model, input_size, device=device)
         self.db_driver.save_model_card(summary)
 
     @processify
@@ -99,7 +99,7 @@ class Experiment():
         if model is not None:
             if input_size is None:
                 raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
-            summary = model_complexity.get_summary(model, input_size)
+            summary = model_complexity.get_summary(model, input_size, device='cpu')
             self.db_driver.save_model_card(summary)
 
         self.measure(queue, pid_list, period=period)

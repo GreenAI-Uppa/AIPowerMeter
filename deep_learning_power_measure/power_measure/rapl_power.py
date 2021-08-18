@@ -264,6 +264,7 @@ def get_mem_uses(process_list):
              mem_info_per_process[p.pid]= mem_info._asdict()
         except (psutil.ZombieProcess, psutil.NoSuchProcess):
             pass
+    print(mem_info_per_process)
     for k, info in mem_info_per_process.items():
         if "pss" in info:
             mem_info_per_process[k] = info["pss"]
