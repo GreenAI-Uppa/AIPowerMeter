@@ -32,7 +32,7 @@ sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 
 ## Usage
 
-See `examples/example_exp_deep_learning.py` to run and measure the energy consumption of one experiment. 
+See `examples/example_exp_deep_learning.py`.
 
 Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.
 
@@ -59,7 +59,7 @@ exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
 ### model card
-We use a wrapper to [torchinfo](https://pypi.org/project/torchinfo/) to provide statistics about your model. 
+We use a wrapper for [torchinfo](https://pypi.org/project/torchinfo/) to extract statistics about your model. 
 To obtain them, add additional parameters:
 ```
 net = ... the model you are using for your experiment 
