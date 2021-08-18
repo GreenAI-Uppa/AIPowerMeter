@@ -23,6 +23,10 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
+You need to authorize the reading of the rapl related files: 
+```
+sudo chmod -R 755 /sys/class/powercap/intel-rapl/
+```
 
 ## Usage
 
