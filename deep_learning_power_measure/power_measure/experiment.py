@@ -81,7 +81,7 @@ class Experiment():
         else:
             print("GPU power will be measured with nvidia")
 
-    def save_model_card(model, input_size):
+    def save_model_card(self, model, input_size):
         summary = model_complexity.get_summary(model, input_size)
         self.db_driver.save_model_card(summary)
 
