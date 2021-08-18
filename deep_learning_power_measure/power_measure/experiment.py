@@ -238,7 +238,9 @@ class ExpResults():
             rel_dram_power = self.total_('per_process_dram_power')
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('mem_use_abs')
-            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",self.humanize_bytes(mem_use_abs))
+            mem_use_uss = self.average_('mem_use_uss')
+
+            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",self.humanize_bytes(mem_use_abs), 'with an overhead of',self.humanize_bytes(mem_use_uss))
             print("CPU consumption:", total_cpu_power, "joules, your consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power)
             print("total psys power: ",total_psys_power)

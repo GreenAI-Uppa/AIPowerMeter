@@ -253,7 +253,7 @@ def get_mem_uses(process_list):
             # on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
             # so with the previous example, the result would be 20Mbs instead of 15Mbs
     """
-    mem_info_per_process = {}
+    mem_info_per_process, mem_pss_per_process, mem_uss_per_process = {}, {}, {}
     for p in process_list:
         try:
              try:
@@ -265,11 +265,13 @@ def get_mem_uses(process_list):
             pass
     for k, info in mem_info_per_process.items():
         if "pss" in info:
-            mem_info_per_process[k] = info["pss"]
+            mem_pss_per_process[k] = info["pss"]
         else:
             # Sometimes we don't have access to PSS so just need to make due with rss
-            mem_info_per_process[k] = info["rss"]
-    return mem_info_per_process
+            mem_pss_per_process[k] = info["rss"]
+        if 'uss' in info:
+            mem_uss_per_process[k] = info['uss']
+    return mem_pss_per_process, mem_uss_per_process
 
 def get_metrics(pid_list, pause = 2.0):
     """
@@ -280,11 +282,23 @@ def get_metrics(pid_list, pause = 2.0):
     s1 = sample.take_sample()
     process_list = get_processes(pid_list)
     cpu_uses = get_cpu_uses(process_list, pause = pause)
-    mem_info_per_process = get_mem_uses(process_list)
-    mem_uses = get_relative_mem_use(mem_info_per_process)
+    mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
+    mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
     intel_power, cpu_power, dram_power, uncore_power, psys_power = get_power(s2 - s1)
     cpu_power_use = get_rel_power(cpu_uses, cpu_power)
     dram_power_use = get_rel_power(mem_uses, dram_power)
-    metrics = {'mem_use_abs':mem_info_per_process, 'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses, 'intel_power' :intel_power, 'total_cpu_power':cpu_power, 'total_dram_power':dram_power, 'uncore_power':uncore_power, 'per_process_cpu_power':cpu_power_use, 'per_process_dram_power':dram_power_use, 'psys_power':psys_power}
+    metrics = {
+        'mem_use_abs':mem_pss_per_process,
+        'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses,
+        'intel_power' :intel_power,
+        'total_cpu_power':cpu_power,
+        'total_dram_power':dram_power,
+        'uncore_power':uncore_power,
+        'per_process_cpu_power':cpu_power_use,
+        'per_process_dram_power':dram_power_use,
+        'psys_power':psys_power
+    }
+    if len(mem_uss_per_process) > 0:
+        metrics['mem_use_uss'] = mem_uss_per_process
     return metrics
