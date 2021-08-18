@@ -6,14 +6,16 @@ This repo is largely inspired from this [experiment Tracker](https://github.com/
 
 ## Requirements
 
+Running Average Power Limit (RAPL) and its linux interface : powercap 
+
 RAPL is introduced in the Intel processors starting with the SkyLake version. 
 
-To check if your linux os is supporting RAPL, you can check that the following folder is not empty.
+Your linux os supports RAPL if the following folder is not empty:
 ```
 /sys/class/powercap/intel-rapl/
 ```
 
-If your cpu is very recent, it is worth to check the most recent linux kernels.
+Empty folder? If your cpu is very recent, it is worth to check the most recent linux kernels.
 
 ## Installation
 
