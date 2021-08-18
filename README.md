@@ -39,12 +39,10 @@ Essentially, you instantiate an experiment and place the code you want to measur
 ```
 from deep_learning_power_measure.power_measure import experiment, parsers
 
-model = ... define your pytorch model
-input_size = ... this information enables count the number of mac operations
 driver = parsers.JsonParser("output_folder")
 exp = experiment.Experiment(driver)
 
-p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+p, q = exp.measure_yourself(period=2)
 ###################
 #  place here the code that you want to profile
 ################
@@ -60,3 +58,12 @@ driver = parsers.JsonParser(output_folder)
 exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
+### model card
+We use a wrapper to [torchinfo](https://pypi.org/project/torchinfo/) to provide statistics about your model. 
+To obtain them, add additional parameters:
+```
+net = ... the model you are using for your experiment 
+input_size = ... (batch_size, *data_point_shape)
+p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+
+```
