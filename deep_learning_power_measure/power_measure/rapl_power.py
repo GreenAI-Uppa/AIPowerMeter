@@ -187,7 +187,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
             print("cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
-            attributable_compute = 0 
+            attributable_compute = 0
         else:
             attributable_compute = cpu_util_process / cpu_util_system
 
@@ -244,15 +244,14 @@ def get_mem_uses(process_list):
     output:
         mem_info_per_process : memory consumption for each process
 
-            # pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes, accounted in a way
-            # that the amount is divided evenly between the processes that share it. I.e. if a process has 10 MBs all to itself
-            # and 10 MBs shared with another process its PSS will be 15 MBs.
-            # summing these two gets us a nice fair metric for the actual memory used in the RAM hardware.
-            # The unique bits are directly attributable to the process
-            # and the shared bits we give credit based on how many processes share those bits
+        some info from psutil documentation:
+            uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory which is unique to a process and which would be freed if the process was terminated right now
+            pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes,
+            accounted in a way that the amount is divided evenly between the processes that share it.
+            I.e. if a process has 10 MBs all to itself and 10 MBs shared with another process its PSS will be 15 MBs.
 
-            #  on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
-            # so with the previous example, the result would be 20Mbs instead of 15Mbs (I guess).
+            # on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
+            # so with the previous example, the result would be 20Mbs instead of 15Mbs
     """
     mem_info_per_process = {}
     for p in process_list:
@@ -264,7 +263,6 @@ def get_mem_uses(process_list):
              mem_info_per_process[p.pid]= mem_info._asdict()
         except (psutil.ZombieProcess, psutil.NoSuchProcess):
             pass
-    print(mem_info_per_process)
     for k, info in mem_info_per_process.items():
         if "pss" in info:
             mem_info_per_process[k] = info["pss"]
