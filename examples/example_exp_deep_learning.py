@@ -23,21 +23,20 @@ net = Conv()
 
 # setting the size of the input
 # minibatch_size x nChannels x Height x Width
-input_size = 1, 3, 128, 128
+input_size = 1000, 3, 128, 128
 # generating some fake data
 data = torch.randn(input_size)
 
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
 # instantiating the experiment.
-# Note that it takes the model and the input as a parameter in order to give a model summary
 exp = experiment.Experiment(driver) 
 
 # starting the record, and wait two seconds between each energy consumption measurement
+# Note that it takes the model and the input as a parameter in order to give a model summary
 p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
 # using gpu if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-device = 'cpu'
 net.to(device)
 data = data.to(device)
 

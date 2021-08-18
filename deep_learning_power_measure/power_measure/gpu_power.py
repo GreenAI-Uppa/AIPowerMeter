@@ -28,27 +28,21 @@ def is_nvidia_compatible():
         return False
     return True
 
-
-def get_process_nvidia_use(nsample=1):
-    sp = subprocess.Popen(
-        ["nvidia-smi", "pmon", "-c", str(nsample)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    out_str = sp.communicate()
-    return out_str
-
 def get_gpu_power():
     p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
     outs, errors = p.communicate()
     #xml = fromstring(outs)
     return outs
 
-def get_gpu_use(nsample=1):
-    #Find per process per gpu usage info
-    # -c corresponds to the number of samples
-    # according to the docs, this command is limited to 4 gpus
-    # information includes the pid, command name and       average utilization values for SM (streaming multiprocessor), Memory, Encoder  and  Decoder  since       the  last  monitoring  cycle
+def get_gpu_use_pmon(nsample=1):
+    """
+    Find per process per gpu usage info
+     -c corresponds to the number of samples
+     according to the docs, this command is limited to 4 gpus
+     information includes the pid, command name and       average utilization values for SM (streaming multiprocessor), Memory, Encoder  and  Decoder  since       the  last  monitoring  cycle
+     result is a panda frame with the following columns
+     gpu   pid    sm   mem  enc  dec
+    """
     sp = subprocess.Popen(
         ["nvidia-smi", "pmon", "-c", str(nsample)],
         stdout=subprocess.PIPE,
@@ -85,7 +79,38 @@ def get_gpu_use(nsample=1):
     out_str_final = re.sub("\s+\n", "\n", out_str_final)  # else pd will mis-align
     out_str_final = out_str_final.strip()
     df = pd.read_csv(StringIO(out_str_final), engine="python", delimiter="\t")
-    return df
+    process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
+    return  process_percentage_used_gpu
+
+def get_gpu_mem(gpu):
+    memory_usage = gpu.findall("fb_memory_usage")[0]
+    total_memory = memory_usage.findall("total")[0].text
+    used_memory = memory_usage.findall("used")[0].text
+    free_memory = memory_usage.findall("free")[0].text
+    return {
+        "total": total_memory,
+        "used_memory": used_memory,
+        "free_memory": free_memory,
+    }
+
+def get_gpu_use(gpu):
+    utilization = gpu.findall("utilization")[0]
+    gpu_util = utilization.findall("gpu_util")[0].text
+    memory_util = utilization.findall("memory_util")[0].text
+    return {"gpu_util": gpu_util, "memory_util": memory_util}
+
+def get_gpu_power(gpu):
+    power_readings = gpu.findall("power_readings")[0]
+    power_draw = power_readings.findall("power_draw")[0].text
+    power_draw = float(power_draw.replace("W", ""))
+    return {"power_draw": power_draw}
+
+def get_gpu_data(gpu):
+    gpu_data = {}
+    gpu_data["memory"] = get_gpu_mem(gpu)
+    gpu_data["utilization"] = get_gpu_data(gpu)
+    gpu_data["power_readings"] = get_gpu_power(gpu)
+    return gpu_data
 
 def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     """
@@ -93,10 +118,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
        nsample indicates the number of queries to nvidia
     second get the power use of nvidia
     """
-    df = get_gpu_use(nsample=nsample)
-    # result is a panda frame with the following columns
-    # gpu   pid    sm   mem  enc  dec
-    process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
+    process_percentage_used_gpu = get_gpu_use_pmon(nsample=nsample)
 
     # this commmand provides the full xml output
     p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
@@ -109,18 +131,20 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     per_gpu_relative_percent_usage = {}
     absolute_power = 0
     per_gpu_performance_states = {}
+    per_gpu_power_draw = {}
+    per_gpu_mem_use = {}
 
-    # now double loop
     # for each gpu
     #    for each pid
     #        collect the amount of power the process's pid is consuming
     for gpu_id, gpu in enumerate(xml.findall("gpu")):
         gpu_data = {}
+        per_gpu_mem_use[gpu_id] = {}
 
         name = gpu.findall("product_name")[0].text
         gpu_data["name"] = name
 
-        # get memory
+        # get overall memory usage for this gpu
         memory_usage = gpu.findall("fb_memory_usage")[0]
         total_memory = memory_usage.findall("total")[0].text
         used_memory = memory_usage.findall("used")[0].text
@@ -131,30 +155,30 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
             "free_memory": free_memory,
         }
 
-        # get utilization
+        # get total utilization for this gpu
         utilization = gpu.findall("utilization")[0]
         gpu_util = utilization.findall("gpu_util")[0].text
         memory_util = utilization.findall("memory_util")[0].text
         gpu_data["utilization"] = {"gpu_util": gpu_util, "memory_util": memory_util}
 
-        # get power
+        # get total power for this gpu
         power_readings = gpu.findall("power_readings")[0]
         power_draw = power_readings.findall("power_draw")[0].text
+        power_this_gpu = float(power_draw.replace("W", ""))
+        gpu_data["power_readings"] = {"power_draw": power_this_gpu}
 
-        gpu_data["power_readings"] = {"power_draw": power_draw}
-        absolute_power += float(power_draw.replace("W", ""))
+        per_gpu_power_draw[gpu_id] = power_this_gpu 
+        absolute_power += power_this_gpu 
 
         # processes
         processes = gpu.findall("processes")[0]
 
-        infos = []
         # all the info for processes on this particular gpu that we're on
         gpu_based_processes = process_percentage_used_gpu[
             process_percentage_used_gpu["gpu"] == gpu_id
         ]
         # what's the total absolute SM for this gpu across all accessible processes
         percentage_of_gpu_used_by_all_processes = float(gpu_based_processes["sm"].sum())
-        per_gpu_power_draw = {}
         for info in processes.findall("process_info"):
             pid = info.findall("pid")[0].text
             process_name = info.findall("process_name")[0].text
@@ -169,17 +193,9 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
                 sm_relative_percent = (
                     sm_absolute_percent / percentage_of_gpu_used_by_all_processes
                 )
-            infos.append(
-                {
-                    "pid": pid,
-                    "process_name": process_name,
-                    "used_memory": used_memory,
-                    "sm_relative_percent": sm_relative_percent,
-                    "sm_absolute_percent": sm_absolute_percent,
-                }
-            )
 
             if int(pid) in pid_list:
+                per_gpu_mem_use[gpu_id][int(pid)] = int(used_memory.replace('MiB',''))*1048576 # convert from mbytes to bytes
                 # only add a gpu to the list if it's being used by one of the processes. sometimes nvidia-smi seems to list all gpus available
                 # even if they're not being used by our application, this is a problem in a slurm setting
                 if gpu_id not in per_gpu_absolute_percent_usage:
@@ -195,15 +211,10 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
                     performance_state = gpu.findall("performance_state")[0].text
                     per_gpu_performance_states[gpu_id] = performance_state
 
-                power += sm_relative_percent * float(power_draw.replace("W", ""))
-                per_gpu_power_draw[gpu_id] = float(power_draw.replace("W", "")) # this could above this loop
+                power += sm_relative_percent * power_this_gpu 
                 # want a proportion value rather than percentage
                 per_gpu_absolute_percent_usage[gpu_id] += sm_absolute_percent / 100.0
                 per_gpu_relative_percent_usage[gpu_id] += sm_relative_percent
-
-        gpu_data["processes"] = infos
-
-        results.append(gpu_data)
 
     if len(per_gpu_absolute_percent_usage.values()) == 0:
         average_gpu_utilization = 0
@@ -219,6 +230,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
         per_gpu_average_estimated_utilization_absolute.append(d)
     data_return_values_with_headers = {
         "nvidia_draw_absolute": absolute_power,
+        "per_gpu_attributable_mem_use": per_gpu_mem_use,
         "nvidia_estimated_attributable_power_draw": power,
         "average_gpu_estimated_utilization_absolute": average_gpu_utilization,
         "per_gpu_average_estimated_utilization_absolute": per_gpu_average_estimated_utilization_absolute,
@@ -226,21 +238,4 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
         "per_gpu_performance_state": per_gpu_performance_states,
         "per_gpu_power_draw": per_gpu_power_draw,
     }
-
     return data_return_values_with_headers
-
-"""
-{'nvidia_draw_absolute': 25.27,
- 'nvidia_estimated_attributable_power_draw': 0,
- 'average_gpu_estimated_utilization_absolute': 0,
- 'per_gpu_average_estimated_utilization_absolute': [{'gpu': 0,
-   'pid': 902,
-   'sm': 0,
-   'mem': 0,
-   'enc': 0,
-   'dec': 0},
-  {'gpu': 0, 'pid': 981, 'sm': 0, 'mem': 0, 'enc': 0, 'dec': 0}],
- 'average_gpu_estimated_utilization_relative': 0,
- 'per_gpu_performance_state': {},
- 'per_gpu_power_draw': {}}
- """
