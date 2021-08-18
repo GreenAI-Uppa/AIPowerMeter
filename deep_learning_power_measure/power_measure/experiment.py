@@ -43,6 +43,7 @@ def processify(func):
         queue = Queue()  # not the same as a Queue.Queue()
         p = Process(target=process_func, args=[self, queue] + list(args), kwargs=kwargs)
         p.start()
+        queue.put(p.pid)
         return p, queue
     return wrapper
 
@@ -63,11 +64,6 @@ class Experiment():
         self.db_driver = driver
         if not cont:
             driver.erase()
-        if model is not None:
-            if input_size is None:
-                raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
-            summary = model_complexity.get_summary(model, input_size)
-            self.db_driver.save_model_card(summary)
         self.rapl_available, msg = rapl_power.is_rapl_compatible()
         self.nvidia_available = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
@@ -90,13 +86,22 @@ class Experiment():
         self.measure(queue, pid_list, period=period)
 
     @processify
-    def measure_yourself(self, queue, period=1):
+    def measure_yourself(self, queue, period=1, model=None, input_size=None):
         """
         """
+        current_pid = queue.get()
         current_process = psutil.Process(os.getppid())
         pid_list = [current_process.pid] + [
             child.pid for child in current_process.children(recursive=True)
         ]
+        pid_list.remove(current_pid)
+
+        if model is not None:
+            if input_size is None:
+                raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
+            summary = model_complexity.get_summary(model, input_size)
+            self.db_driver.save_model_card(summary)
+
         self.measure(queue, pid_list, period=period)
 
     def measure(self, queue, pid_list, period=1):
