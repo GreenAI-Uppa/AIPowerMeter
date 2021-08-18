@@ -2,7 +2,7 @@
 
 Record the energy consumption of your cpu and gpu. 
 
-It is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
+This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
 
 ## Requirements
 
