@@ -248,6 +248,8 @@ class ExpResults():
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
         r = integrate(metric)[-1]
+        if len(metric) == 1:
+            return r
         return r /( metric[-1]['date'] - metric[0]['date'])
 
     def print(self):
@@ -271,8 +273,8 @@ class ExpResults():
             mem_use_abs = self.average_('mem_use_abs')
             mem_use_uss = self.average_('mem_use_uss')
 
-            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
-            print("CPU consumption:", total_cpu_power, "joules, your consumption: ", rel_cpu_power, "joules")
+            print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+            print("Total CPU consumption:", total_cpu_power, "joules, your experiment consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power, "joules")
             print("total psys power: ",total_psys_power, "joules")
         if self.gpu_metrics is not None:
