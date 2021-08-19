@@ -8,7 +8,7 @@ This repo is largely inspired from this [experiment Tracker](https://github.com/
 
 Running Average Power Limit (RAPL) and its linux interface : powercap 
 
-RAPL is introduced in the Intel processors starting with the SkyLake version. 
+RAPL is introduced in the Intel processors starting with the SkyLake version in 2015. 
 
 Your linux os supports RAPL if the following folder is not empty:
 ```
