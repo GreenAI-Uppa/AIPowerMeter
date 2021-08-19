@@ -215,6 +215,10 @@ class ExpResults():
     def __init__(self, db_driver):
         self.db_driver = db_driver
         self.cpu_metrics, self.gpu_metrics, self.exp_metrics = self.db_driver.load_metrics()
+        if self.cpu_metrics is None and self.gpu_metrics is None and self.exp_metrics is None:
+            raise Exception('I could not load any recordings from folder',
+            self.db_driver,
+            '.\n Please check that the folder contains valid recordings')
         self.model_card = self.db_driver.get_model_card(self)
 
 
