@@ -1,10 +1,14 @@
-from deep_learning_power_measure.power_measure import experiment, parsers
-import time, argparse
+"""
+Recording of a simple experiment where a random image is fed multiple times to a convolutional layer
+"""
+import argparse
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from deep_learning_power_measure.power_measure import experiment, parsers
 
-parser = argparse.ArgumentParser(description='Run a convolution layer on random input and record the energy consumption')
+parser = argparse.ArgumentParser(
+    description='Run convolution layer on random input and record the energy consumption'
+    )
 parser.add_argument('--output_folder',
                     help='directory to save the energy consumption records',
                     default='measure_power', type=str)
@@ -13,11 +17,13 @@ args = parser.parse_args()
 
 # defining a small network with one convolution layer
 class Conv(nn.Module):
+    """one conv layer model"""
     def __init__(self):
-        super(Conv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(3,1, (3,3))
-    def forward(self, x):
-        return self.conv(x)
+    def forward(self, input_data):
+        """forward pass"""
+        return self.conv(input_data)
 net = Conv()
 
 
@@ -30,30 +36,30 @@ data = torch.randn(input_size)
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
 # instantiating the experiment.
-exp = experiment.Experiment(driver) 
+exp = experiment.Experiment(driver)
 
 # starting the record, and wait two seconds between each energy consumption measurement
 # Note that it takes the model and the input as a parameter in order to give a model summary
 p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
 # using gpu if available
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-net.to(device)
-data = data.to(device)
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+net.to(DEVICE)
+data = data.to(DEVICE)
 
 ## starting the experiment
-n_iter = 200000
+N_ITER = 200000
 print('starting to burn the planet')
-for i in range(n_iter):
+for i in range(N_ITER):
     out = net(data)
     if i%10000 == 0:
-        print(i,'over',n_iter,'iterations')
+        print(i,'over',N_ITER,'iterations')
 q.put(experiment.STOP_MESSAGE)
 ## end of the experiment
 
 ### displaying the result of the experiment.
-from deep_learning_power_measure.power_measure import experiment, parsers
 # reinstantiating a parser to reload the result.
-# a reload function should be used, but this way, it shows how to read results from a past experiment
+# a reload function should be used, but this way,
+# it shows how to read results from a past experiment
 driver = parsers.JsonParser(args.output_folder)
 exp_result = experiment.ExpResults(driver)
 exp_result.print()
