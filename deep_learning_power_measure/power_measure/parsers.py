@@ -8,9 +8,6 @@ class JsonParser():
         cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
         self.folder = folder
-        if not os.path.isfolder(folder):
-            raise Exception('You called JsonParser(',folder,') but this folder does not exist')
-
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         if not os.path.isdir(self.folder):
