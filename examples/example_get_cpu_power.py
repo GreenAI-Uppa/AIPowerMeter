@@ -1,4 +1,4 @@
-from power_consumption_measure.power_measure import rapl, rapl_power
+from deep_learning_power_measure.power_measure import rapl, rapl_power
 import time
 
 print('The intel processor has one or more "packages". The package contains multiple PP0 PP1 power plane or domains. \n PP0 refers to the processor cores. \n PP1 domain refers to the power plane of a specific device in the uncore (eg the graphic card). \n DRAM corresponds to the power used by the memory.')

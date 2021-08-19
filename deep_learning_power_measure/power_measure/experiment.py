@@ -1,37 +1,93 @@
-import json
-#from thop import profile
-import datetime
+"""
+this module contains mainly two classes
+    Experiment is an entry point to start and end the recording of the power consumption of your Experiment
+    ExpResult is used to process and format the recordings.
+
+    Both classes uses a driver attribute to communicate with a database, or read and write in json files
+"""
 from functools import wraps
-import psutil
 import os
 import sys
 import traceback
 from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
+import numpy as np
+import psutil
 from . import rapl_power
 from . import gpu_power
 from . import model_complexity
 
 STOP_MESSAGE = "Stop"
 
+def joules_to_wh(n):
+    """conversion function"""
+    return n*3600/1000
+
+def integrate(metric):
+    """integral of the metric values over time"""
+    r = [0]
+    for i in range(len(metric)-1):
+        x1 = metric[i]['date']
+        x2 = metric[i+1]['date']
+        y1 = metric[i]['value']
+        y2 = metric[i+1]['value']
+        v = (x2-x1)*(y2+y1)/2
+        v += r[-1]
+        r.append(v)
+    return r
+
+def interpolate(metric1, metric2):
+    """
+    return two new metrics so that metric1 and metric2 have the same range of dates
+    """
+    x1 = [m['date'] for m in metric1]
+    x2 = [m['date'] for m in metric2]
+    x = sorted( x1 + x2)
+    y1 = [m['value'] for m in metric1]
+    y2 = [m['value'] for m in metric2]
+    y1 = np.interp(x, x1, y1)
+    y2 = np.interp(x, x2, y2)
+    metric1 = [{'date':x, 'value':v} for (x,v) in zip(x, y1) ]
+    metric2 = [{'date':x, 'value':v} for (x,v) in zip(x, y2) ]
+    return metric1, metric2
+
+def humanize_bytes(num, suffix='B'):
+    """
+    convert a float number to a human readable string to display a number of bytes
+    (copied from https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size)
+    """
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
+def time_to_sec(t):
+    """convert a date to timestamp in seconds"""
+    return t.timestamp()
+
+def cumsum(metric):
+    """simple wrapper to cumsum"""
+    return np.cumsum([ m['value'] for m in metric ])
+
 def processify(func):
     """Decorator to run a function as a process.
     The created process is joined, so the code does not
     run in parallel.
     """
-    def process_func(self, q, *args, **kwargs):
+    def process_func(self, queue, *args, **kwargs):
         try:
-            ret = func(self, q, *args, **kwargs)
+            ret = func(self, queue, *args, **kwargs)
         except Exception as e:
             ex_type, ex_value, tb = sys.exc_info()
             error = ex_type, ex_value, "".join(traceback.format_tb(tb))
             ret = None
-            q.put((ret, error))
+            queue.put((ret, error))
             raise e
         else:
             error = None
-        q.put((ret, error))
+        queue.put((ret, error))
 
     # register original function with different name
     # in sys.modules so it is pickable
@@ -49,7 +105,13 @@ def processify(func):
 
 
 class Experiment():
-    def __init__(self, driver, model=None, input_size=None, cont=False):
+    """
+    This class provides the method to start an experiment
+    by launching a thread which will record the power draw.
+    The recording can be ended by sending a stop message
+    to this thread
+    """
+    def __init__(self, driver, cont=False):
         """
         wrapper class with the methods in charge of recording
         cpu and gpu uses
@@ -67,7 +129,10 @@ class Experiment():
         self.rapl_available, msg = rapl_power.is_rapl_compatible()
         self.nvidia_available = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
-            raise Exception("\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "+ msg)
+            raise Exception(
+            "\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "
+            + msg
+            )
         if not self.rapl_available:
             print("rapl not available, " + msg)
         else:
@@ -78,16 +143,27 @@ class Experiment():
             print("GPU power will be measured with nvidia")
 
     def save_model_card(self, model, input_size, device='cpu'):
+        """
+        get a model summary and save it
+
+        model : pytorch model
+        input_size : input_size for this model (batch_size, *input_data_size)
+        """
+        if model is None and input_size is None:
+            raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
         summary = model_complexity.get_summary(model, input_size, device=device)
         self.db_driver.save_model_card(summary)
 
     @processify
-    def measure_from_pid_list(self, queue, pids, period=1):
+    def measure_from_pid_list(self, queue, pid_list, period=1, model=None, input_size=None):
+        """record power use for the processes given in pid_list"""
+        self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     @processify
     def measure_yourself(self, queue, period=1, model=None, input_size=None):
         """
+        record power use for the process which calls this method
         """
         current_pid = queue.get()
         current_process = psutil.Process(os.getppid())
@@ -95,16 +171,18 @@ class Experiment():
             child.pid for child in current_process.children(recursive=True)
         ]
         pid_list.remove(current_pid)
-
-        if model is not None:
-            if input_size is None:
-                raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
-            summary = model_complexity.get_summary(model, input_size, device='cpu')
-            self.db_driver.save_model_card(summary)
-
+        self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     def measure(self, queue, pid_list, period=1):
+        """
+        performs power use recording
+
+        queue : queue used to communicate to the thread which ask
+        for the recording
+        pid_list : the recording will be done for these process
+        period : waiting time between two RAPL samples.
+        """
         print("we'll take the measure of the following pids", pid_list)
         while True:
             time.sleep(period)
@@ -124,25 +202,16 @@ class Experiment():
             except EmptyQueueException:
                 pass
 
-    def dump_exp_metric(self, metrics):
-        self.parser.save_exp_metrics(metrics)
-
 class ExpResults():
+    """
+    Process the power recording from an experiment.
+    The actual reading of the recording is done by the driver.
+    """
     def __init__(self, db_driver):
         self.db_driver = db_driver
         self.cpu_metrics, self.gpu_metrics, self.exp_metrics = self.db_driver.load_metrics()
         self.model_card = self.db_driver.get_model_card(self)
 
-    def get_max_acc_and_time(self):
-        max_acc = round(max(self.metrics['test_accuracy']['values'] )* 100)/100
-        #import pdb; pdb.set_trace()
-        num_epochs_to_get_max_acc = min( [ i for (i,v) in enumerate(self.metrics['test_accuracy']['values']) if round(v * 100)/100 == max_acc  ])
-        training_time = sum(self.metrics['training_time']['values'][:num_epochs_to_get_max_acc])
-        return training_time, max_acc
-
-    #@staticmethod maybe better to be non static because it can changes in function of the Experiment instances
-    def time_to_sec(self, t):
-        return t.timestamp()
 
     def get_curve(self, name):
         """
@@ -153,76 +222,33 @@ class ExpResults():
         """
         if self.cpu_metrics is not None:
             if name in self.cpu_metrics:
-                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.cpu_metrics[name]['dates'], self.cpu_metrics[name]['values']) ]
+                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.cpu_metrics[name]['dates'], self.cpu_metrics[name]['values']) ]
 
         if self.gpu_metrics is not None:
             if name in self.gpu_metrics:
-                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) ]
+                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) ]
 
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
-                return [{'date':self.time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
+                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
         return None
 
-    def cumsum(self, metric):
-        return np.cumsum([ m['value'] for m in metric ])
-
-    def integrate(self, metric):
-        r = [0]
-        for i in range(len(metric)-1):
-            x1 = metric[i]['date']
-            x2 = metric[i+1]['date']
-            y1 = metric[i]['value']
-            y2 = metric[i+1]['value']
-            v = (x2-x1)*(y2+y1)/2
-            v += r[-1]
-            r.append(v)
-        return r
-
     def total_(self, metric_name):
+        """Total value for this metric. For instance if the metric is in watt and the time in seconds,
+        the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
-        return self.integrate(metric)[-1]
+        return integrate(metric)[-1]
 
     def average_(self, metric_name):
+        """take the average of a metric"""
         metric = self.get_curve(metric_name)
-        r = self.integrate(metric)[-1]
+        r = integrate(metric)[-1]
         return r /( metric[-1]['date'] - metric[0]['date'])
 
-    def wtowh(self, xs):
-        return [ x/3600 for x in xs]
-
-    def interpolate(self, metric1, metric2):
-        x1 = [m['date'] for m in metric1]
-        x2 = [m['date'] for m in metric2]
-        x = sorted( x1 + x2)
-        y1 = [m['value'] for m in metric1]
-        y2 = [m['value'] for m in metric2]
-        y1 = np.interp(x, x1, y1)
-        y2 = np.interp(x, x2, y2)
-        metric1 = [{'date':x, 'value':v} for (x,v) in zip(x, y1) ]
-        metric2 = [{'date':x, 'value':v} for (x,v) in zip(x, y2) ]
-        return metric1, metric2
-
-    def total_energy_consumed(unit='Wh'):
-        # integration
-        delta_sec = driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][-1]) - driver.e.time_to_sec(driver.e.metrics['nvidia_draw_absolute']['dates'][0])
-        self.metrics['nvidia_draw_absolute']
-
-    def humanize_bytes(self, num, suffix='B'):
-        """
-        convert a float number to a human readable string to display a number of bytes
-        (copied from https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size)
-        """
-        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
-            if abs(num) < 1024.0:
-                return "%3.1f%s%s" % (num, unit, suffix)
-            num /= 1024.0
-        return "%.1f%s%s" % (num, 'Yi', suffix)
-
-    def joules_to_wh(self, n):
-        return n*3600/1000
-
     def print(self):
+        """
+        simple print of the experiment summary
+        """
         print("============================================ EXPERIMENT SUMMARY ============================================")
         if self.model_card is not None:
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass")
@@ -238,10 +264,12 @@ class ExpResults():
             rel_dram_power = self.total_('per_process_dram_power')
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('mem_use_abs')
-            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",self.humanize_bytes(mem_use_abs))
+            mem_use_uss = self.average_('mem_use_uss')
+
+            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
             print("CPU consumption:", total_cpu_power, "joules, your consumption: ", rel_cpu_power, "joules")
-            print("total intel power: ", total_intel_power)
-            print("total psys power: ",total_psys_power)
+            print("total intel power: ", total_intel_power, "joules")
+            print("total psys power: ",total_psys_power, "joules")
         if self.gpu_metrics is not None:
             print()
             print()
@@ -249,4 +277,4 @@ class ExpResults():
             rel_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
             abs_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
             nvidia_mem_use_abs = self.average_("nvidia_mem_use")
-            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',self.humanize_bytes(nvidia_mem_use_abs))
+            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))

@@ -1,23 +1,25 @@
-# deep_learning_power_measure
+# Measure the efficiency of your deep learning
 
 Record the energy consumption of your cpu and gpu. 
 
-It is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
+This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
 
 ## Requirements
 
-RAPL is introduced in the Intel processors starting with the SkyLake version. 
+Running Average Power Limit (RAPL) and its linux interface : powercap 
 
-To check if your linux os is supporting RAPL, you can check that the following folder is not empty.
+RAPL is introduced in the Intel processors starting with the SkyLake version in 2015. 
+
+Your linux os supports RAPL if the following folder is not empty:
 ```
 /sys/class/powercap/intel-rapl/
 ```
 
-Note that it might take some months before the linux kernel add supports of recent version of intel cpus.
+Empty folder? If your cpu is very recent, it is worth to check the most recent linux kernels.
 
 ## Installation
 
-this repo has been tested with torch 1.9.0
+Install pytorch, then,
 ```
 pip install -r requirements.txt
 python setup.py install
@@ -30,19 +32,17 @@ sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 
 ## Usage
 
-See `examples/example_exp_deep_learning.py` to run and measure the energy consumption of one experiment. 
+See `examples/example_exp_deep_learning.py`.
 
 Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.
 
 ```
 from deep_learning_power_measure.power_measure import experiment, parsers
 
-model = ... define your pytorch model
-input_size = ... this information enables count the number of mac operations
 driver = parsers.JsonParser("output_folder")
 exp = experiment.Experiment(driver)
 
-p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+p, q = exp.measure_yourself(period=2)
 ###################
 #  place here the code that you want to profile
 ################
@@ -58,3 +58,12 @@ driver = parsers.JsonParser(output_folder)
 exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
+### model card
+We use a wrapper for [torchinfo](https://pypi.org/project/torchinfo/) to extract statistics about your model. 
+To obtain them, add additional parameters:
+```
+net = ... the model you are using for your experiment 
+input_size = ... (batch_size, *data_point_shape)
+p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+
+```

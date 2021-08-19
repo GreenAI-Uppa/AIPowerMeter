@@ -28,12 +28,6 @@ def is_nvidia_compatible():
         return False
     return True
 
-def get_gpu_power():
-    p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
-    outs, errors = p.communicate()
-    #xml = fromstring(outs)
-    return outs
-
 def get_gpu_use_pmon(nsample=1):
     """
     Find per process per gpu usage info
@@ -117,6 +111,8 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     first, get gpu usage per process
        nsample indicates the number of queries to nvidia
     second get the power use of nvidia
+    then for each gpu and for each process in pid_list
+        compute its attributatble power
     """
     process_percentage_used_gpu = get_gpu_use_pmon(nsample=nsample)
 
@@ -167,8 +163,8 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
         power_this_gpu = float(power_draw.replace("W", ""))
         gpu_data["power_readings"] = {"power_draw": power_this_gpu}
 
-        per_gpu_power_draw[gpu_id] = power_this_gpu 
-        absolute_power += power_this_gpu 
+        per_gpu_power_draw[gpu_id] = power_this_gpu
+        absolute_power += power_this_gpu
 
         # processes
         processes = gpu.findall("processes")[0]
@@ -211,7 +207,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
                     performance_state = gpu.findall("performance_state")[0].text
                     per_gpu_performance_states[gpu_id] = performance_state
 
-                power += sm_relative_percent * power_this_gpu 
+                power += sm_relative_percent * power_this_gpu
                 # want a proportion value rather than percentage
                 per_gpu_absolute_percent_usage[gpu_id] += sm_absolute_percent / 100.0
                 per_gpu_relative_percent_usage[gpu_id] += sm_relative_percent
