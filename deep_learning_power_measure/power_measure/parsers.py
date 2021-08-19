@@ -19,7 +19,6 @@ class JsonParser():
         os.makedirs(self.folder)
 
     def save_model_card(self, model_card):
-        print('saving model', self.model_card_file)
         json.dump(model_card, open(self.model_card_file, 'w'))
 
     def save_power_metrics(self, metrics):
