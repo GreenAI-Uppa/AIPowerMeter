@@ -2,4 +2,3 @@ torchinfo
 psutil
 numpy
 pandas
-networkx
