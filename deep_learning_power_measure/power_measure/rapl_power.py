@@ -19,53 +19,7 @@ def is_rapl_compatible():
         return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Can you change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/ ")
     return (True, "rapl ok")
 
-def get_pids():
-    """
-    return a tree where each node corresponds to a running process
-    the parent-child in the tree follows the parent child process relations, ie a child process had been launched by its father
-    """
-    process_tree = nx.DiGraph()
-    for proc in psutil.process_iter():
-        try:
-            process_tree.add_node(proc.pid)
-            process_tree.nodes[proc.pid]['name'] = proc.name()
-            process_tree.nodes[proc.pid]['user'] = proc.username()
-            for child in proc.children(recursive=False):
-                process_tree.add_edge(proc.pid, child.pid)
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-    return process_tree
-
 _timer = getattr(time, "monotonic", time.time)
-
-def get_process_tree():
-    """
-    process_tree : return a networkx tree of the processes currently running on this machine. A child process corresponds to a process launched by its father.
-
-    check the following code to visualise the tree with matplotlib :
-
-    labels = nx.get_node_attributes(process_tree, 'user')
-    import matplotlib.pyplot as plt
-    from networkx.drawing.nx_agraph import graphviz_layout
-    pos = graphviz_layout(process_tree, prog="twopi", args="")
-    plt.figure(figsize=(8, 8))
-    nx.draw(process_tree, pos, labels=labels, node_size=20, alpha=0.5, node_color="blue", with_labels=True)
-    plt.axis("equal")
-    plt.show()
-
-    """
-    process_tree = nx.DiGraph()
-    for proc in psutil.process_iter():
-        try:
-            process_tree.add_node(proc.pid)
-            process_tree.nodes[proc.pid]['name'] = proc.name()
-            process_tree.nodes[proc.pid]['user'] = proc.username()
-            for child in proc.children(recursive=False):
-                process_tree.add_edge(proc.pid, child.pid)
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-    return process_tree
-
 
 def get_info_time(process_list, zombies=None):
     """
