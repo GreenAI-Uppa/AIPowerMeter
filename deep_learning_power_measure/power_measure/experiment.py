@@ -149,7 +149,10 @@ class Experiment():
         model : pytorch model
         input_size : input_size for this model (batch_size, *input_data_size)
         """
-        if model is None and input_size is None:
+        if model is None:
+            raise Exception('You tried to compute the model card with the parameter model set to None')
+
+        if model is not None and input_size is None:
             raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
         summary = model_complexity.get_summary(model, input_size, device=device)
         self.db_driver.save_model_card(summary)
@@ -157,7 +160,8 @@ class Experiment():
     @processify
     def measure_from_pid_list(self, queue, pid_list, period=1, model=None, input_size=None):
         """record power use for the processes given in pid_list"""
-        self.save_model_card(model, input_size, device='cpu')
+        if model is not None:
+            self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     @processify
@@ -171,7 +175,8 @@ class Experiment():
             child.pid for child in current_process.children(recursive=True)
         ]
         pid_list.remove(current_pid)
-        self.save_model_card(model, input_size, device='cpu')
+        if model is not None:
+            self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     def measure(self, queue, pid_list, period=1):
