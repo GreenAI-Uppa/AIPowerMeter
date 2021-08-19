@@ -149,7 +149,10 @@ class Experiment():
         model : pytorch model
         input_size : input_size for this model (batch_size, *input_data_size)
         """
-        if model is None and input_size is None:
+        if model is None:
+            raise Exception('You tried to compute the model card with the parameter model set to None')
+
+        if model is not None and input_size is None:
             raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
         summary = model_complexity.get_summary(model, input_size, device=device)
         self.db_driver.save_model_card(summary)
@@ -157,7 +160,8 @@ class Experiment():
     @processify
     def measure_from_pid_list(self, queue, pid_list, period=1, model=None, input_size=None):
         """record power use for the processes given in pid_list"""
-        self.save_model_card(model, input_size, device='cpu')
+        if model is not None:
+            self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     @processify
@@ -171,7 +175,8 @@ class Experiment():
             child.pid for child in current_process.children(recursive=True)
         ]
         pid_list.remove(current_pid)
-        self.save_model_card(model, input_size, device='cpu')
+        if model is not None:
+            self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     def measure(self, queue, pid_list, period=1):
@@ -210,6 +215,10 @@ class ExpResults():
     def __init__(self, db_driver):
         self.db_driver = db_driver
         self.cpu_metrics, self.gpu_metrics, self.exp_metrics = self.db_driver.load_metrics()
+        if self.cpu_metrics is None and self.gpu_metrics is None and self.exp_metrics is None:
+            raise Exception('I could not load any recordings from folder: "' +
+            self.db_driver.folder +
+            '".\n Please check that the folder contains valid recordings')
         self.model_card = self.db_driver.get_model_card(self)
 
 
@@ -243,6 +252,8 @@ class ExpResults():
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
         r = integrate(metric)[-1]
+        if len(metric) == 1:
+            return r
         return r /( metric[-1]['date'] - metric[0]['date'])
 
     def print(self):
@@ -266,8 +277,8 @@ class ExpResults():
             mem_use_abs = self.average_('mem_use_abs')
             mem_use_uss = self.average_('mem_use_uss')
 
-            print("RAM consumption:", total_dram_power, "joules, your consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
-            print("CPU consumption:", total_cpu_power, "joules, your consumption: ", rel_cpu_power, "joules")
+            print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+            print("Total CPU consumption:", total_cpu_power, "joules, your experiment consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power, "joules")
             print("total psys power: ",total_psys_power, "joules")
         if self.gpu_metrics is not None:

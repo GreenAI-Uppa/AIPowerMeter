@@ -10,8 +10,6 @@ class JsonParser():
         self.folder = folder
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
-        if not os.path.isdir(self.folder):
-            os.makedirs(self.folder)
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
 
     def erase(self):
@@ -19,9 +17,13 @@ class JsonParser():
         os.makedirs(self.folder)
 
     def save_model_card(self, model_card):
+        if not os.path.isdir(self.folder):
+            os.makedirs(self.folder)
         json.dump(model_card, open(self.model_card_file, 'w'))
 
     def save_power_metrics(self, metrics):
+        if not os.path.isdir(self.folder):
+            os.makedirs(self.folder)
         power_metric_fileout = open(self.power_metric_filename,'a')
         today_str = datetime.datetime.now().__str__()
         data = { 'date': today_str, 'metrics': metrics }
@@ -29,6 +31,8 @@ class JsonParser():
         power_metric_fileout.write(json_str+'\n')
 
     def save_exp_metrics(self, metrics):
+        if not os.path.isdir(self.folder):
+            os.makedirs(self.folder)
         exp_metric_fileout = open(self.exp_metric_filename,'a')
         today_str = datetime.datetime.now().__str__()
         data = { 'date': today_str, 'metrics': metrics }
@@ -36,8 +40,8 @@ class JsonParser():
         exp_metric_fileout.write(json_str+'\n')
 
     def get_model_card(self, folder):
-        assert os.path.isfile(self.model_card_file)
-        return json.load(open(self.model_card_file))
+        if os.path.isfile(self.model_card_file):
+            return json.load(open(self.model_card_file))
 
     def load_cpu_metrics(self):
         if os.path.isfile(self.power_metric_filename):
