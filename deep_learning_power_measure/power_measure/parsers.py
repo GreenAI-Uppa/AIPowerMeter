@@ -36,8 +36,8 @@ class JsonParser():
         exp_metric_fileout.write(json_str+'\n')
 
     def get_model_card(self, folder):
-        assert os.path.isfile(self.model_card_file)
-        return json.load(open(self.model_card_file))
+        if os.path.isfile(self.model_card_file):
+            return json.load(open(self.model_card_file))
 
     def load_cpu_metrics(self):
         if os.path.isfile(self.power_metric_filename):
