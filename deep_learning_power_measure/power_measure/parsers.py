@@ -13,8 +13,9 @@ class JsonParser():
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
 
     def erase(self):
-        shutil.rmtree(self.folder)
-        os.makedirs(self.folder)
+        if  os.path.isdir(self.folder):
+            shutil.rmtree(self.folder)
+            os.makedirs(self.folder)
 
     def save_model_card(self, model_card):
         if not os.path.isdir(self.folder):

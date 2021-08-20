@@ -6,6 +6,7 @@ def to_bytes(num: int) -> float:
 
 def get_summary(model, input_size, device=None):
     """input_size (batch_size, *input_shape)"""
+    print('summary',device)
     summ = summary(model, input_size=input_size, device=device)
     data = {"input_size": summ.input_size,
             "total_params":summ.total_params,
