@@ -64,6 +64,6 @@ To obtain them, add additional parameters:
 ```
 net = ... the model you are using for your experiment 
 input_size = ... (batch_size, *data_point_shape)
-p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+exp = experiment.Experiment(driver, model=net, input_size=input_size)
 
 ```

@@ -36,11 +36,11 @@ data = torch.randn(input_size)
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
 # instantiating the experiment.
-exp = experiment.Experiment(driver)
+exp = experiment.Experiment(driver, model=net, input_size=input_size)
 
 # starting the record, and wait two seconds between each energy consumption measurement
 # Note that it takes the model and the input as a parameter in order to give a model summary
-p, q = exp.measure_yourself(period=2, model=net, input_size=input_size)
+p, q = exp.measure_yourself(period=2)
 # using gpu if available
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 net.to(DEVICE)

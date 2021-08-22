@@ -111,7 +111,7 @@ class Experiment():
     The recording can be ended by sending a stop message
     to this thread
     """
-    def __init__(self, driver, cont=False):
+    def __init__(self, driver, model=None, input_size=None, cont=False):
         """
         wrapper class with the methods in charge of recording
         cpu and gpu uses
@@ -126,6 +126,10 @@ class Experiment():
         self.db_driver = driver
         if not cont:
             driver.erase()
+        if model is not None:
+            device = 'cpu'
+            model.to(device)
+            self.save_model_card(model, input_size, device=device)
         self.rapl_available, msg = rapl_power.is_rapl_compatible()
         self.nvidia_available = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
@@ -158,14 +162,14 @@ class Experiment():
         self.db_driver.save_model_card(summary)
 
     @processify
-    def measure_from_pid_list(self, queue, pid_list, period=1, model=None, input_size=None):
+    def measure_from_pid_list(self, queue, pid_list, period=1):
         """record power use for the processes given in pid_list"""
         if model is not None:
-            self.save_model_card(model, input_size, device='cpu')
+            self.save_model_card(model)
         self.measure(queue, pid_list, period=period)
 
     @processify
-    def measure_yourself(self, queue, period=1, model=None, input_size=None):
+    def measure_yourself(self, queue, period=1):
         """
         record power use for the process which calls this method
         """
@@ -175,8 +179,6 @@ class Experiment():
             child.pid for child in current_process.children(recursive=True)
         ]
         pid_list.remove(current_pid)
-        if model is not None:
-            self.save_model_card(model, input_size, device='cpu')
         self.measure(queue, pid_list, period=period)
 
     def measure(self, queue, pid_list, period=1):
