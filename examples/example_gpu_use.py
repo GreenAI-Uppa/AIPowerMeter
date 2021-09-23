@@ -5,4 +5,4 @@ import re
 from collections import OrderedDict
 from io import StringIO
 
-print(gpu_power.get_gpu_use(nsample=1))
+print(gpu_power.get_gpu_use_pmon(nsample=1))
