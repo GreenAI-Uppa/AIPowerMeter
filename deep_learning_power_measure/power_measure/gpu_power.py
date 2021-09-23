@@ -96,13 +96,15 @@ def get_gpu_use(gpu):
 def get_gpu_power(gpu):
     power_readings = gpu.findall("power_readings")[0]
     power_draw = power_readings.findall("power_draw")[0].text
+    if power_draw  == 'N/A':
+        raise Exception("nvidia-smi could not retrieve power draw from the nvidia card. Check that it is supported on your hardware ?")
     power_draw = float(power_draw.replace("W", ""))
     return {"power_draw": power_draw}
 
 def get_gpu_data(gpu):
     gpu_data = {}
     gpu_data["memory"] = get_gpu_mem(gpu)
-    gpu_data["utilization"] = get_gpu_data(gpu)
+    gpu_data["utilization"] = get_gpu_use(gpu)
     gpu_data["power_readings"] = get_gpu_power(gpu)
     return gpu_data
 

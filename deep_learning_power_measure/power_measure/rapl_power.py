@@ -1,12 +1,7 @@
 # sudo chmod -R 555 /sys/class/powercap/intel-rapl/
-import os, time, numpy as np
-import json
+import os, time
 import psutil
 import warnings
-import networkx as nx
-import sys
-from functools import wraps
-import traceback
 from multiprocessing import Process, Queue
 
 from . import rapl
