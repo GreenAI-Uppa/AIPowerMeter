@@ -27,10 +27,13 @@ p.start()
 while True:
     np.matmul(a,b)
     try:
-        msg = q.get(block=False)
-        print(msg)
-        total_percent = sum(msg.values())
-        print("our programm used ", total_percent, "of the cpu times when we were measuring")
+        mem_pss_per_process, mem_uss_per_process = q.get(block=False)
+        uss = sum(mem_uss_per_process.values())
+        pss = sum(mem_pss_per_process.values())
+        print("USS value : ", uss,  " : 'Unique Set Size', this is the memory which is unique to a process and which would be freed if the process was terminated right now")
+        print("PSS (or rss if not available ):", pss, "  : 'Proportional Set Size', is the amount of memory shared with other processes. Linux only")
+        print()
+        print("Our programm used ", uss + pss, "bytes from the memory")
         break
     except EmptyQueueException:
         pass

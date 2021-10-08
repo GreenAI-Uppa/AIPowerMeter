@@ -22,6 +22,8 @@ STOP_MESSAGE = "Stop"
 
 def joules_to_wh(n):
     """conversion function"""
+    if hasattr(n, '__iter__'):
+        return [i*3600/1000 for i in n]
     return n*3600/1000
 
 def integrate(metric):
@@ -250,6 +252,9 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         return integrate(metric)[-1]
 
+    def duration(self):
+        pass
+
     def average_(self, metric_name):
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
@@ -287,7 +292,7 @@ class ExpResults():
             print()
             print()
             print("on the gpu")
-            rel_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
+            rel_nvidia_power = self.total_('nvidia_draw_absolute')
             abs_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
             nvidia_mem_use_abs = self.average_("nvidia_mem_use")
             print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))

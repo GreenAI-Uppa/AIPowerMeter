@@ -1,12 +1,7 @@
 # sudo chmod -R 555 /sys/class/powercap/intel-rapl/
-import os, time, numpy as np
-import json
+import os, time
 import psutil
 import warnings
-import networkx as nx
-import sys
-from functools import wraps
-import traceback
 from multiprocessing import Process, Queue
 
 from . import rapl
@@ -240,8 +235,7 @@ def get_metrics(pid_list, pause = 2.0):
     mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
-    intel_power, dram_power, cpu_power,  uncore_power, psys_power = get_power(s2 - s1)
-    print('cpu_power',cpu_power)
+    intel_power, dram_power, cpu_power, uncore_power, psys_power = get_power(s2 - s1)
     cpu_power_use = get_rel_power(cpu_uses, cpu_power)
     print('cpu_power_use', cpu_power_use)
     dram_power_use = get_rel_power(mem_uses, dram_power)
