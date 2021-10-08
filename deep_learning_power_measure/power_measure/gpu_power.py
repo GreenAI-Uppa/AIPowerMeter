@@ -26,6 +26,14 @@ def is_nvidia_compatible():
         return False
     if "NVIDIA-SMI has failed".lower() in output.lower():
         return False
+    xml = get_nvidia_xml()
+    for gpu_id, gpu in enumerate(xml.findall("gpu")):
+        try:
+            get_gpu_data(gpu)
+        except:
+            return False
+        break
+
     return True
 
 def get_gpu_use_pmon(nsample=1):
@@ -103,10 +111,17 @@ def get_gpu_power(gpu):
 
 def get_gpu_data(gpu):
     gpu_data = {}
+    gpu_data["name"] = name
     gpu_data["memory"] = get_gpu_mem(gpu)
     gpu_data["utilization"] = get_gpu_use(gpu)
     gpu_data["power_readings"] = get_gpu_power(gpu)
     return gpu_data
+
+def get_nvidia_xml():
+    p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
+    outs, errors = p.communicate()
+    xml = fromstring(outs)
+    return xml
 
 def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     """
@@ -119,9 +134,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     process_percentage_used_gpu = get_gpu_use_pmon(nsample=nsample)
 
     # this commmand provides the full xml output
-    p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
-    outs, errors = p.communicate()
-    xml = fromstring(outs)
+    xml = get_nvidia_xml()
     num_gpus = int(xml.findall("attached_gpus")[0].text)
     results = []
     power = 0
@@ -138,6 +151,8 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
     for gpu_id, gpu in enumerate(xml.findall("gpu")):
         gpu_data = {}
         per_gpu_mem_use[gpu_id] = {}
+
+        #gpu_data = get_gpu_data(gpu)
 
         name = gpu.findall("product_name")[0].text
         gpu_data["name"] = name
@@ -165,7 +180,9 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
         power_this_gpu = float(power_draw.replace("W", ""))
         gpu_data["power_readings"] = {"power_draw": power_this_gpu}
 
-        per_gpu_power_draw[gpu_id] = power_this_gpu
+
+
+        per_gpu_power_draw[gpu_id] = gpu_data["power_readings"]["power_draw"] # power_this_gpu
         absolute_power += power_this_gpu
 
         # processes

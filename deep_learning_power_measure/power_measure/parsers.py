@@ -1,16 +1,20 @@
 import json, glob, os, numpy as np, datetime, shutil
 
 class JsonParser():
-    def __init__(self, folder : str):
+    def __init__(self, location : str):
         """
         JSonParser will save the recordings of the experiment as json files
         folder : the location where the json will be saved, it will be created if it does not exist
         cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
-        self.folder = folder
-        self.power_metric_filename = self.folder + '/power_metrics.json'
-        self.exp_metric_filename = self.folder + '/results_exp.json'
-        self.model_card_file = os.path.join(self.folder,'model_summary.json')
+        if os.path.isdir(location):
+            self.folder = location
+            self.power_metric_filename = self.folder + '/power_metrics.json'
+            self.exp_metric_filename = self.folder + '/results_exp.json'
+            self.model_card_file = os.path.join(self.folder,'model_summary.json')
+        elif os.path.isfile(location):
+            self.power_metric_filename = location
+
 
     def erase(self):
         if  os.path.isdir(self.folder):
@@ -90,15 +94,19 @@ class JsonParser():
     def load_exp_metrics(self):
         if os.path.isfile(self.exp_metric_filename):
             results = json.load(open(self.exp_metric_filename))
+            metrics = {}
             for result in results:
+                if isinstance(results, dict):
+                    result = results[result]
                 date = datetime.datetime.fromisoformat(result['end_training_epoch'])
                 for k in result:
                     if k == 'end_training_epoch':
                         continue
                     if k not in metrics:
-                        self.metrics[k] = {'dates':[], 'values':[]}
+                        metrics[k] = {'dates':[], 'values':[]}
                     metrics[k]['dates'].append(date)
                     metrics[k]['values'].append(result[k])
+            return metrics
 
 
     def load_metrics(self):

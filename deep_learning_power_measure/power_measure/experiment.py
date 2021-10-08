@@ -22,6 +22,8 @@ STOP_MESSAGE = "Stop"
 
 def joules_to_wh(n):
     """conversion function"""
+    if hasattr(n, '__iter__'):
+        return [i*3600/1000 for i in n]
     return n*3600/1000
 
 def integrate(metric):
