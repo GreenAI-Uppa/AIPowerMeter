@@ -31,9 +31,9 @@ def is_nvidia_compatible():
         try:
             get_gpu_data(gpu)
         except:
+            print("Exception")
             return False
         break
-
     return True
 
 def get_gpu_use_pmon(nsample=1):
@@ -111,6 +111,7 @@ def get_gpu_power(gpu):
 
 def get_gpu_data(gpu):
     gpu_data = {}
+    name = gpu.findall("product_name")[0].text
     gpu_data["name"] = name
     gpu_data["memory"] = get_gpu_mem(gpu)
     gpu_data["utilization"] = get_gpu_use(gpu)
