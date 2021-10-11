@@ -7,13 +7,10 @@ class JsonParser():
         folder : the location where the json will be saved, it will be created if it does not exist
         cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
-        if os.path.isdir(location):
-            self.folder = location
-            self.power_metric_filename = self.folder + '/power_metrics.json'
-            self.exp_metric_filename = self.folder + '/results_exp.json'
-            self.model_card_file = os.path.join(self.folder,'model_summary.json')
-        elif os.path.isfile(location):
-            self.power_metric_filename = location
+        self.folder = location
+        self.power_metric_filename = self.folder + '/power_metrics.json'
+        self.exp_metric_filename = self.folder + '/results_exp.json'
+        self.model_card_file = os.path.join(self.folder,'model_summary.json')
 
 
     def erase(self):
