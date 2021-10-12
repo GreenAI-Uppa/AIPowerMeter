@@ -11,6 +11,7 @@ Welcome to IA Power Meter's documentation!
    :caption: Contents:
 
    usage/installation
+   background/background
 
 
 
