@@ -5,7 +5,7 @@ It uses [Sphynx](https://www.sphinx-doc.org/en/master/), so first you should ins
 
 ### usage
 
-- Modifiy the .rst file in the `docsrc` folder
+- Modifiy the .rst files in the `docsrc` folder
 
 - Build the documentation into the `docs` folder
 ```
@@ -15,11 +15,11 @@ sphinx-build -b html docsrc/ docs
 - commit and push `docsrc` and `docs`
 
 
-The documentation will be available [on line](https://greenai-uppa.github.io/IAPowerMeter/)
+And the documentation will be available on the [github page](https://greenai-uppa.github.io/IAPowerMeter/)
 
 ### Tips
 
-Add the docstring from the library
+Use autodoc to add the docstrings, for instance:
 ```
 .. autofunction:: deep_learning_power_measure.power_measure.experiment.Experiment
 ```
