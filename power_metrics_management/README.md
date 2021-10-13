@@ -15,7 +15,7 @@ __input_format
 
 Where *latency.json* countains an array with all latencies you need.
 
-## usage
+## Usage
 
 Four arguments have to be specified when you run the main function.
 - **output**: can be "csv", "full" or "cube"
