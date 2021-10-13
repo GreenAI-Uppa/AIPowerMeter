@@ -1,15 +1,17 @@
-# Power Metric Management 
+# Power Metric Management 
 
-Make use of `concat_power_measure.py` to merge your multiple power_metrics.json.
+Make use of *concat_power_measure.py* to merge your multiple power_metrics.json.
 
 ## Requirements 
 
 Following architecture is required:
 
-____input_format
-    |____run_x
-        |____power_metrics.json
-        |____latency.json
+```
+__input_format
+  |__run_x
+     |__power_metrics.json
+     |__latency.json
+```
 
 Where *latency.json* countains an array with all latencies you need.
 
