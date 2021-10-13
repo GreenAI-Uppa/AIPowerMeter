@@ -11,6 +11,14 @@ import os, sys, json, re, statistics, pandas as pd
 # file_to_write = '/data/mfrancois/measure/res.csv'
 
 def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
+    """Merge several power_metrics.json located in several directories.
+
+    Args:
+        output (str): Can be "csv", "full" or "cube". Defaults to 'csv'.
+        main_folder (str): Path where the previous required architecture is.. Defaults to None.
+        n_iterations (dict): Number iteration inside one power_metrics.json. If various number of iterations have been used then use this format: {'folder': number_of_iteration}. Defaults to None.
+        file_to_write (str): Output path/file where to write your data. Defaults to None.
+    """
     global cube, full_data
     folders = os.listdir(main_folder)
     # fitre sur les noms de dossier : doivent contenir 'input'
