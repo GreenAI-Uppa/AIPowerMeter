@@ -114,6 +114,7 @@ def get_power(diff):
             "It seems that power estimates from Intel RAPL are coming back 0, this indicates a problem."
         )
     print('total_cpu_power', total_cpu_power)
+    assert total_intel_power >= 0 and total_dram_power >= 0 and total_cpu_power >= 0 and total_uncore_power >= 0   
     return total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
