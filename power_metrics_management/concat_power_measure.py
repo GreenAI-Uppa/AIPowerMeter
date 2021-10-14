@@ -21,7 +21,6 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
     """
     if main_folder is None or n_iterations is None or file_to_write is None:
         raise ValueError('Missing argument')
-
     
     global cube, full_data
     folders = os.listdir(main_folder)
@@ -66,13 +65,22 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
                 'sm': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_average_estimated_utilization_absolute', 'sm'])/n,
                 'latency': statistics.median(full_data[folder][sub_folder]['latency'])/n,
             }
-            
+
+    write_data(path=file_to_write, output=output)
+
+def write_data(path, output):
+    """write data
+
+    Args:
+        path (str): output path
+        output (str): output format
+    """
     if output == 'csv':
-        get_csv(path=file_to_write)
+        get_csv(path=path)
     elif output == 'full':
-        get_raw(path=file_to_write)
+        get_raw(path=path)
     else: 
-        get_cube(path=file_to_write)
+        get_cube(path=path)
 
 def get_cube(path):
     """write cube data
