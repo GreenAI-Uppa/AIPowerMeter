@@ -11,6 +11,7 @@ import os, sys, json, re, statistics, pandas as pd
 # file_to_write = '/data/mfrancois/measure/res.csv'
 
 def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
+    
     """Merge several power_metrics.json located in several directories.
 
     Args:
@@ -19,6 +20,7 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
         n_iterations (int): Number of iteration to create one power_metrics.json. If various number of iterations have been used, please use this format: {'folder_name': number_of_iteration} instead of int. Defaults to None.
         file_to_write (str): Output path/file where to write your data. Defaults to None.
     """
+    
     if main_folder is None or n_iterations is None or file_to_write is None:
         raise ValueError('Missing argument')
     
@@ -160,18 +162,20 @@ def calc_median(power_metrics, metrics):
     return n * med
 
 
-def get_value(power_metrics, metrics):
+def get_value(power_metrics=None, metrics=None, debug=False):
     """travel across dictionary
 
     Args:
-        power_metrics (dict): dictionnary
-        metrics (list): keys way to get the target value  
-
+        power_metrics (dict): dictionnary. Defaults to None.
+        metrics (list): keys way to get the target value. Defaults to None.
+        debug (bool): print running step. Defaults to False.
+        
     Returns:
         float: return the target value 
     """
     for metric in metrics:
-        print(f'running on {metric}')
+        if debug:
+            print(f'running on {metric}')
         if metric == 'pid':
             power_metrics = list(power_metrics.values())[0]
         elif metric == 'sm':
