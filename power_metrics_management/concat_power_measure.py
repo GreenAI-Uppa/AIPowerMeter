@@ -15,10 +15,14 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
 
     Args:
         output (str): Can be "csv", "full" or "cube". Defaults to 'csv'.
-        main_folder (str): Path where the previous required architecture is.. Defaults to None.
-        n_iterations (dict): Number iteration inside one power_metrics.json. If various number of iterations have been used then use this format: {'folder': number_of_iteration}. Defaults to None.
+        main_folder (str): Path where the previous required architecture is. Defaults to None.
+        n_iterations (int): Number of iteration to create one power_metrics.json. If various number of iterations have been used, please use this format: {'folder_name': number_of_iteration} instead of int. Defaults to None.
         file_to_write (str): Output path/file where to write your data. Defaults to None.
     """
+    if main_folder is None or n_iterations is None or file_to_write is None:
+        raise ValueError('Missing argument')
+
+    
     global cube, full_data
     folders = os.listdir(main_folder)
     # fitre sur les noms de dossier : doivent contenir 'input'
@@ -49,17 +53,18 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             full_data[folder][sub_folder]['latency'] = json.load(f)
             f.close()
 
+            n = n_iterations[folder] if type(n_iterations) is dict else n_iterations
                 
             # concatenation des lists par la médiane
             # cube processing
             cube[folder][sub_folder] = {
-                'intel_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'intel_power'])/n_iterations[folder],
-                'total_cpu_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'total_cpu_power'])/n_iterations[folder],
-                'mem_use_abs': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'mem_use_abs', 'pid'])/n_iterations[folder],
-                'nvidia_estimated_attributable_power_draw': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'nvidia_estimated_attributable_power_draw'])/n_iterations[folder],
-                'per_gpu_attributable_mem_use': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_attributable_mem_use', '0', 'pid'])/n_iterations[folder],
-                'sm': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_average_estimated_utilization_absolute', 'sm'])/n_iterations[folder],
-                'latency': statistics.median(full_data[folder][sub_folder]['latency'])/n_iterations[folder],
+                'intel_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'intel_power'])/n,
+                'total_cpu_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'total_cpu_power'])/n,
+                'mem_use_abs': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'mem_use_abs', 'pid'])/n,
+                'nvidia_estimated_attributable_power_draw': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'nvidia_estimated_attributable_power_draw'])/n,
+                'per_gpu_attributable_mem_use': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_attributable_mem_use', '0', 'pid'])/n,
+                'sm': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_average_estimated_utilization_absolute', 'sm'])/n,
+                'latency': statistics.median(full_data[folder][sub_folder]['latency'])/n,
             }
             
     if output == 'csv':
