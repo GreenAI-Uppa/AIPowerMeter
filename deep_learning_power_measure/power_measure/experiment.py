@@ -144,9 +144,9 @@ class Experiment():
             + msg
             )
         if not self.rapl_available:
-            print("rapl not available, " + msg)
+            print("RAPL not available: " + msg)
         else:
-            print("CPU power will be measured with rapl")
+            print(msg)
         if not self.nvidia_available:
             print("nvidia not available, the power of the gpu won't be measured")
         else:

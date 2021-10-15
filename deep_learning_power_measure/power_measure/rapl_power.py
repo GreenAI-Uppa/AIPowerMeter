@@ -9,10 +9,37 @@ rapl_dir = "/sys/class/powercap/intel-rapl/"
 
 def is_rapl_compatible():
     if not os.path.isdir(rapl_dir):
-        return (False, "cannot find directory "+rapl_dir + " maybe modify the value in rapl_power.rapl_dir")
+        return (False, "cannot find rapl directory in "+rapl_dir)
     if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
-        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Can you change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/ ")
-    return (True, "rapl ok")
+        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/")
+
+    sample = rapl.RAPLSample()
+    domain_names = set()
+    s1 = sample.take_sample()
+    for d in s1.domains:
+        domain = s1.domains[d]
+        domain_names.add(domain.name)
+        for sd in domain.subdomains:
+            subdomain = domain.subdomains[sd]
+            domain_names.add(subdomain.name)
+    msg = "RAPL available:\n"
+    if 'dram' not in domain_names and 'ram' not in domain_names:
+        msg += 'RAM related energy consumption NOT available\n'
+    else:
+        msg += 'RAM related energy consumption available\n'
+    if 'core' not in domain_names and 'cpu' not in domain_names:
+            msg += 'CPU core related energy consumption NOT available\n'
+    else:
+        msg += 'CPU core related energy consumption available\n'
+    if 'uncore' not in domain_names:
+            msg += 'uncore related energy consumption NOT available\n'
+    else:
+        msg += 'uncore related energy consumption available\n'
+    if 'psys' not in domain_names:
+            msg += 'System on Chip related energy consumption NOT available\n'
+    else:
+        msg += 'System on Chip related energy consumption available\n'
+    return (True, msg)
 
 _timer = getattr(time, "monotonic", time.time)
 
@@ -120,7 +147,7 @@ def get_power(diff):
     if 'ram' in domains_found or 'dram' in domains_found:
         power_metrics['dram_power'] = total_dram_power
     if 'core' in domains_found or 'cpu' in domains_found:
-        power_metrics['cpu_power'] = total_cpu_power 
+        power_metrics['cpu_power'] = total_cpu_power
     if 'uncore' in domains_found:
         power_metrics['uncore_power'] = total_uncore_power
     return power_metrics #total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
