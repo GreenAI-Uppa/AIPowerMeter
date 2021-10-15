@@ -98,7 +98,7 @@ def get_power(diff):
             subdomain = domain.subdomains[sd]
             power = diff.average_power(package=domain.name, domain=subdomain.name)
             subdomain = subdomain.name.lower()
-            print(subdomain, power)
+            #print(subdomain, power)
             if subdomain == "ram" or subdomain == "dram":
                 total_dram_power += power
             elif subdomain == "core" or subdomain == "cpu":
@@ -113,7 +113,7 @@ def get_power(diff):
         raise ValueError(
             "It seems that power estimates from Intel RAPL are coming back 0, this indicates a problem."
         )
-    print('total_cpu_power', total_cpu_power)
+    #print('total_cpu_power', total_cpu_power)
     return total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
@@ -237,7 +237,7 @@ def get_metrics(pid_list, pause = 2.0):
     s2 = sample.take_sample()
     intel_power, dram_power, cpu_power, uncore_power, psys_power = get_power(s2 - s1)
     cpu_power_use = get_rel_power(cpu_uses, cpu_power)
-    print('cpu_power_use', cpu_power_use)
+    #print('cpu_power_use', cpu_power_use)
     dram_power_use = get_rel_power(mem_uses, dram_power)
     metrics = {
         'mem_use_abs':mem_pss_per_process,
