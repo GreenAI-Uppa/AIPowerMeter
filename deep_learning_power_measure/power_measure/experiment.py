@@ -26,10 +26,14 @@ def joules_to_wh(n):
         return [i*3600/1000 for i in n]
     return n*3600/1000
 
-def integrate(metric):
+def integrate(metric, start=None, end=None):
     """integral of the metric values over time"""
     r = [0]
-    for i in range(len(metric)-1):
+    if start is None:
+        start = 0
+    if end is None:
+        end = len(metric)-1
+    for i in range(start, end):
         x1 = metric[i]['date']
         x2 = metric[i+1]['date']
         y1 = metric[i]['value']
@@ -45,7 +49,7 @@ def interpolate(metric1, metric2):
     """
     x1 = [m['date'] for m in metric1]
     x2 = [m['date'] for m in metric2]
-    x = sorted( x1 + x2)
+    x = sorted( set(x1 + x2))
     y1 = [m['value'] for m in metric1]
     y2 = [m['value'] for m in metric2]
     y1 = np.interp(x, x1, y1)
@@ -250,7 +254,10 @@ class ExpResults():
         """Total value for this metric. For instance if the metric is in watt and the time in seconds,
         the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
+        if metric is None:
+            return None
         return integrate(metric)[-1]
+
 
     def duration(self):
         pass
@@ -258,6 +265,8 @@ class ExpResults():
     def average_(self, metric_name):
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
+        if metric is None:
+            return None
         r = integrate(metric)[-1]
         if len(metric) == 1:
             return r
@@ -284,8 +293,14 @@ class ExpResults():
             mem_use_abs = self.average_('mem_use_abs')
             mem_use_uss = self.average_('mem_use_uss')
 
-            print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
-            print("Total CPU consumption:", total_cpu_power, "joules, your experiment consumption: ", rel_cpu_power, "joules")
+            if total_dram_power is None:
+                print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+            else:
+                print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+            if total_cpu_power is None:
+                print("CPU consumption not available")
+            else:
+                print("Total CPU consumption:", total_cpu_power, "joules, your experiment consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power, "joules")
             print("total psys power: ",total_psys_power, "joules")
         if self.gpu_metrics is not None:
@@ -296,3 +311,6 @@ class ExpResults():
             rel_nvidia_power = self.total_('nvidia_estimated_attributable_power_draw')
             nvidia_mem_use_abs = self.average_("nvidia_mem_use")
             print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
+        else:
+            print()
+            print("gpu consumption not available")
