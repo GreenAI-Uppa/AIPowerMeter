@@ -70,7 +70,6 @@ class JsonParser():
                 result = json.loads(line)
                 if 'gpu' in result['metrics']:
                     date = datetime.datetime.fromisoformat(result['date'])
-
                     for k in ['nvidia_estimated_attributable_power_draw', 'nvidia_draw_absolute']:
                         v = result['metrics']['gpu'][k]
                         if k not in metrics:

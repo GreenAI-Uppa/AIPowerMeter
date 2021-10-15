@@ -67,6 +67,7 @@ def get_power(diff):
     total_uncore_power = 0
     psys_power = -1
     total = 0
+    domains_found = set()
     for d in diff.domains:
         domain = diff.domains[d]
         power = diff.average_power(package=domain.name)
@@ -87,7 +88,6 @@ def get_power(diff):
         if domain.name == "psys":  # skip SoC aggregate reporting
             psys_power = power
             continue
-
         if "package" not in domain.name:
             raise NotImplementedError(
                 "Unexpected top level domain for RAPL package. Not yet supported."
@@ -98,6 +98,7 @@ def get_power(diff):
             subdomain = domain.subdomains[sd]
             power = diff.average_power(package=domain.name, domain=subdomain.name)
             subdomain = subdomain.name.lower()
+            domains_found.add(subdomain)
             print(subdomain, power)
             if subdomain == "ram" or subdomain == "dram":
                 total_dram_power += power
@@ -107,14 +108,19 @@ def get_power(diff):
                 total_uncore_power += power
             # other domains get don't have relevant readouts to give power attribution, therefore
             # will get assigned the same amount of credit as the CPU
-
     ## this block should be put much higher the stack, in another function
     if total_intel_power == 0:
         raise ValueError(
             "It seems that power estimates from Intel RAPL are coming back 0, this indicates a problem."
         )
     print('total_cpu_power', total_cpu_power)
-    assert total_intel_power >= 0 and total_dram_power >= 0 and total_cpu_power >= 0 and total_uncore_power >= 0   
+    print(domains_found)
+    if 'ram' not in domains_found and 'dram' not in domains_found:
+        total_dram_power = -1
+    if 'core' not in domains_found and 'cpu' not in domains_found:
+        total_cpu_power = -1
+    if 'uncore' not in domains_found:
+        total_uncore_power = -1
     return total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
@@ -237,20 +243,21 @@ def get_metrics(pid_list, pause = 2.0):
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
     intel_power, dram_power, cpu_power, uncore_power, psys_power = get_power(s2 - s1)
-    cpu_power_use = get_rel_power(cpu_uses, cpu_power)
-    print('cpu_power_use', cpu_power_use)
-    dram_power_use = get_rel_power(mem_uses, dram_power)
     metrics = {
         'mem_use_abs':mem_pss_per_process,
         'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses,
         'intel_power' :intel_power,
-        'total_cpu_power':cpu_power,
-        'total_dram_power':dram_power,
         'uncore_power':uncore_power,
-        'per_process_cpu_power':cpu_power_use,
-        'per_process_dram_power':dram_power_use,
         'psys_power':psys_power
     }
+    if cpu_power == -1:
+        cpu_power_use = get_rel_power(cpu_uses, cpu_power)
+        metrics['per_process_cpu_power'] = cpu_power_use
+        metrics['total_cpu_power'] = cpu_power
+    if dram_power == -1:
+        dram_power_use = get_rel_power(mem_uses, dram_power)
+        metrics['per_process_dram_power'] = dram_power_use
+        metrics['total_dram_power'] = dram_power
     if len(mem_uss_per_process) > 0:
         metrics['mem_use_uss'] = mem_uss_per_process
     return metrics
