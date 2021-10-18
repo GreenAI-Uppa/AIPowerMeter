@@ -7,10 +7,10 @@ Make use of *concat_power_measure.py* to merge your multiple power_metrics.json.
 Following architecture is required:
 
 ```
-__input_format
-  |__run_x
-     |__power_metrics.json
-     |__latency.json
+└── input_format
+   └── run_x
+      ├──power_metrics.json
+      └──latency.json
 ```
 
 Where *latency.json* countains an array with all latencies you need.
