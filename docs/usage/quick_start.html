@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick start &#8212; IA Power Meter  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Background on power measure" href="../background/background.html" />
+    <link rel="prev" title="Welcome to AI Power Meter’s documentation!" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hardware-requirements">
+<h2>Hardware requirements<a class="headerlink" href="#hardware-requirements" title="Permalink to this headline">¶</a></h2>
+<p><strong>CPU</strong> power measure is done with RAPL.
+Support is ensured on intel processor since Sandy Bridge architecture.</p>
+<p>To see if your processor is compatible, first check that the CPU is a GenuineIntel:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cat /proc/cpuinfo <span class="p">|</span> grep vendor <span class="p">|</span> uniq <span class="p">|</span> awk <span class="s1">&#39;{print $3}&#39;</span>
+<span class="go">GenuineIntel</span>
+</pre></div>
+</div>
+<p><strong>GPU</strong> will be measured by nvidia-smi.
+Again, not all gpu cards (for ex: Jetson Nano board) include the required sensors.</p>
+<p>A quick check is to run
+.. code-block:: console</p>
+<blockquote>
+<div><p>$ nvidia-smi -q -x</p>
+</div></blockquote>
+<p>and search if the xml output contains values at the “power_readings” field.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
+<span class="gp">$</span> pip install -r requirements.txt
+<span class="gp">$</span> python setup.py install
+</pre></div>
+</div>
+</div>
+<div class="section" id="measuring-my-first-program">
+<h2>Measuring my first program<a class="headerlink" href="#measuring-my-first-program" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py">examples/example_exp_deep_learning.py</a>.</p>
+<p>Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="s2">&quot;output_folder&quot;</span><span class="p">)</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Experiment</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">measure_yourself</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">###################</span>
+<span class="c1">#  place here the code that you want to profile</span>
+<span class="c1">################</span>
+<span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">STOP_MESSAGE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">IA Power Meter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-requirements">Hardware requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measuring-my-first-program">Measuring my first program</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="in_details.html">In details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to AI Power Meter’s documentation!</a></li>
+      <li>Next: <a href="../background/background.html" title="next chapter">Background on power measure</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, GreenAIUppa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/quick_start.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

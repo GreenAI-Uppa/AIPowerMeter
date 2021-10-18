@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Background on power measure &#8212; IA Power Meter  documentation</title>
+    <title>Insights into energy consumption &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -15,8 +15,7 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="In details" href="../usage/in_details.html" />
-    <link rel="prev" title="Quick start" href="../usage/quick_start.html" />
+    <link rel="prev" title="Good practices" href="../usage/good_practices.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,23 +32,19 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="background-on-power-measure">
-<h1>Background on power measure<a class="headerlink" href="#background-on-power-measure" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="general-considerations">
-<h2>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h2>
-<p>Main sources of energy consumption are the gpu, the cpu and memory.</p>
-<p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives</p>
+  <div class="section" id="insights-into-energy-consumption">
+<h1>Insights into energy consumption<a class="headerlink" href="#insights-into-energy-consumption" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="experimental-protocol">
+<h2>Experimental protocol<a class="headerlink" href="#experimental-protocol" title="Permalink to this headline">¶</a></h2>
+<p>rational behind our procedure, we show the energy consumption of standard deep learning models with different sizes of inputs</p>
+<p>Select an input size</p>
+<p>How many iterations</p>
 </div>
-<div class="section" id="cpu-and-rapl">
-<h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
-<p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption</p>
-<p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
-<p>Add ref to the finnish guys</p>
+<div class="section" id="resnet-cnns">
+<h2>Resnet CNNs<a class="headerlink" href="#resnet-cnns" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="gpu-and-nvidia-smi">
-<h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
-<p>description of nvidia-smi
-Things are more simple, and unfortunately because we have much less information.</p>
+<div class="section" id="bert-transformers">
+<h2>Bert Transformers<a class="headerlink" href="#bert-transformers" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -72,23 +67,22 @@ Things are more simple, and unfortunately because we have much less information.
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../usage/quick_start.html">Quick start</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Background on power measure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#general-considerations">General considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/in_details.html">In details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/good_practices.html">Good practices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Insights into energy consumption</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#experimental-protocol">Experimental protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resnet-cnns">Resnet CNNs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bert-transformers">Bert Transformers</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../usage/quick_start.html" title="previous chapter">Quick start</a></li>
-      <li>Next: <a href="../usage/in_details.html" title="next chapter">In details</a></li>
+      <li>Previous: <a href="../usage/good_practices.html" title="previous chapter">Good practices</a></li>
   </ul></li>
 </ul>
 </div>
@@ -122,7 +116,7 @@ Things are more simple, and unfortunately because we have much less information.
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="../_sources/background/background.rst.txt"
+      <a href="../_sources/experiments/experiments.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

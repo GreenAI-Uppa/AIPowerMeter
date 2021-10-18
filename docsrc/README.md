@@ -1,4 +1,4 @@
-## Documentation
+## How to contribute to this documentation
 
 It uses [Sphynx](https://www.sphinx-doc.org/en/master/), so first you should install it. 
 
@@ -19,12 +19,27 @@ And the documentation will be available on the [github page](https://greenai-upp
 
 ### Tips
 
-Use autodoc to add the docstrings, for instance:
+- Use autodoc to add the docstrings, for instance:
 ```
 .. autofunction:: deep_learning_power_measure.power_measure.experiment.Experiment
 ```
 
-Sphynx documentation for the [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) format
+- Sphynx documentation for the [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) format
+
+- adding sections
+
+Create a file, which header will contain the section title, eg with `usage/quick_start.rst`:
+```
+Quick start
+===========
+```
+Then, add the file path to the toc in the `index.rst`
+```
+.. toctree::
+   :maxdepth: 2
+
+   usage/quick_start
+```
 
 ### TODO 
 
