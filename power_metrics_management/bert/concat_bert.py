@@ -10,6 +10,7 @@ n_iterations = {
     'input_400': 6000,
     'input_500': 5000,
 }
+# n_iterations = 5000
 file_to_write = '/data/mfrancois/measure/res.csv'
 
 # apply concatenation and write it in csv file 
