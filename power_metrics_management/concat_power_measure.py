@@ -1,4 +1,4 @@
-import os, sys, json, re, statistics, pandas as pd
+import os, sys, json, re, statistics, pandas as pd, numpy as np
 
 # main_folder = '/data/mfrancois/measure'
 # n_iterations = {
@@ -49,11 +49,14 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             metrics = [json.loads(line) for line in f]
             full_data[folder][sub_folder]['metrics'] = [json.loads(line) for line in f]
             f.close()
-
-            f = open(f'{main_folder}/{folder}/{sub_folder}/latency.json')
-            full_data[folder][sub_folder]['latency'] = json.load(f)
-            f.close()
-
+            
+            if 'latency.json' in os.listdir(f'{main_folder}/{folder}/{sub_folder}'):
+                f = open(f'{main_folder}/{folder}/{sub_folder}/latency.json')
+                full_data[folder][sub_folder]['latency'] = json.load(f)
+                f.close()
+            else: 
+                full_data[folder][sub_folder]['latency'] = np.loadtxt(f'{main_folder}/{folder}/{sub_folder}/latency.csv').tolist()
+            
             n = n_iterations[folder] if type(n_iterations) is dict else n_iterations
                 
             # concatenation des lists par la médiane
