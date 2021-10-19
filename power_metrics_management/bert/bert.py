@@ -1,6 +1,6 @@
-import torch, numpy as np, pandas as pd, sys, time, os, time, json, argparse
-sys.path.append('/home/mfrancois/Documents/')
-from iapowermeter.deep_learning_power_measure.power_measure import experiment, parsers
+import torch, sys, time, os, time, json, argparse
+sys.path.append('../..')
+from deep_learning_power_measure.power_measure import experiment, parsers
 from transformers import BertTokenizer, BertForSequenceClassification
 
 # main params
