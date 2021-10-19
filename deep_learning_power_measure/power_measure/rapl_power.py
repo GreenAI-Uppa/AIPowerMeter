@@ -126,7 +126,7 @@ def get_power(diff):
             power = diff.average_power(package=domain.name, domain=subdomain.name)
             subdomain = subdomain.name.lower()
             domains_found.add(subdomain)
-            print(subdomain, power)
+            #print(subdomain, power)
             if subdomain == "ram" or subdomain == "dram":
                 total_dram_power += power
             elif subdomain == "core" or subdomain == "cpu":
