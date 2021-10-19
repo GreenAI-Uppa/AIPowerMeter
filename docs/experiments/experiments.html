@@ -46,7 +46,27 @@
 </div>
 <div class="section" id="alexnet-study">
 <h2>Alexnet study<a class="headerlink" href="#alexnet-study" title="Permalink to this headline">¶</a></h2>
-<p>As a gentle start, we measure the consumption of a vanilla <a class="reference external" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">Alexnet</a> on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.</p>
+<p>As a gentle start, we measure the consumption at inference of a vanilla <a class="reference external" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">Alexnet</a> on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.</p>
+<p>We first import necessary modules for power draws and torch models downloads.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="kn">as</span> <span class="nn">models</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+</pre></div>
+</div>
+<p>We then load Alexnet model and push it into our GeForce RTX 3090 GPU.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#load your favorite model</span>
+<span class="n">alexnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1">#choose your favorite device</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Using {} device&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+<span class="c1">#load the model to the device</span>
+<span class="n">alexnet</span> <span class="o">=</span> <span class="n">alexnet</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="resnet-study">
 <h2>Resnet study<a class="headerlink" href="#resnet-study" title="Permalink to this headline">¶</a></h2>

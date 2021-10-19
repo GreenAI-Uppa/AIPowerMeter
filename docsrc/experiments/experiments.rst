@@ -19,7 +19,31 @@ For each set of experiments, power measurements are written into severals power_
 
 Alexnet study
 --------------
-As a gentle start, we measure the consumption of a vanilla `Alexnet <https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html>`_ on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.
+As a gentle start, we measure the consumption at inference of a vanilla `Alexnet <https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html>`_ on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.
+
+We first import necessary modules for power draws and torch models downloads.
+
+.. code-block:: python
+
+  import time, os
+  import numpy as np
+  from deep_learning_power_measure.power_measure import experiment, parsers
+  import torchvision.models as models
+  import torch
+
+We then load Alexnet model and push it into our GeForce RTX 3090 GPU.
+
+.. code-block:: python
+
+  #load your favorite model
+  alexnet = models.alexnet(pretrained=True)
+  
+  #choose your favorite device
+  device = 'cuda' if torch.cuda.is_available() else 'cpu'
+  print('Using {} device'.format(device))
+  
+  #load the model to the device
+  alexnet = alexnet.to(device)
 
 
 Resnet study
