@@ -106,7 +106,6 @@ def integrate(date, watt):
         y1 = watt[i]
         y2 = watt[i+1]
         v.append((x2-x1)*(y2+y1)/2)
-    print(v)
     return statistics.median(v)*len(v)
 
 def write_data(path, output):
