@@ -11,6 +11,7 @@ It uses [Sphynx](https://www.sphinx-doc.org/en/master/), so first you should ins
 ```
 sphinx-build -b html docsrc/ docs
 ```
+- open docs/index.html in a web browser to visualise locally the new version
 
 - commit and push `docsrc` and `docs`
 
