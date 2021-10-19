@@ -19,7 +19,7 @@ For each set of experiments, power measurements are written into severals power_
 
 Alexnet study
 --------------
-
+As a gentle start, we measure the consumption of a vanilla `Alexnet <https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html>`_ on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.
 
 
 Resnet study
