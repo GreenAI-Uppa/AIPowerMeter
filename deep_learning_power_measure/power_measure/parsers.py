@@ -41,7 +41,7 @@ class JsonParser():
         json_str = json.dumps(data)
         exp_metric_fileout.write(json_str+'\n')
 
-    def get_model_card(self, folder):
+    def get_model_card(self):
         if os.path.isfile(self.model_card_file):
             return json.load(open(self.model_card_file))
 

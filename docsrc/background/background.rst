@@ -15,7 +15,7 @@ CPU and RAPL
 -----------------------------------------------------
 
 The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu). 
-It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ).
+It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ), and there has been considerable study to validate its use for software monitoring ( [Khan2018]_ ).
 
 It is divided into different physically meaningfull domains:
 
@@ -24,12 +24,12 @@ It is divided into different physically meaningfull domains:
    RAPL power domains (from [Khan2018]_ )
 
 - Power Plane 0 : the cores alias the CPU
-- Power Plane 1 : uncore : memory controller and cache, and an integrated gpu if present (this is not the external nvidia GPU). 
+- Power Plane 1 : uncore : memory controller and cache, and an integrated on chip gpu is present (this is not the external nvidia GPU). 
 - DRAM : energy consumption of the RAM
 - Psys : System on Chip energy consumption
 
 
-The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>_` and we multpily the RAPL value by the percentage of cpu and memory used.
+The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>`_ and multiply the RAPL value by the percentage of cpu and memory used.
 
 
 The rapl interface writes these values in module specific registers located in `/dev/cpu/*/msr`. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in `/sys/class/powercap/intel-rapl`.
@@ -52,6 +52,8 @@ Other tools
 -----------
 
 CarbonTracker, PAPI, Experiment-Impact-Tracker
+
+https://www.tensorflow.org/guide/profiler
 
 Bibliography
 ------------

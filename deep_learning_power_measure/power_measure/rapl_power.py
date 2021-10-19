@@ -207,6 +207,10 @@ def get_rel_power(rel_uses, power):
         power : total power used in watts
     return
         dictionnary pid : power use for this process
+
+    We use this function to multiply the entire socket consumption and gpu board
+    values by the relative usage of each process to obtain the per process energy
+    consumption.
     """
     power_per_process = {}
     for pid, rel_use in rel_uses.items():

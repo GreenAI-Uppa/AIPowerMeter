@@ -230,7 +230,7 @@ class ExpResults():
             raise Exception('I could not load any recordings from folder: "' +
             self.db_driver.folder +
             '".\n Please check that the folder contains valid recordings')
-        self.model_card = self.db_driver.get_model_card(self)
+        self.model_card = self.db_driver.get_model_card()
 
 
     def get_curve(self, name):

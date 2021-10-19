@@ -47,6 +47,12 @@ Installation
    $ python setup.py install
 
 
+If you wish to get the number of parameters and mac operations of your pytorch model, also install: 
+
+.. code-block:: console
+
+   $ pip install torchinfo
+
 Measuring my first program
 --------------------------
 
