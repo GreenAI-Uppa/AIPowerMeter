@@ -13,6 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Code Documentation" href="modules.html" />
@@ -49,6 +50,9 @@
 <cite>psys_power</cite>: System on chip consumption
 <cite>uncore_power</cite>: some graphic cards, but not nvidia gpu
 <cite>total_cpu_power</cite>: core power consumption.</p>
+<p>In other words, you have the following relations:</p>
+<div class="math notranslate nohighlight">
+\[Intel\_power = psys + uncore + total\_cpu\]</div>
 <p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
 <p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details.</p>
 <p><strong>GPU use</strong></p>
@@ -60,11 +64,11 @@
 <cite>streaming multiprocessors</cite>: streaming multiprocessors used. Analog to <cite>cpu_uses</cite> for the gpu.
 <cite>per_gpu_average_estimated_utilization_absolute</cite>: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the <cite>cpu_uses</cite> for the gpu.</p>
 </div>
+<div class="section" id="processing-the-resulting-files">
+<h2>Processing the resulting files<a class="headerlink" href="#processing-the-resulting-files" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="linking-energy-and-computation-usage">
 <h2>Linking energy and computation usage<a class="headerlink" href="#linking-energy-and-computation-usage" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="drivers">
-<h2>Drivers<a class="headerlink" href="#drivers" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -90,8 +94,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#experimental-results">Experimental results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#processing-the-resulting-files">Processing the resulting files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#drivers">Drivers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Code Documentation</a></li>

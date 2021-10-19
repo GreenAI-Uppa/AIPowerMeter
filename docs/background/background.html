@@ -13,6 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Advanced use" href="../usage/in_details.html" />
@@ -38,21 +39,46 @@
 <div class="section" id="general-considerations">
 <h2>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h2>
 <p>Main sources of energy consumption are the gpu, the cpu and memory.</p>
-<p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives</p>
+<p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives.</p>
 </div>
 <div class="section" id="cpu-and-rapl">
 <span id="rapl"></span><h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
-<p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).</p>
+<p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).
+It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ).</p>
+<p>It is divided into different physically meaningfull domains:</p>
+<div class="figure align-default" id="id4">
+<img alt="../_images/rapl_domain.png" src="../_images/rapl_domain.png" />
+<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id2"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>Power Plane 0 : the cores alias the CPU</p></li>
+<li><p>Power Plane 1 : uncore : memory controller and cache, and an integrated gpu if present (this is not the external nvidia GPU).</p></li>
+<li><p>DRAM : energy consumption of the RAM</p></li>
+<li><p>Psys : System on Chip energy consumption</p></li>
+</ul>
+<p>The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the <cite>experiment impact tracker &lt;https://github.com/Breakend/experiment-impact-tracker&gt;_</cite> and we multpily the RAPL value by the percentage of cpu and memory used.</p>
+<p>The rapl interface writes these values in module specific registers located in <cite>/dev/cpu/*/msr</cite>. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in <cite>/sys/class/powercap/intel-rapl</cite>.</p>
+<p><strong>More readings on RAPL</strong>:</p>
 <p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
-<p>Frequency of 1000Hz</p>
-<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id1"><span>[Khan2018]</span></a></p>
+<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a></p>
 </div>
 <div class="section" id="gpu-and-nvidia-smi">
 <h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
 <p>description of nvidia-smi
-Things are more simple, and unfortunately because we have much less information.</p>
+Things are more simple, and unfortunately because we have much less information.
+from the man page of <a class="reference external" href="https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en">nvidia-smi</a> : <em>The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.</em></p>
+</div>
+<div class="section" id="other-tools">
+<h2>Other tools<a class="headerlink" href="#other-tools" title="Permalink to this headline">¶</a></h2>
+<p>CarbonTracker, PAPI, Experiment-Impact-Tracker</p>
+</div>
+<div class="section" id="bibliography">
+<h2>Bibliography<a class="headerlink" href="#bibliography" title="Permalink to this headline">¶</a></h2>
 <dl class="citation">
-<dt class="label" id="khan2018"><span class="brackets"><a class="fn-backref" href="#id1">Khan2018</a></span></dt>
+<dt class="label" id="hackenberg2015"><span class="brackets"><a class="fn-backref" href="#id1">Hackenberg2015</a></span></dt>
+<dd><p>An Energy Efficiency Feature Survey of the Intel Haswell Processor.  IEEE International Parallel and Distributed Processing Symposium Workshop. 2015</p>
+</dd>
+<dt class="label" id="khan2018"><span class="brackets">Khan2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
 <dd><p>Khan et al. RAPL in Action: Experiences in Using RAPL for Power Measurements. ACM Transactions on Modeling and Performance Evaluation of Computing Systems. 2018</p>
 </dd>
 </dl>
@@ -82,6 +108,8 @@ Things are more simple, and unfortunately because we have much less information.
 <li class="toctree-l2"><a class="reference internal" href="#general-considerations">General considerations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-tools">Other tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bibliography">Bibliography</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/in_details.html">Advanced use</a></li>
