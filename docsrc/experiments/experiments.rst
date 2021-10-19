@@ -45,6 +45,48 @@ We then load Alexnet model and push it into our GeForce RTX 3090 GPU.
   #load the model to the device
   alexnet = alexnet.to(device)
 
+We then prepare the experiment protocol described above for a random 224X244 image. We choose to run 4000 inferences to let AIPowerMeter reports the power draws during 40 seconds.
+
+.. code-block:: python
+
+  #experiments protocol
+  iters = 4000#number of inferences
+  xps = 10#number of experiments to reach robustness
+  
+  #choose a resolution size
+  input_size = 224
+  
+  #create a random image
+  image_test = torch.rand(1,3,input_size,input_size)
+
+We then start the inferences and measurements.
+
+.. code-block:: python
+
+  #start of the experiments
+  for k in range(xps):
+  	print('Experience',k,'/',xps,'is running')
+  	latencies = []
+  	#AIPM
+  	input_image_size = (1,3,input_size,input_size)
+  	driver = parsers.JsonParser(os.path.join(os.getcwd(),"input_"+str(input_size)+"/run_"+str(k)))
+	exp = experiment.Experiment(driver,model=alexnet,input_size=input_image_size)
+	p, q = exp.measure_yourself(period=2)
+	start_xp = time.time()
+	for t in range(iters):
+		start_iter = time.time()
+		y = alexnet(image_test)
+		res = time.time()-start_iter
+		#print(t,'latency',res)
+		latencies.append(res)
+	q.put(experiment.STOP_MESSAGE)
+	end_xp = time.time()
+	print("power measuring stopped after",end_xp-start_xp,"seconds for experience",k,"/",xps)
+	driver = parsers.JsonParser("input_"+str(input_size)+"/run_"+str(k))
+	#write latency.csv next to power_metrics.json file
+	np.savetxt("input_"+str(input_size)+"/run_"+str(k)+"/latency.csv",np.array(latencies))
+
+
 
 Resnet study
 ------------
