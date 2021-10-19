@@ -1,9 +1,9 @@
 ## How to contribute to this documentation
 
-It uses [Sphynx](https://www.sphinx-doc.org/en/master/), so first you should install it:
+It uses [Sphinx](https://www.sphinx-doc.org/en/master/), so first you should install it:
 
 ```
-pip install sphynx
+pip install sphinx
 ```
 
 ### usage
