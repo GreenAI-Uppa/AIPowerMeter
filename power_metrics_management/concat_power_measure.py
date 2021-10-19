@@ -68,7 +68,7 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
                 'nvidia_estimated_attributable_power_draw': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'nvidia_estimated_attributable_power_draw'])/n,
                 'per_gpu_attributable_mem_use': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_attributable_mem_use', '0', 'pid'])/n,
                 'sm': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_average_estimated_utilization_absolute', 'sm'])/n,
-                'latency': statistics.median(full_data[folder][sub_folder]['latency'])/n,
+                'latency': statistics.median(full_data[folder][sub_folder]['latency']),
             }
 
     write_data(path=file_to_write, output=output)
