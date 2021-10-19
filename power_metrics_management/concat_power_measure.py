@@ -85,8 +85,19 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
     write_data(path=file_to_write, output=output)
 
 def integrate(date, watt):
-    """integral of the metric values over time"""
-    v = 0
+    """integrate x: date, y: watt
+
+    Args:
+        date (list): list of date
+        watt (list): list of watt
+
+    Raises:
+        ValueError: [description]
+
+    Returns:
+        float: estimated joule metric
+    """
+    v = []
     if len(date) != len(watt):
         raise ValueError('not the same length')
     for i in range(len(watt)-1):
@@ -94,8 +105,9 @@ def integrate(date, watt):
         x2 = datetime.datetime.fromisoformat(date[i+1]).timestamp()
         y1 = watt[i]
         y2 = watt[i+1]
-        v += (x2-x1)*(y2+y1)/2
-    return v
+        v.append((x2-x1)*(y2+y1)/2)
+    print(v)
+    return statistics.median(v)*len(v)
 
 def write_data(path, output):
     """write data
