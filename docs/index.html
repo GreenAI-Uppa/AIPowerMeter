@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to IA Power Meter’s documentation! &#8212; IA Power Meter  documentation</title>
+    <title>Welcome to AI Power Meter’s documentation! &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage" href="usage/installation.html" />
+    <link rel="next" title="Quick start" href="usage/quick_start.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,18 +32,39 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-ia-power-meter-s-documentation">
-<h1>Welcome to IA Power Meter’s documentation!<a class="headerlink" href="#welcome-to-ia-power-meter-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-ai-power-meter-s-documentation">
+<h1>Welcome to AI Power Meter’s documentation!<a class="headerlink" href="#welcome-to-ai-power-meter-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usage/installation.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quick_start.html">Quick start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/quick_start.html#hardware-requirements">Hardware requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/quick_start.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/quick_start.html#measuring-my-first-program">Measuring my first program</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="background/background.html">Background on power measure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="background/background.html#rapl-measure-on-cpu">RAPL : measure on cpu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="background/background.html#too-short-nvidia-smi-measure-on-gpu">too short nvidia-smi : measure on gpu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/background.html#general-considerations">General considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/background.html#cpu-and-rapl">CPU and RAPL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/background.html#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/in_details.html">In details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/in_details.html#more-details-on-the-json-output">More details on the json output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/in_details.html#threading">Threading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/in_details.html#experimental-results">Experimental results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/in_details.html#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/in_details.html#drivers">Drivers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/good_practices.html">Good practices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/good_practices.html#frequency-of-measure">Frequency of measure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/good_practices.html#multiple-program-on-the-same-machine">Multiple program on the same machine</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments/experiments.html">Insights into energy consumption</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="experiments/experiments.html#experimental-protocol">Experimental protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experiments/experiments.html#resnet-cnns">Resnet CNNs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experiments/experiments.html#bert-transformers">Bert Transformers</a></li>
 </ul>
 </li>
 </ul>
@@ -75,17 +96,19 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quick_start.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background/background.html">Background on power measure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/in_details.html">In details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/good_practices.html">Good practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="usage/installation.html" title="next chapter">Usage</a></li>
+      <li>Next: <a href="usage/quick_start.html" title="next chapter">Quick start</a></li>
   </ul></li>
 </ul>
 </div>

@@ -15,26 +15,26 @@ def is_nvidia_compatible():
     """
     from shutil import which
 
+    msg = "nvidia NOT available for energy consumption\n"
     if which("nvidia-smi") is None:
-        return False
-
+        return (False, msg+"nvidia-smi program is not in the path")
     # make sure that nvidia-smi doesn't just return no devices
     p = Popen(["nvidia-smi"], stdout=PIPE)
     stdout, stderror = p.communicate()
     output = stdout.decode("UTF-8")
     if "no devices" in output.lower():
-        return False
+        return (False, msg+"nvidia-smi did not found GPU device on this machine")
     if "NVIDIA-SMI has failed".lower() in output.lower():
-        return False
+        return (False, msg+output)
     xml = get_nvidia_xml()
     for gpu_id, gpu in enumerate(xml.findall("gpu")):
         try:
             get_gpu_data(gpu)
-        except:
-            print("Exception")
-            return False
+        except Exception as e:
+            return (False, msg+e.__str__())
         break
-    return True
+    msg = "GPU power will be measured with nvidia"
+    return True, msg
 
 def get_gpu_use_pmon(nsample=1):
     """

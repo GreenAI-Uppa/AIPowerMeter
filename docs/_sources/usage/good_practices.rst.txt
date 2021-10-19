@@ -1,8 +1,8 @@
-Quick start
-===========
+Good practices
+===============
 
-Installation
-------------
+Frequency of measure
+---------------------
 
 
 .. code-block:: console
@@ -13,3 +13,7 @@ Installation
 
 Check if you have the required hardware
 
+
+
+Multiple program on the same machine
+------------------------------------

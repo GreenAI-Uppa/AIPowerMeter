@@ -9,10 +9,37 @@ rapl_dir = "/sys/class/powercap/intel-rapl/"
 
 def is_rapl_compatible():
     if not os.path.isdir(rapl_dir):
-        return (False, "cannot find directory "+rapl_dir + " maybe modify the value in rapl_power.rapl_dir")
+        return (False, "cannot find rapl directory in "+rapl_dir)
     if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
-        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Can you change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/ ")
-    return (True, "rapl ok")
+        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/")
+
+    sample = rapl.RAPLSample()
+    domain_names = set()
+    s1 = sample.take_sample()
+    for d in s1.domains:
+        domain = s1.domains[d]
+        domain_names.add(domain.name)
+        for sd in domain.subdomains:
+            subdomain = domain.subdomains[sd]
+            domain_names.add(subdomain.name)
+    msg = "RAPL available:\n"
+    if 'dram' not in domain_names and 'ram' not in domain_names:
+        msg += 'RAM related energy consumption NOT available\n'
+    else:
+        msg += 'RAM related energy consumption available\n'
+    if 'core' not in domain_names and 'cpu' not in domain_names:
+            msg += 'CPU core related energy consumption NOT available\n'
+    else:
+        msg += 'CPU core related energy consumption available\n'
+    if 'uncore' not in domain_names:
+            msg += 'uncore related energy consumption NOT available\n'
+    else:
+        msg += 'uncore related energy consumption available\n'
+    if 'psys' not in domain_names:
+            msg += 'System on Chip related energy consumption NOT available\n'
+    else:
+        msg += 'System on Chip related energy consumption available\n'
+    return (True, msg)
 
 _timer = getattr(time, "monotonic", time.time)
 
@@ -67,6 +94,7 @@ def get_power(diff):
     total_uncore_power = 0
     psys_power = -1
     total = 0
+    domains_found = set()
     for d in diff.domains:
         domain = diff.domains[d]
         power = diff.average_power(package=domain.name)
@@ -87,7 +115,6 @@ def get_power(diff):
         if domain.name == "psys":  # skip SoC aggregate reporting
             psys_power = power
             continue
-
         if "package" not in domain.name:
             raise NotImplementedError(
                 "Unexpected top level domain for RAPL package. Not yet supported."
@@ -98,7 +125,8 @@ def get_power(diff):
             subdomain = domain.subdomains[sd]
             power = diff.average_power(package=domain.name, domain=subdomain.name)
             subdomain = subdomain.name.lower()
-            print(subdomain, power)
+            domains_found.add(subdomain)
+            #print(subdomain, power)
             if subdomain == "ram" or subdomain == "dram":
                 total_dram_power += power
             elif subdomain == "core" or subdomain == "cpu":
@@ -107,14 +135,22 @@ def get_power(diff):
                 total_uncore_power += power
             # other domains get don't have relevant readouts to give power attribution, therefore
             # will get assigned the same amount of credit as the CPU
-
     ## this block should be put much higher the stack, in another function
     if total_intel_power == 0:
         raise ValueError(
             "It seems that power estimates from Intel RAPL are coming back 0, this indicates a problem."
         )
-    print('total_cpu_power', total_cpu_power)
-    return total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
+    power_metrics = {
+            'intel_power': total_intel_power,
+            'psys_power':psys_power
+            }
+    if 'ram' in domains_found or 'dram' in domains_found:
+        power_metrics['dram_power'] = total_dram_power
+    if 'core' in domains_found or 'cpu' in domains_found:
+        power_metrics['cpu_power'] = total_cpu_power
+    if 'uncore' in domains_found:
+        power_metrics['uncore_power'] = total_uncore_power
+    return power_metrics #total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
     """
@@ -235,21 +271,25 @@ def get_metrics(pid_list, pause = 2.0):
     mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
-    intel_power, dram_power, cpu_power, uncore_power, psys_power = get_power(s2 - s1)
-    cpu_power_use = get_rel_power(cpu_uses, cpu_power)
-    print('cpu_power_use', cpu_power_use)
-    dram_power_use = get_rel_power(mem_uses, dram_power)
+    power_metrics = get_power(s2 - s1)
     metrics = {
         'mem_use_abs':mem_pss_per_process,
         'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses,
-        'intel_power' :intel_power,
-        'total_cpu_power':cpu_power,
-        'total_dram_power':dram_power,
-        'uncore_power':uncore_power,
-        'per_process_cpu_power':cpu_power_use,
-        'per_process_dram_power':dram_power_use,
-        'psys_power':psys_power
+        'intel_power' :power_metrics['intel_power'],
+        'psys_power':power_metrics['psys_power']
     }
+    if 'uncore_power' in power_metrics:
+        metrics['uncore_power'] = power_metrics['uncore_power'],
+    if 'cpu_power' in power_metrics:
+        cpu_power = power_metrics['cpu_power']
+        cpu_power_use = get_rel_power(cpu_uses, cpu_power)
+        metrics['per_process_cpu_power'] = cpu_power_use
+        metrics['total_cpu_power'] = cpu_power
+    if 'dram_power' in power_metrics:
+        dram_power = power_metrics['dram_power']
+        dram_power_use = get_rel_power(mem_uses, dram_power)
+        metrics['per_process_dram_power'] = dram_power_use
+        metrics['total_dram_power'] = dram_power
     if len(mem_uss_per_process) > 0:
         metrics['mem_use_uss'] = mem_uss_per_process
     return metrics

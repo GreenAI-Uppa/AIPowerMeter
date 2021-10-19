@@ -1,6 +1,10 @@
-from deep_learning_power_measure.power_measure import experiment, parsers
+from deep_learning_power_measure.power_measure import rapl_power, gpu_power, rapl 
 
-driver = parsers.JsonParser('/home/paul/data/power_measure')
+rapl_available, msg = rapl_power.is_rapl_compatible()
+print(msg)
 
-# will call the init and check if rapl or nvidia are available
-exp = experiment.Experiment(driver)
+nvidia_available, msg = gpu_power.is_nvidia_compatible()
+if nvidia_available:
+    print(msg)
+else:
+    print(msg)

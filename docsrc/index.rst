@@ -8,10 +8,12 @@ Welcome to AI Power Meter's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   usage/installation
+   usage/quick_start
    background/background
+   usage/in_details
+   usage/good_practices
+   experiments/experiments
 
 
 
