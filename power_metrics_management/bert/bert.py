@@ -40,13 +40,13 @@ def main(n_input: int):
         start_measuring(output_folder=f'{root}/{parent_folder}/{output_folder}')
 
         # model prediction
-        for i in range(n_iterations): # Attention : un range de float ne plante pas mais tourne indéfiniment
+        for _ in range(n_iterations): # Attention : un range de float ne plante pas mais tourne indéfiniment
              
             # latency calc for each predict
             since = time.time()
             
             with torch.no_grad():
-                outputs = model(**inputs)
+                _ = model(**inputs)
             
             latency.append(time.time() - since)
 
@@ -58,6 +58,11 @@ def main(n_input: int):
         f.close()
 
 def start_measuring(output_folder: str):
+    """start the consumption measure
+
+    Args:
+        output_folder (str): path where power_metrics.json will be save.
+    """
     global parser, driver, q
     driver = parsers.JsonParser(output_folder)
     exp = experiment.Experiment(driver)
@@ -67,6 +72,11 @@ def start_measuring(output_folder: str):
     print('*'*10)
 
 def end_measuring(output_folder: str):
+    """end the consumption measure
+
+    Args:
+        output_folder (str): path where power_metrics.json will be save.
+    """
     print('*'*10)
     print('Power Meter ending...')
     print('*'*10)
