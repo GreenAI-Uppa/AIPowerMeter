@@ -19,7 +19,7 @@ sphinx-build -b html docsrc/ docs
 - commit and push `docsrc` and `docs`
 
 
-And the documentation will be available on the [github page](https://greenai-uppa.github.io/IAPowerMeter/)
+And the documentation will be available on the [github page](https://greenai-uppa.github.io/AIPowerMeter/)
 
 ### Tips
 

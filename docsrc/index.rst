@@ -12,6 +12,7 @@ Welcome to AI Power Meter's documentation!
    usage/quick_start
    background/background
    usage/in_details
+   usage/modules
    usage/good_practices
    experiments/experiments
 

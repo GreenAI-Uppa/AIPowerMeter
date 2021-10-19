@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Documentation &#8212; IA Power Meter  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Good practices" href="good_practices.html" />
+    <link rel="prev" title="In details" href="in_details.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="code-documentation">
+<h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="experiment-module">
+<h2>Experiment module<a class="headerlink" href="#experiment-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="rapl-power-module">
+<h2>rapl_power module<a class="headerlink" href="#rapl-power-module" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses">
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>input :</dt><dd><p>process_list : list of psutil.Process objects</p>
+</dd>
+<dt>output:</dt><dd><p>mem_info_per_process : memory consumption for each process</p>
+<dl>
+<dt>some info from psutil documentation:</dt><dd><p>uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory which is unique to a process and which would be freed if the process was terminated right now
+pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes,
+accounted in a way that the amount is divided evenly between the processes that share it.
+I.e. if a process has 10 MBs all to itself and 10 MBs shared with another process its PSS will be 15 MBs.</p>
+<p># on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
+# so with the previous example, the result would be 20Mbs instead of 15Mbs</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gpu-power-module">
+<h2>gpu_power module<a class="headerlink" href="#gpu-power-module" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">IA Power Meter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="in_details.html">In details</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#experiment-module">Experiment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rapl-power-module">rapl_power module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gpu-power-module">gpu_power module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="in_details.html" title="previous chapter">In details</a></li>
+      <li>Next: <a href="good_practices.html" title="next chapter">Good practices</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, GreenAIUppa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/modules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

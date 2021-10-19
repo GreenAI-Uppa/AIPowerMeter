@@ -8,6 +8,7 @@ Main sources of energy consumption are the gpu, the cpu and memory.
 
 However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives
 
+
 CPU and RAPL
 -----------------------------------------------------
 
@@ -16,6 +17,7 @@ The Running Average Power Limit (RAPL) reports the accumulated energy consumptio
 
 The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.
 
+Frequency of 1000Hz
 
 Add ref to the finnish guys
 

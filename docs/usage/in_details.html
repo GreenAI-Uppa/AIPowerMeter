@@ -15,7 +15,7 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Good practices" href="good_practices.html" />
+    <link rel="next" title="Code Documentation" href="modules.html" />
     <link rel="prev" title="Background on power measure" href="../background/background.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,8 +35,17 @@
             
   <div class="section" id="in-details">
 <h1>In details<a class="headerlink" href="#in-details" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="more-details-on-the-json-output">
-<h2>More details on the json output<a class="headerlink" href="#more-details-on-the-json-output" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="experimental-results">
+<h2>Experimental results<a class="headerlink" href="#experimental-results" title="Permalink to this headline">¶</a></h2>
+<p>The json logs power and use of the CPU and GPU for the pids related to your experiment.</p>
+<p>Most of the recordings are done for each pid related to your experiments: <cite>metric_name : {… pid_i: v_i, ….}</cite></p>
+<p><strong>CPU use</strong></p>
+<p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
+<p><cite>mem_use_abs</cite>: Number of bytes. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
+<p><cite>mem_use_abs</cite>: Relative number of bytes.</p>
+<p><strong>CPU power</strong>
+check for more details on RAPL domains</p>
+<p><cite>Intel_power</cite> :</p>
 </div>
 <div class="section" id="threading">
 <h2>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h2>
@@ -49,9 +58,6 @@ The recording can be ended by sending a stop message
 to this thread</p>
 </dd></dl>
 
-</div>
-<div class="section" id="experimental-results">
-<h2>Experimental results<a class="headerlink" href="#experimental-results" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="linking-energy-and-computation-usage">
 <h2>Linking energy and computation usage<a class="headerlink" href="#linking-energy-and-computation-usage" title="Permalink to this headline">¶</a></h2>
@@ -82,13 +88,13 @@ to this thread</p>
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">In details</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#more-details-on-the-json-output">More details on the json output</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#experimental-results">Experimental results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#drivers">Drivers</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Code Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
@@ -98,7 +104,7 @@ to this thread</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../background/background.html" title="previous chapter">Background on power measure</a></li>
-      <li>Next: <a href="good_practices.html" title="next chapter">Good practices</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">Code Documentation</a></li>
   </ul></li>
 </ul>
 </div>
