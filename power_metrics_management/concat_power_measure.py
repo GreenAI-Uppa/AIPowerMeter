@@ -1,4 +1,4 @@
-import os, sys, json, re, statistics, pandas as pd, numpy as np
+import os, sys, json, re, statistics, pandas as pd, numpy as np, time, datetime
 
 # main_folder = '/data/mfrancois/measure'
 # n_iterations = {
@@ -58,20 +58,44 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
                 full_data[folder][sub_folder]['latency'] = np.loadtxt(f'{main_folder}/{folder}/{sub_folder}/latency.csv').tolist()
             
             n = n_iterations[folder] if type(n_iterations) is dict else n_iterations
-                
+
+            #convert en joules 
+            # intel_power
+            # total_cpu_power
+            # nvidia_estimated_attributable_power_draw
+            intel_power_watt = [get_value(power_metrics=metric, metrics=['metrics', 'cpu', 'intel_power']) for metric in metrics]
+            total_cpu_power = [get_value(power_metrics=metric, metrics=['metrics', 'cpu', 'total_cpu_power']) for metric in metrics]
+            nvidia_draw_absolute = [get_value(power_metrics=metric, metrics=['metrics', 'gpu', 'nvidia_draw_absolute']) for metric in metrics]
+            nvidia_estimated_attributable_power_draw = [get_value(power_metrics=metric, metrics=['metrics', 'gpu', 'nvidia_estimated_attributable_power_draw']) for metric in metrics]
+            date = [get_value(power_metrics=metric, metrics=['date']) for metric in metrics]
+
             # concatenation des lists par la médiane
             # cube processing
             cube[folder][sub_folder] = {
-                'intel_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'intel_power'])/n,
-                'total_cpu_power': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'total_cpu_power'])/n,
+                'intel_power': integrate(date=date, watt=intel_power_watt)/n,
+                'total_cpu_power': integrate(date=date, watt=total_cpu_power)/n,
                 'mem_use_abs': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'mem_use_abs', 'pid'])/n,
-                'nvidia_estimated_attributable_power_draw': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'nvidia_estimated_attributable_power_draw'])/n,
+                'nvidia_draw_absolute': integrate(date=date, watt=nvidia_draw_absolute)/n,
+                'nvidia_estimated_attributable_power_draw': integrate(date=date, watt=nvidia_estimated_attributable_power_draw)/n,
                 'per_gpu_attributable_mem_use': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_attributable_mem_use', '0', 'pid'])/n,
                 'sm': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_average_estimated_utilization_absolute', 'sm'])/n,
                 'latency': statistics.median(full_data[folder][sub_folder]['latency']),
             }
 
     write_data(path=file_to_write, output=output)
+
+def integrate(date, watt):
+    """integral of the metric values over time"""
+    v = 0
+    if len(date) != len(watt):
+        raise ValueError('not the same length')
+    for i in range(len(watt)-1):
+        x1 = datetime.datetime.fromisoformat(date[i]).timestamp()
+        x2 = datetime.datetime.fromisoformat(date[i+1]).timestamp()
+        y1 = watt[i]
+        y2 = watt[i+1]
+        v += (x2-x1)*(y2+y1)/2
+    return v
 
 def write_data(path, output):
     """write data
@@ -107,6 +131,7 @@ def to_pandas():
         'intel_power',
         'total_cpu_power',
         'mem_use_abs',
+        'nvidia_draw_absolute',
         'nvidia_estimated_attributable_power_draw',
         'per_gpu_attributable_mem_use',
         'sm',
