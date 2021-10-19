@@ -115,6 +115,9 @@ def to_pandas():
     df = pd.DataFrame.from_dict(
         {k: [statistics.median([v.get(k) for _, v in cube.get(folder).items()]) for folder in cube.keys()] for k in keys}
     )
+    ind = [folder.split('_')[1] for folder in cube.keys()]
+    df.index = ind 
+    
     print('-'*10)
     print('Dataframe transformed')
     print('-'*10)
