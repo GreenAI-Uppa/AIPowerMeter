@@ -15,7 +15,7 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="In details" href="../usage/in_details.html" />
+    <link rel="next" title="Advanced use" href="../usage/in_details.html" />
     <link rel="prev" title="Quick start" href="../usage/quick_start.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -41,16 +41,21 @@
 <p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives</p>
 </div>
 <div class="section" id="cpu-and-rapl">
-<h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
-<p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption</p>
+<span id="rapl"></span><h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
+<p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).</p>
 <p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
 <p>Frequency of 1000Hz</p>
-<p>Add ref to the finnish guys</p>
+<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id1"><span>[Khan2018]</span></a></p>
 </div>
 <div class="section" id="gpu-and-nvidia-smi">
 <h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
 <p>description of nvidia-smi
 Things are more simple, and unfortunately because we have much less information.</p>
+<dl class="citation">
+<dt class="label" id="khan2018"><span class="brackets"><a class="fn-backref" href="#id1">Khan2018</a></span></dt>
+<dd><p>Khan et al. RAPL in Action: Experiences in Using RAPL for Power Measurements. ACM Transactions on Modeling and Performance Evaluation of Computing Systems. 2018</p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -79,7 +84,8 @@ Things are more simple, and unfortunately because we have much less information.
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/in_details.html">In details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/in_details.html">Advanced use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/modules.html">Code Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/good_practices.html">Good practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
@@ -89,7 +95,7 @@ Things are more simple, and unfortunately because we have much less information.
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../usage/quick_start.html" title="previous chapter">Quick start</a></li>
-      <li>Next: <a href="../usage/in_details.html" title="next chapter">In details</a></li>
+      <li>Next: <a href="../usage/in_details.html" title="next chapter">Advanced use</a></li>
   </ul></li>
 </ul>
 </div>

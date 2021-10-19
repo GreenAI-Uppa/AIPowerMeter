@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>In details &#8212; IA Power Meter  documentation</title>
+    <title>Advanced use &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -33,8 +33,8 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="in-details">
-<h1>In details<a class="headerlink" href="#in-details" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="advanced-use">
+<h1>Advanced use<a class="headerlink" href="#advanced-use" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="experimental-results">
 <h2>Experimental results<a class="headerlink" href="#experimental-results" title="Permalink to this headline">¶</a></h2>
 <p>The json logs power and use of the CPU and GPU for the pids related to your experiment.</p>
@@ -43,21 +43,22 @@
 <p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
 <p><cite>mem_use_abs</cite>: Number of bytes. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
 <p><cite>mem_use_abs</cite>: Relative number of bytes.</p>
-<p><strong>CPU power</strong>
-check for more details on RAPL domains</p>
-<p><cite>Intel_power</cite> :</p>
-</div>
-<div class="section" id="threading">
-<h2>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class provides the method to start an experiment
-by launching a thread which will record the power draw.
-The recording can be ended by sending a stop message
-to this thread</p>
-</dd></dl>
-
+<p><strong>CPU power</strong></p>
+<p>The following metrics are in Watts:</p>
+<p><cite>Intel_power</cite>: total consumption measured by RAPL
+<cite>psys_power</cite>: System on chip consumption
+<cite>uncore_power</cite>: some graphic cards, but not nvidia gpu
+<cite>total_cpu_power</cite>: core power consumption.</p>
+<p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
+<p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details.</p>
+<p><strong>GPU use</strong></p>
+<p>sm</p>
+<p>memory</p>
+<p><strong>GPU power</strong></p>
+<p>This is done by the nvidia-smi tool supported by the NVML library of nvidia. The record are done per pid and per gpu.</p>
+<p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.
+<cite>streaming multiprocessors</cite>: streaming multiprocessors used. Analog to <cite>cpu_uses</cite> for the gpu.
+<cite>per_gpu_average_estimated_utilization_absolute</cite>: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the <cite>cpu_uses</cite> for the gpu.</p>
 </div>
 <div class="section" id="linking-energy-and-computation-usage">
 <h2>Linking energy and computation usage<a class="headerlink" href="#linking-energy-and-computation-usage" title="Permalink to this headline">¶</a></h2>
@@ -87,9 +88,8 @@ to this thread</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">In details</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#experimental-results">Experimental results</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#drivers">Drivers</a></li>
 </ul>
