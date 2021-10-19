@@ -62,6 +62,7 @@ There is a thread which is launched to record the energy of your program.
 
 You can also record the time and accuracy in the main program and then, interpolate with the energy values
 
+add the figure from the presentation
 
 Processing the resulting files
 ------------------------------

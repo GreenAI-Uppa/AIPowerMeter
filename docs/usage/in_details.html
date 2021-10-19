@@ -54,7 +54,7 @@
 <div class="math notranslate nohighlight">
 \[Intel\_power = psys + uncore + total\_cpu\]</div>
 <p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
-<p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details.</p>
+<p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details. The support for different power domains varies according to the processor model, our library will ignore not available domains.</p>
 <p><strong>GPU use</strong></p>
 <p>sm</p>
 <p>memory</p>
@@ -63,6 +63,17 @@
 <p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.
 <cite>streaming multiprocessors</cite>: streaming multiprocessors used. Analog to <cite>cpu_uses</cite> for the gpu.
 <cite>per_gpu_average_estimated_utilization_absolute</cite>: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the <cite>cpu_uses</cite> for the gpu.</p>
+</div>
+<div class="section" id="model-complexity">
+<h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this headline">¶</a></h2>
+<p>You can log the number of parameters and the number of multiply and add (mac) operations of your model.
+Currently, only pytorch is supported, and tensorflow should be supported shortly</p>
+</div>
+<div class="section" id="threading">
+<h2>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h2>
+<p>There is a thread which is launched to record the energy of your program.</p>
+<p>You can also record the time and accuracy in the main program and then, interpolate with the energy values</p>
+<p>add the figure from the presentation</p>
 </div>
 <div class="section" id="processing-the-resulting-files">
 <h2>Processing the resulting files<a class="headerlink" href="#processing-the-resulting-files" title="Permalink to this headline">¶</a></h2>
@@ -94,6 +105,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#experimental-results">Experimental results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-complexity">model complexity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#processing-the-resulting-files">Processing the resulting files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
 </ul>

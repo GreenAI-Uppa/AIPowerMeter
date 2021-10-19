@@ -2,6 +2,8 @@ Code Documentation
 ===================
 
 
+Place a general figure of the library
+
 Experiment module
 -----------------
 

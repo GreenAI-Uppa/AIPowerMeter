@@ -46,6 +46,8 @@ Installation
    $ pip install -r requirements.txt
    $ python setup.py install
 
+We provide examples for pytorch and tensorflow, but the model creation is independant from the power recording part.
+
 
 If you wish to get the number of parameters and mac operations of your pytorch model, also install: 
 

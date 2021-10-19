@@ -7,9 +7,7 @@ Experimental results
 
 The json logs power and use of the CPU and GPU for the pids related to your experiment.
 
-
 Most of the recordings are done for each pid related to your experiments: `metric_name : {... pid_i: v_i, ....}`
-
 
 
 **CPU use**
@@ -35,11 +33,9 @@ In other words, you have the following relations:
 
   Intel\_power = psys + uncore + total\_cpu
 
-
-
 For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields `per_process_cpu_power` and `per_process_dram_power`.
 
-Check the :ref:`rapl` section for more details on RAPL domains, and :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_power` for implementation details.
+Check the :ref:`rapl` section for more details on RAPL domains, and :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_power` for implementation details. The support for different power domains varies according to the processor model, our library will ignore not available domains.
 
 **GPU use**
 
@@ -55,6 +51,18 @@ This is done by the nvidia-smi tool supported by the NVML library of nvidia. The
 `streaming multiprocessors`: streaming multiprocessors used. Analog to `cpu_uses` for the gpu.
 `per_gpu_average_estimated_utilization_absolute`: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the `cpu_uses` for the gpu.
 
+model complexity
+----------------
+You can log the number of parameters and the number of multiply and add (mac) operations of your model. 
+Currently, only pytorch is supported, and tensorflow should be supported shortly
+
+Threading
+-------------------
+There is a thread which is launched to record the energy of your program. 
+
+You can also record the time and accuracy in the main program and then, interpolate with the energy values
+
+add the figure from the presentation
 
 Processing the resulting files
 ------------------------------

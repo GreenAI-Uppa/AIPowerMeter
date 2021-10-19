@@ -13,6 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Background on power measure" href="../background/background.html" />
@@ -62,6 +63,11 @@ Again, not all gpu cards (for ex: Jetson Nano board) include the required sensor
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
 <span class="gp">$</span> pip install -r requirements.txt
 <span class="gp">$</span> python setup.py install
+</pre></div>
+</div>
+<p>We provide examples for pytorch and tensorflow, but the model creation is independant from the power recording part.</p>
+<p>If you wish to get the number of parameters and mac operations of your pytorch model, also install:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install torchinfo
 </pre></div>
 </div>
 </div>

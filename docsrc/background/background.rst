@@ -8,6 +8,31 @@ Main sources of energy consumption are the gpu, the cpu and memory.
 
 However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives.
 
+Preliminaries
+-------------
+
+The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm). 
+
+The watt is the unit to measure power. 
+
+1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)
+
+1kWh = 3600000 Joules ~= 3 hours of GPU
+
+
+**And for a computer:**
+
+A computer consumes energy from different parts. This library allows you to measure the one highlighted in red.
+
+Thousands of cores to enable parallelism
+Lower amount of RAM memory available
+Higher latency : GPU clock speed < CPU clock speed
+Higher memory throughput : GPU operates on larger chunks of data
+GPU can fetch data from its RAM more quickly
+CPU bandwidth < GPU bandwidth
+Smaller set of instructions dedicated to graphics and matrix calculus
+More power hungry and requires a CPU
+Energy efficient since the computations is faster.
 
 .. _rapl:
 

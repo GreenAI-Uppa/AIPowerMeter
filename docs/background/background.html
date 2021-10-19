@@ -41,26 +41,44 @@
 <p>Main sources of energy consumption are the gpu, the cpu and memory.</p>
 <p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives.</p>
 </div>
+<div class="section" id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
+<p>The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm).</p>
+<p>The watt is the unit to measure power.</p>
+<p>1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)</p>
+<p>1kWh = 3600000 Joules ~= 3 hours of GPU</p>
+<p><strong>And for a computer:</strong></p>
+<p>A computer consumes energy from different parts. This library allows you to measure the one highlighted in red.</p>
+<p>Thousands of cores to enable parallelism
+Lower amount of RAM memory available
+Higher latency : GPU clock speed &lt; CPU clock speed
+Higher memory throughput : GPU operates on larger chunks of data
+GPU can fetch data from its RAM more quickly
+CPU bandwidth &lt; GPU bandwidth
+Smaller set of instructions dedicated to graphics and matrix calculus
+More power hungry and requires a CPU
+Energy efficient since the computations is faster.</p>
+</div>
 <div class="section" id="cpu-and-rapl">
 <span id="rapl"></span><h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
 <p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).
-It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ).</p>
+It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ), and there has been considerable study to validate its use for software monitoring ( <a class="reference internal" href="#khan2018" id="id2"><span>[Khan2018]</span></a> ).</p>
 <p>It is divided into different physically meaningfull domains:</p>
-<div class="figure align-default" id="id4">
+<div class="figure align-default" id="id5">
 <img alt="../_images/rapl_domain.png" src="../_images/rapl_domain.png" />
-<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id2"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 <ul class="simple">
 <li><p>Power Plane 0 : the cores alias the CPU</p></li>
-<li><p>Power Plane 1 : uncore : memory controller and cache, and an integrated gpu if present (this is not the external nvidia GPU).</p></li>
+<li><p>Power Plane 1 : uncore : memory controller and cache, and an integrated on chip gpu is present (this is not the external nvidia GPU).</p></li>
 <li><p>DRAM : energy consumption of the RAM</p></li>
 <li><p>Psys : System on Chip energy consumption</p></li>
 </ul>
-<p>The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the <cite>experiment impact tracker &lt;https://github.com/Breakend/experiment-impact-tracker&gt;_</cite> and we multpily the RAPL value by the percentage of cpu and memory used.</p>
+<p>The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">experiment impact tracker</a> and multiply the RAPL value by the percentage of cpu and memory used.</p>
 <p>The rapl interface writes these values in module specific registers located in <cite>/dev/cpu/*/msr</cite>. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in <cite>/sys/class/powercap/intel-rapl</cite>.</p>
 <p><strong>More readings on RAPL</strong>:</p>
 <p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
-<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a></p>
+<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id4"><span>[Khan2018]</span></a></p>
 </div>
 <div class="section" id="gpu-and-nvidia-smi">
 <h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
@@ -71,6 +89,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <div class="section" id="other-tools">
 <h2>Other tools<a class="headerlink" href="#other-tools" title="Permalink to this headline">¶</a></h2>
 <p>CarbonTracker, PAPI, Experiment-Impact-Tracker</p>
+<p><a class="reference external" href="https://www.tensorflow.org/guide/profiler">https://www.tensorflow.org/guide/profiler</a></p>
 </div>
 <div class="section" id="bibliography">
 <h2>Bibliography<a class="headerlink" href="#bibliography" title="Permalink to this headline">¶</a></h2>
@@ -78,7 +97,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <dt class="label" id="hackenberg2015"><span class="brackets"><a class="fn-backref" href="#id1">Hackenberg2015</a></span></dt>
 <dd><p>An Energy Efficiency Feature Survey of the Intel Haswell Processor.  IEEE International Parallel and Distributed Processing Symposium Workshop. 2015</p>
 </dd>
-<dt class="label" id="khan2018"><span class="brackets">Khan2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
+<dt class="label" id="khan2018"><span class="brackets">Khan2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
 <dd><p>Khan et al. RAPL in Action: Experiences in Using RAPL for Power Measurements. ACM Transactions on Modeling and Performance Evaluation of Computing Systems. 2018</p>
 </dd>
 </dl>
@@ -106,6 +125,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <li class="toctree-l1"><a class="reference internal" href="../usage/quick_start.html">Quick start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Background on power measure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#general-considerations">General considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preliminaries">Preliminaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#other-tools">Other tools</a></li>
