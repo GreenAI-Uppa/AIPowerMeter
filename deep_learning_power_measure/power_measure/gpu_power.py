@@ -33,7 +33,8 @@ def is_nvidia_compatible():
         except Exception as e:
             return (False, msg+e.__str__())
         break
-    return True
+    msg = "GPU power will be measured with nvidia"
+    return True, msg
 
 def get_gpu_use_pmon(nsample=1):
     """

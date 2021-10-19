@@ -136,21 +136,24 @@ class Experiment():
             device = 'cpu'
             model.to(device)
             self.save_model_card(model, input_size, device=device)
-        self.rapl_available, msg = rapl_power.is_rapl_compatible()
-        self.nvidia_available = gpu_power.is_nvidia_compatible()
+        self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
+        self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
-            "\n\n Neither rapl and nvidia are available, I can't measure anything. Regarding rapl:\n "
-            + msg
+            "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n Regarding rapl:\n "
+            + msg_rapl + "\n\n"
+            + "Regarding nvidia\n"
+            + msg_nvidia
             )
+            return
         if not self.rapl_available:
-            print("RAPL not available: " + msg)
+            print("RAPL not available: " + msg_rapl)
         else:
-            print(msg)
+            print(msg_rapl)
         if not self.nvidia_available:
-            print("nvidia not available, the power of the gpu won't be measured")
+            print("nvidia not available: " + msg_nvidia)
         else:
-            print("GPU power will be measured with nvidia")
+            print(msg_nvidia)
 
     def save_model_card(self, model, input_size, device='cpu'):
         """
