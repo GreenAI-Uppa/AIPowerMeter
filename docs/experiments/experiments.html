@@ -35,15 +35,20 @@
 <h1>Insights into energy consumption<a class="headerlink" href="#insights-into-energy-consumption" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="experimental-protocol">
 <h2>Experimental protocol<a class="headerlink" href="#experimental-protocol" title="Permalink to this headline">¶</a></h2>
-<p>rational behind our procedure, we show the energy consumption of standard deep learning models with different sizes of inputs</p>
-<p>Select an input size</p>
-<p>How many iterations</p>
+<p>We’ve started to run experiments to measure the energy consumption of classical deep learning pretrained model at inference. Our protocol acts as follows:</p>
+<ul class="simple">
+<li><p>we load a pretrained architecture,</p></li>
+<li><p>we select an input size (resolution for Computer Vision, number of tokens for NLP),</p></li>
+<li><p>we run x inferences and measure power draws with AIPowerMeter,</p></li>
+<li><p>we repeat the experiment 10 times to have more robustness.</p></li>
+</ul>
+<p>For each set of experiments, power measurements are written into severals power_metrics.json files (one by tuple (input_size,experiment). We then compile  <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py">here</a> an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.</p>
 </div>
-<div class="section" id="cnn">
-<h2>Alexnet<a class="headerlink" href="#cnn" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="alexnet-study">
+<h2>Alexnet study<a class="headerlink" href="#alexnet-study" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="resnet">
-<h2>Resnet<a class="headerlink" href="#resnet" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="resnet-study">
+<h2>Resnet study<a class="headerlink" href="#resnet-study" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="bert-transformers">
 <h2>Bert Transformers<a class="headerlink" href="#bert-transformers" title="Permalink to this headline">¶</a></h2>
@@ -74,8 +79,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../usage/good_practices.html">Good practices</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Insights into energy consumption</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#experimental-protocol">Experimental protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cnn">Alexnet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#resnet">Resnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alexnet-study">Alexnet study</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resnet-study">Resnet study</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bert-transformers">Bert Transformers</a></li>
 </ul>
 </li>
