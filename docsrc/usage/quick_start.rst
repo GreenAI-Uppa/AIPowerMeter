@@ -67,7 +67,8 @@ You have an example `there <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/ma
   ################
   q.put(experiment.STOP_MESSAGE)
 
-This will create a directory `output_folder` in which a `power_metrics.json` will contain the power measurements. You can then get a summary of the recordings
+This will create a directory `output_folder` in which a `power_metrics.json` will contain the power measurements. If it already exists, the content folder will be replaced. So you should have one folder per experiment.
+You can then get a summary of the recordings
 
 .. code-block:: python
 

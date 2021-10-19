@@ -8,6 +8,9 @@ from . import rapl
 rapl_dir = "/sys/class/powercap/intel-rapl/"
 
 def is_rapl_compatible():
+    """
+    Check if rapl logs are available on this machine
+    """
     if not os.path.isdir(rapl_dir):
         return (False, "cannot find rapl directory in "+rapl_dir)
     if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
@@ -87,31 +90,29 @@ def get_processes(pid_list):
 def get_power(diff):
     """
     diff : difference between two RAPL samples
+
+    this should get the power per package (e.g., total rapl power)
+    see  https://blog.chih.me/images/power-planes.jpg
+    Recent (Sandy Bridge and later) Intel processors that implement the RAPL (Running Average Power Limit)
+    interface that provides MSRs containing energy consumption estimates for up to four power planes or
+    domains of a machine, as seen in the diagram above.
+    PKG: The entire package.
+    PP0: The cores.
+    PP1: An uncore device, usually the GPU (not available on all processor models.)
+    DRAM: main memory (not available on all processor models.)
+    PSys: Skylake mobile SoC total energy
+    The following relationship holds: PP0 + PP1 <= PKG. DRAM is independent of the other three domains.
+    Most processors come in two packages so top level domains should be package-1 and package-0
     """
     total_intel_power = 0
     total_dram_power = 0
     total_cpu_power = 0
     total_uncore_power = 0
     psys_power = -1
-    total = 0
     domains_found = set()
     for d in diff.domains:
         domain = diff.domains[d]
         power = diff.average_power(package=domain.name)
-        # this should get the power per package (e.g., total rapl power)
-        # see images/power-planes.png for example
-        # Downloaded from: https://blog.chih.me/images/power-planes.jpg
-        #  Recent (Sandy Bridge and later) Intel processors that implement the RAPL (Running Average Power Limit)
-        # interface that provides MSRs containing energy consumption estimates for up to four power planes or
-        # domains of a machine, as seen in the diagram above.
-        # PKG: The entire package.
-        # PP0: The cores.
-        # PP1: An uncore device, usually the GPU (not available on all processor models.)
-        # DRAM: main memory (not available on all processor models.)
-        # PSys: Skylake mobile SoC total energy
-        # The following relationship holds: PP0 + PP1 <= PKG. DRAM is independent of the other three domains.
-        # Most processors come in two packages so top level domains shold be package-1 and package-0
-        total += power
         if domain.name == "psys":  # skip SoC aggregate reporting
             psys_power = power
             continue
@@ -150,7 +151,7 @@ def get_power(diff):
         power_metrics['cpu_power'] = total_cpu_power
     if 'uncore' in domains_found:
         power_metrics['uncore_power'] = total_uncore_power
-    return power_metrics #total_intel_power, total_dram_power, total_cpu_power, total_uncore_power, psys_power
+    return power_metrics
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
     """
@@ -230,14 +231,20 @@ def get_mem_uses(process_list):
     output:
         mem_info_per_process : memory consumption for each process
 
-        some info from psutil documentation:
-            uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory which is unique to a process and which would be freed if the process was terminated right now
-            pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes,
-            accounted in a way that the amount is divided evenly between the processes that share it.
-            I.e. if a process has 10 MBs all to itself and 10 MBs shared with another process its PSS will be 15 MBs.
-
-            # on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
-            # so with the previous example, the result would be 20Mbs instead of 15Mbs
+    psutil will be used to collect pss and uss values. rss is collected if pss
+    is not available
+    some info from psutil documentation:
+        - uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
+         which is unique to a process and which would be freed if the process
+         was terminated right now
+        - pss (Linux): aka “Proportional Set Size”, is the amount of memory
+        shared with other processes, accounted in a way that the amount is
+        divided evenly between the processes that share it. I.e. if a process
+        has 10 MBs all to itself and 10 MBs shared with another process its
+         PSS will be 15 MBs.
+         on the other hand RSS is resident set size : the non-swapped physical
+         memory that a task has used in bytes. so with the previous example,
+         the result would be 20Mbs instead of 15Mbs
     """
     mem_info_per_process, mem_pss_per_process, mem_uss_per_process = {}, {}, {}
     for p in process_list:
