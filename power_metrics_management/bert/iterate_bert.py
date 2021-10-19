@@ -4,11 +4,12 @@ import json
 iterations = []
 inputs = []
 
-for i in range(5):
-    print(f'Running on i: {i*100}')
-    main(n_input=i*100)
-    iterations.append(int(10000-(i*100*10)))
-    inputs.append(i*100)
+for i in range(10):
+    i += 1
+    print(f'Running on i: {i*50}')
+    main(n_input=i*50)
+    iterations.append(int(10000-(i*50*10)))
+    inputs.append(i*50)
 
 meta = {
     'iterations': iterations,
@@ -17,7 +18,7 @@ meta = {
     'details': '',  
 }
 f = open('/data/mfrancois/measure/meta.json', 'w')
-json.dump()
+json.dump(meta, f)
 f.close()
 
 print()
