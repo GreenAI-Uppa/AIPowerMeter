@@ -14,7 +14,17 @@ We've started to run experiments to measure the energy consumption of classical 
 
 - we repeat the experiment 10 times to have more robustness.
 
-For each set of experiments, power measurements are written into severals power_metrics.json files (one by tuple (input_size,experiment). We then compile  `here <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py>`_ an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.  
+For each set of experiments, power measurements and lattencies are written into several power_metrics.json  and latency.csv files: one by tuple (format,x) where format is the chosen input size an integer and x =0, ... 9 following this architecture:
+
+::
+
+    input_format
+    ├── run_x          
+        ├── power_metrics.json
+        └── latency.csv
+
+
+We then compile  `here <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py>`_ an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.  
 
 
 Alexnet study
