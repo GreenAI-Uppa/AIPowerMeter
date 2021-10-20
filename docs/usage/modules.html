@@ -1,10 +1,9 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Documentation &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -13,7 +12,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Good practices" href="good_practices.html" />
@@ -39,9 +38,9 @@
 <p>Place a general figure of the library</p>
 <div class="section" id="experiment-module">
 <h2>Experiment module<a class="headerlink" href="#experiment-module" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">model=None</em>, <em class="sig-param">input_size=None</em>, <em class="sig-param">cont=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class provides the method to start an experiment
 by launching a thread which will record the power draw.
 The recording can be ended by sending a stop message
@@ -51,9 +50,9 @@ to this thread</p>
 </div>
 <div class="section" id="rapl-power-module">
 <h2>rapl_power module<a class="headerlink" href="#rapl-power-module" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param">process_list</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
 <dd><dl>
 <dt>input :</dt><dd><p>process_list : list of psutil.Process objects</p>
 </dd>
@@ -71,9 +70,9 @@ I.e. if a process has 10 MBs all to itself and 10 MBs shared with another proces
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_power">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diff</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_power</code><span class="sig-paren">(</span><em class="sig-param">diff</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>diff : difference between two RAPL samples</p>
 </dd></dl>
 
@@ -149,7 +148,7 @@ I.e. if a process has 10 MBs all to itself and 10 MBs shared with another proces
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
