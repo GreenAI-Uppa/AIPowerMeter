@@ -130,3 +130,43 @@ We also compute the matrix of Spearman correlation :
 
 Bert Transformers
 -----------------
+
+As a similar study than the previous Alexnet and Resnet one, we measure consumption of a famous NLP transformers: `Bert <https://arxiv.org/abs/1810.04805>`_.
+
+In this case we use torch with a sequence classifier version of Bert. Provided by the `transformers <https://huggingface.co/transformers/model_doc/bert.html>`_ library.
+
+The process is quite similar then before. We have a main object of 10 runs of multiplte measures. We just change the input size. Hence, we chose to set **"yes "** as main sentence. Next we juste have to repeat this "sentence" by the wanted input size.
+
+.. code-block:: python
+
+   # tokenizer call
+   tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+   
+   # model creation
+   model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+   
+   # use gpu to apply model
+   model.to(device)
+
+   # Transform data
+   sentence = "yes "
+   inputs = tokenizer(sentence*n_input, return_tensors="pt") # Tokenization + format input 
+   inputs = inputs.to(device)
+
+First outputs:
+
+We chose to vary the input size from 50 to 500 token with a 50 tokens step (Bert is limited to 512 tokens). Each measure consumption last at least 20 seconds in order to have 10 metrics in our output.
+
+Here we can see the evolution of GPU and CPU consumption in Joule compared to the input size. The output is pretty interesting because GPU consumption seems to be linear compared to the input size. Whereas the CPU consumption decrease until a 300 tokens input size then shoot up to 0.26J per iteration. 
+
+.. image:: GPU_CPU.png
+   :width: 400pt
+   :align: center
+
+On the next figure we can see the evolution of latency in seconds compared to the input size. The measure is clearly not linear. A gap appears at 300-350 tokens. This observation let us think that a link exists beetween CPU consumption and latency. 
+
+.. image:: latency.png
+   :width: 400pt
+   :align: center
+
+These outputs are interesting because iteration has been realised on GPU. We shouldn't be able to see a link between CPU consumption and latency. 

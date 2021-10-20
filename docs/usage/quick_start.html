@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick start &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Background on power measure" href="../background/background.html" />
@@ -40,33 +41,33 @@
 <p><strong>CPU</strong> power measure is done with RAPL</p>
 <p>Support is ensured on intel processor since Sandy Bridge architecture.</p>
 <p>To see if your processor is compatible, first check that the CPU is a GenuineIntel:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cat /proc/cpuinfo <span class="p">|</span> grep vendor <span class="p">|</span> uniq <span class="p">|</span> awk <span class="s1">&#39;{print $3}&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cat /proc/cpuinfo <span class="p">|</span> grep vendor <span class="p">|</span> uniq <span class="p">|</span> awk <span class="s1">&#39;{print $3}&#39;</span>
 <span class="go">GenuineIntel</span>
 </pre></div>
 </div>
 <p>In linux, RAPL will log the energy consumption in  <cite>/sys/class/powercap/intel-rapl</cite></p>
 <p>Change the permissions so that our program can read these logs:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> sudo chmod -R <span class="m">755</span> /sys/class/powercap/intel-rapl
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo chmod -R <span class="m">755</span> /sys/class/powercap/intel-rapl
 </pre></div>
 </div>
 <p><strong>GPU</strong> will be measured by nvidia-smi.
 Again, not all gpu cards (for ex: Jetson Nano board) include the required sensors.</p>
 <p>A quick check is to run</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> nvidia-smi -q -x
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nvidia-smi -q -x
 </pre></div>
 </div>
 <p>and search if the xml output contains values at the “power_readings” field.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
-<span class="gp">$</span> pip install -r requirements.txt
-<span class="gp">$</span> python setup.py install
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
+<span class="gp">$ </span>pip install -r requirements.txt
+<span class="gp">$ </span>python setup.py install
 </pre></div>
 </div>
 <p>We provide examples for pytorch and tensorflow, but the model creation is independant from the power recording part.</p>
 <p>If you wish to get the number of parameters and mac operations of your pytorch model, also install:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install torchinfo
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install torchinfo
 </pre></div>
 </div>
 </div>
@@ -182,7 +183,7 @@ You can then get a summary of the recordings</p>
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

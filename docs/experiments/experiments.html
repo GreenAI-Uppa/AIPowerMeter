@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insights into energy consumption &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Good practices" href="../usage/good_practices.html" />
@@ -129,6 +130,31 @@
 </div>
 <div class="section" id="bert-transformers">
 <h2>Bert Transformers<a class="headerlink" href="#bert-transformers" title="Permalink to this headline">¶</a></h2>
+<p>As a similar study than the previous Alexnet and Resnet one, we measure consumption of a famous NLP transformers: <a class="reference external" href="https://arxiv.org/abs/1810.04805">Bert</a>.</p>
+<p>In this case we use torch with a sequence classifier version of Bert. Provided by the <a class="reference external" href="https://huggingface.co/transformers/model_doc/bert.html">transformers</a> library.</p>
+<p>The process is quite similar then before. We have a main object of 10 runs of multiplte measures. We just change the input size. Hence, we chose to set <strong>“yes “</strong> as main sentence. Next we juste have to repeat this “sentence” by the wanted input size.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tokenizer call</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;bert-base-uncased&#39;</span><span class="p">)</span>
+
+<span class="c1"># model creation</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">BertForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;bert-base-uncased&#39;</span><span class="p">)</span>
+
+<span class="c1"># use gpu to apply model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Transform data</span>
+<span class="n">sentence</span> <span class="o">=</span> <span class="s2">&quot;yes &quot;</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">sentence</span><span class="o">*</span><span class="n">n_input</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span> <span class="c1"># Tokenization + format input</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>First outputs:</p>
+<p>We chose to vary the input size from 50 to 500 token with a 50 tokens step (Bert is limited to 512 tokens). Each measure consumption last at least 20 seconds in order to have 10 metrics in our output.</p>
+<p>Here we can see the evolution of GPU and CPU consumption in Joule compared to the input size. The output is pretty interesting because GPU consumption seems to be linear compared to the input size. Whereas the CPU consumption decrease until a 300 tokens input size then shoot up to 0.26J per iteration.</p>
+<a class="reference internal image-reference" href="../_images/GPU_CPU.png"><img alt="../_images/GPU_CPU.png" class="align-center" src="../_images/GPU_CPU.png" style="width: 400pt;" /></a>
+<p>On the next figure we can see the evolution of latency in seconds compared to the input size. The measure is clearly not linear. A gap appears at 300-350 tokens. This observation let us think that a link exists beetween CPU consumption and latency.</p>
+<a class="reference internal image-reference" href="../_images/latency.png"><img alt="../_images/latency.png" class="align-center" src="../_images/latency.png" style="width: 400pt;" /></a>
+<p>These outputs are interesting because iteration has been realised on GPU. We shouldn’t be able to see a link between CPU consumption and latency.</p>
 </div>
 </div>
 
@@ -198,7 +224,7 @@
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
