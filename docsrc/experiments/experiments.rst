@@ -107,16 +107,16 @@ Following the same steps as for Alexnet study, we have done the measurements wit
 
 - the number of inferences is set to 5000 for an input size of 8 up to 2048 and only 1000 for an input size of 4096.
 
-.. image:: plot_resnet/nvidi.png
+.. image:: docs/_images/nvidi.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/int_mem.png
+.. image:: docs/_images/int_mem.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/laten_sm.png
+.. image:: docs/_images/laten_sm.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/sm_nvi.png
+.. image:: docs/_images/sm_nvi.png
    :width: 300pt
    :align: center
 
