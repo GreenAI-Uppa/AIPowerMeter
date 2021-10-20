@@ -101,6 +101,30 @@ We then start the inferences and measurements.
 Resnet study
 ------------
 
+Following the same steps as for Alexnet study, we have done the measurements with a pretrained Resnet50, using the following parameters:
+
+- we define random colored images with an width/height of 8, 32, 64, 128, 256, 512, 1024, 2048 and 4096,
+
+- the number of inferences is set to 5000 for an input size of 8 up to 2048 and only 1000 for an input size of 4096.
+
+.. image:: plot_resnet/nvidi.png
+   :width: 400pt
+   :align: center
+.. image:: plot_resnet/int_mem.png
+   :width: 400pt
+   :align: center
+.. image:: plot_resnet/laten_sm.png
+   :width: 400pt
+   :align: center
+.. image:: plot_resnet/sm_nvi.png
+   :width: 300pt
+   :align: center
+
+
+We also compute the matrix of Spearman correlation :  
+
+.. image:: plot_resnet/spearman.png
+   :width: 400pt   
 
 
 
