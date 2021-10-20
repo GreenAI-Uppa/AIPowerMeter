@@ -68,6 +68,8 @@ We then prepare the experiment protocol described above for a random 224X244 ima
   
   #create a random image
   image_test = torch.rand(1,3,input_size,input_size)
+  #for GPU use
+  image_test = image_test.to(device)
 
 We then start the inferences and measurements.
 
