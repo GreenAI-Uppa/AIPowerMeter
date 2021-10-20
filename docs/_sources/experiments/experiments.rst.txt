@@ -107,23 +107,23 @@ Following the same steps as for Alexnet study, we have done the measurements wit
 
 - the number of inferences is set to 5000 for an input size of 8 up to 2048 and only 1000 for an input size of 4096.
 
-.. image:: plot_resnet/nvidi.png
+.. image:: nvidi.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/int_mem.png
+.. image:: int_mem.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/laten_sm.png
+.. image:: laten_sm.png
    :width: 400pt
    :align: center
-.. image:: plot_resnet/sm_nvi.png
+.. image:: sm_nvi.png
    :width: 300pt
    :align: center
 
 
 We also compute the matrix of Spearman correlation :  
 
-.. image:: plot_resnet/spearman.png
+.. image:: spearman.png
    :width: 400pt   
 
 
