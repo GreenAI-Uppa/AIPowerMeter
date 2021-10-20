@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Background on power measure &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -64,9 +64,9 @@ Energy efficient since the computations is faster.</p>
 <p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).
 It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ), and there has been considerable study to validate its use for software monitoring ( <a class="reference internal" href="#khan2018" id="id2"><span>[Khan2018]</span></a> ).</p>
 <p>It is divided into different physically meaningfull domains:</p>
-<div class="figure align-default" id="id5">
+<div class="figure align-default" id="id4">
 <img alt="../_images/rapl_domain.png" src="../_images/rapl_domain.png" />
-<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
 <ul class="simple">
 <li><p>Power Plane 0 : the cores alias the CPU</p></li>
@@ -78,7 +78,6 @@ It is present since and from Haswell is supported by integrated voltage regulato
 <p>The rapl interface writes these values in module specific registers located in <cite>/dev/cpu/*/msr</cite>. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in <cite>/sys/class/powercap/intel-rapl</cite>.</p>
 <p><strong>More readings on RAPL</strong>:</p>
 <p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
-<p>Add ref to the finnish guys <a class="reference internal" href="#khan2018" id="id4"><span>[Khan2018]</span></a></p>
 </div>
 <div class="section" id="gpu-and-nvidia-smi">
 <h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
@@ -97,7 +96,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <dt class="label" id="hackenberg2015"><span class="brackets"><a class="fn-backref" href="#id1">Hackenberg2015</a></span></dt>
 <dd><p>An Energy Efficiency Feature Survey of the Intel Haswell Processor.  IEEE International Parallel and Distributed Processing Symposium Workshop. 2015</p>
 </dd>
-<dt class="label" id="khan2018"><span class="brackets">Khan2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
+<dt class="label" id="khan2018"><span class="brackets">Khan2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
 <dd><p>Khan et al. RAPL in Action: Experiences in Using RAPL for Power Measurements. ACM Transactions on Modeling and Performance Evaluation of Computing Systems. 2018</p>
 </dd>
 </dl>
@@ -173,7 +172,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

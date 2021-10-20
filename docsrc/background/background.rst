@@ -65,8 +65,6 @@ The rapl interface writes these values in module specific registers located in `
 The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.
 
 
-Add ref to the finnish guys [Khan2018]_
-
 GPU and nvidia-smi 
 ---------------------------
 description of nvidia-smi

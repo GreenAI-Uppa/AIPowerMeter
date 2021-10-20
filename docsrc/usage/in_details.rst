@@ -1,30 +1,29 @@
 Advanced use
 ============
 
-Experimental results
+Recorded fields
 ---------------------
 
-
-The json logs power and use of the CPU and GPU for the pids related to your experiment.
-
-Most of the recordings are done for each pid related to your experiments: `metric_name : {... pid_i: v_i, ....}`
-
+Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `metric_name : {... pid_i: v_i, ....}`
+Unless specified otherwise, the power is logged in watts.
 
 **CPU use**
 
 `cpu_uses`: percentage of cpu clock used by this pid during the recording. 
 
-`mem_use_abs`: Number of bytes. The recording uses psutil in the background, check: :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses` for more details.
+`mem_use_abs`: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses` for more details.
 
 `mem_use_abs`: Relative number of bytes.
 
 **CPU power**
 
-The following metrics are in Watts:
 
 `Intel_power`: total consumption measured by RAPL
+
 `psys_power`: System on chip consumption
+
 `uncore_power`: some graphic cards, but not nvidia gpu
+
 `total_cpu_power`: core power consumption.
 
 In other words, you have the following relations: 
@@ -39,17 +38,15 @@ Check the :ref:`rapl` section for more details on RAPL domains, and :py:func:`de
 
 **GPU use**
 
-sm
+`sm`: Streaming multiprocessor usage. Analog to the `cpu_uses` for the gpu.
 
-memory
+`memory`: Number of bytes used in the GPU
 
 **GPU power**
 
 This is done by the nvidia-smi tool supported by the NVML library of nvidia. The record are done per pid and per gpu.
 
 `nvidia_draw_absolute`: the amount of power used by the whole nvidia card.
-`streaming multiprocessors`: streaming multiprocessors used. Analog to `cpu_uses` for the gpu.
-`per_gpu_average_estimated_utilization_absolute`: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the `cpu_uses` for the gpu.
 
 model complexity
 ----------------
@@ -58,15 +55,13 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 
 Threading
 -------------------
-There is a thread which is launched to record the energy of your program. 
+In practice, a thread is launched to record the energy of your program. 
 
-You can also record the time and accuracy in the main program and then, interpolate with the energy values
+.. figure:: multi_threading.png
 
-add the figure from the presentation
+   Interaction between the experiment and the recording threads
 
-Processing the resulting files
-------------------------------
+If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values
 
-Linking energy and computation usage
-------------------------------------
+
 

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="370.1897mm"
+   height="198.57137mm"
+   viewBox="0 0 370.18969 198.57136"
+   version="1.1"
+   id="svg43054"
+   inkscape:export-filename="/home/paul/Documents/uppa/chaireSeb/seminaire/images/multi_threading.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   inkscape:version="1.1.1 (1:1.1+202109281949+c3084ef5ed)"
+   sodipodi:docname="multi_threading.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview43056"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.67081229"
+     inkscape:cx="513.55648"
+     inkscape:cy="380.88151"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs43051">
+    <rect
+       x="334.08066"
+       y="300.71155"
+       width="14.978998"
+       height="66.610672"
+       id="rect53535" />
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1090" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend-0"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1090-7" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(20.755969,-47.533311)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M 15.334383,62.858829 V 245.13399"
+       id="path43184"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M 255.85432,107.75432 V 229.11933"
+       id="path43186"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="9.8648033"
+       y="55.574139"
+       id="text44370"><tspan
+         sodipodi:role="line"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="9.8648033"
+         y="55.574139"
+         id="tspan55615">Main thread</tspan></text>
+    <rect
+       style="fill:#ffffff;stroke-width:0.532559"
+       id="rect67475-2"
+       width="23.253029"
+       height="15.259466"
+       x="2.1806972"
+       y="82.736877" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="-14.066208"
+       y="92.619911"
+       id="text45006"><tspan
+         sodipodi:role="line"
+         id="tspan45004"
+         style="stroke-width:0.264583"
+         x="-14.066208"
+         y="92.619911">e = Experiment()</tspan></text>
+    <rect
+       style="fill:#ffffff;stroke-width:0.532559"
+       id="rect67475"
+       width="21.459448"
+       height="38.040955"
+       x="3.3763623"
+       y="141.0202" />
+    <rect
+       style="fill:#ffffff;stroke-width:0.909774"
+       id="rect67475-5"
+       width="26.771631"
+       height="88.986542"
+       x="241.4344"
+       y="118.71122" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="22.625097"
+       y="155.59538"
+       id="text47936"><tspan
+         sodipodi:role="line"
+         id="tspan47934"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="22.625099"
+         y="155.59538">Deep learning </tspan><tspan
+         sodipodi:role="line"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="22.625095"
+         y="168.82451"
+         id="tspan47938">Computation</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.175, 3.175;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M 15.381772,112.84265 H 254.94422"
+       id="path50231"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.175, 3.175;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Lend-0)"
+       d="M 14.721363,210.24623 H 255.30366"
+       id="path50231-3"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text53533"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect53535);fill:#000000;fill-opacity:1;stroke:none" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="263.88724"
+       y="90.527672"
+       id="text54047"><tspan
+         sodipodi:role="line"
+         id="tspan54045"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="263.88724"
+         y="90.527672">Recording</tspan><tspan
+         sodipodi:role="line"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="263.88724"
+         y="103.7568"
+         id="tspan54049">thread</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="36.891121"
+       y="110.51838"
+       id="text60956"><tspan
+         sodipodi:role="line"
+         id="tspan60954"
+         style="stroke-width:0.264583"
+         x="36.891121"
+         y="110.51838">q = e.measure_yourself(period=2)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="33.78661"
+       y="206.94603"
+       id="text60956-8"><tspan
+         sodipodi:role="line"
+         id="tspan60954-2"
+         style="stroke-width:0.264583"
+         x="33.78661"
+         y="206.94603">q.put(&quot;STOP&quot;)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="242.31917"
+       y="129.77332"
+       id="text67181"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="129.77332"
+         id="tspan67183">Get model card</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="143.00244"
+         id="tspan9379" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="156.23157"
+         id="tspan67371">each p seconds:</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="169.46069"
+         id="tspan6351">    - Call RAPL</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="182.68982"
+         id="tspan67185">    - Call nvidia-smi</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="242.31917"
+         y="195.91895"
+         id="tspan68112">    - Write recordings</tspan></text>
+  </g>
+</svg>

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Advanced use &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -36,33 +36,30 @@
             
   <div class="section" id="advanced-use">
 <h1>Advanced use<a class="headerlink" href="#advanced-use" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="experimental-results">
-<h2>Experimental results<a class="headerlink" href="#experimental-results" title="Permalink to this headline">¶</a></h2>
-<p>The json logs power and use of the CPU and GPU for the pids related to your experiment.</p>
-<p>Most of the recordings are done for each pid related to your experiments: <cite>metric_name : {… pid_i: v_i, ….}</cite></p>
+<div class="section" id="recorded-fields">
+<h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
+<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>metric_name : {… pid_i: v_i, ….}</cite>
+Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
 <p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
-<p><cite>mem_use_abs</cite>: Number of bytes. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
+<p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
 <p><cite>mem_use_abs</cite>: Relative number of bytes.</p>
 <p><strong>CPU power</strong></p>
-<p>The following metrics are in Watts:</p>
-<p><cite>Intel_power</cite>: total consumption measured by RAPL
-<cite>psys_power</cite>: System on chip consumption
-<cite>uncore_power</cite>: some graphic cards, but not nvidia gpu
-<cite>total_cpu_power</cite>: core power consumption.</p>
+<p><cite>Intel_power</cite>: total consumption measured by RAPL</p>
+<p><cite>psys_power</cite>: System on chip consumption</p>
+<p><cite>uncore_power</cite>: some graphic cards, but not nvidia gpu</p>
+<p><cite>total_cpu_power</cite>: core power consumption.</p>
 <p>In other words, you have the following relations:</p>
 <div class="math notranslate nohighlight">
 \[Intel\_power = psys + uncore + total\_cpu\]</div>
 <p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
 <p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details. The support for different power domains varies according to the processor model, our library will ignore not available domains.</p>
 <p><strong>GPU use</strong></p>
-<p>sm</p>
-<p>memory</p>
+<p><cite>sm</cite>: Streaming multiprocessor usage. Analog to the <cite>cpu_uses</cite> for the gpu.</p>
+<p><cite>memory</cite>: Number of bytes used in the GPU</p>
 <p><strong>GPU power</strong></p>
 <p>This is done by the nvidia-smi tool supported by the NVML library of nvidia. The record are done per pid and per gpu.</p>
-<p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.
-<cite>streaming multiprocessors</cite>: streaming multiprocessors used. Analog to <cite>cpu_uses</cite> for the gpu.
-<cite>per_gpu_average_estimated_utilization_absolute</cite>: contains the memory and the Streaming multiprocessor (SM) used. The latter is the analog to the <cite>cpu_uses</cite> for the gpu.</p>
+<p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
 </div>
 <div class="section" id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this headline">¶</a></h2>
@@ -71,15 +68,12 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 </div>
 <div class="section" id="threading">
 <h2>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h2>
-<p>There is a thread which is launched to record the energy of your program.</p>
-<p>You can also record the time and accuracy in the main program and then, interpolate with the energy values</p>
-<p>add the figure from the presentation</p>
+<p>In practice, a thread is launched to record the energy of your program.</p>
+<div class="figure align-default" id="id1">
+<img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
+<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
-<div class="section" id="processing-the-resulting-files">
-<h2>Processing the resulting files<a class="headerlink" href="#processing-the-resulting-files" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="linking-energy-and-computation-usage">
-<h2>Linking energy and computation usage<a class="headerlink" href="#linking-energy-and-computation-usage" title="Permalink to this headline">¶</a></h2>
+<p>If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values</p>
 </div>
 </div>
 
@@ -104,11 +98,9 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#experimental-results">Experimental results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recorded-fields">Recorded fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-complexity">model complexity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#processing-the-resulting-files">Processing the resulting files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#linking-energy-and-computation-usage">Linking energy and computation usage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Code Documentation</a></li>
@@ -151,7 +143,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
