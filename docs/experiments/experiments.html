@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deep learining benchmark &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Dev Documentation" href="../usage/modules.html" />
@@ -58,63 +57,71 @@
 <p>As a gentle start, we measure the consumption at inference of a vanilla <a class="reference external" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">Alexnet</a> on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.</p>
 <p>We first import necessary modules for power draws and torch models downloads.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
-<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="kn">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 </pre></div>
 </div>
 <p>We then load Alexnet model and push it into our GeForce RTX 3090 GPU.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#load your favorite model</span>
-<span class="n">alexnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">alexnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1">#choose your favorite device</span>
 <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using </span><span class="si">{}</span><span class="s1"> device&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Using {} device&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
 
 <span class="c1">#load the model to the device</span>
 <span class="n">alexnet</span> <span class="o">=</span> <span class="n">alexnet</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We then prepare the experiment protocol described above for a random 224X244 image. We choose to run 4000 inferences to let AIPowerMeter reports the power draws during 40 seconds.</p>
+<p>We then prepare the experiment protocol described above for a list of 20 input sizes from 112*112 to 2016*2016 resolution sizes. We choose to run an adequate number of inferences for each input size to let AIPowerMeter reports the power draws during around 40 seconds.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#experiments protocol</span>
-<span class="n">iters</span> <span class="o">=</span> <span class="mi">4000</span><span class="c1">#number of inferences</span>
-<span class="n">xps</span> <span class="o">=</span> <span class="mi">10</span><span class="c1">#number of experiments to reach robustness</span>
 
-<span class="c1">#choose a resolution size</span>
-<span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
-
-<span class="c1">#create a random image</span>
-<span class="n">image_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">input_size</span><span class="p">,</span><span class="n">input_size</span><span class="p">)</span>
-<span class="c1">#for GPU use</span>
-<span class="n">image_test</span> <span class="o">=</span> <span class="n">image_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="c1">#resolution size list</span>
+<span class="n">input_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">112</span><span class="o">*</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+<span class="c1">#number of experiments</span>
+<span class="n">xps</span> <span class="o">=</span> <span class="mi">10</span>
 </pre></div>
 </div>
-<p>We then start the inferences and measurements.</p>
+<p>We then start the inferences and measurements for each input size and each experiment.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#start of the experiments</span>
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xps</span><span class="p">):</span>
-      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Experience&#39;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="n">xps</span><span class="p">,</span><span class="s1">&#39;is running&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">input_size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_sizes</span><span class="p">):</span>
+  <span class="c1">#number of inferences</span>
+  <span class="n">iters</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">40000</span><span class="o">/</span><span class="p">(</span><span class="n">u</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+  <span class="c1">#create a random image</span>
+  <span class="n">image_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">input_size</span><span class="p">,</span><span class="n">input_size</span><span class="p">)</span>
+  <span class="n">image_test</span> <span class="o">=</span> <span class="n">image_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+  <span class="c1">#start of the experiments</span>
+  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xps</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Experience&#39;</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="n">xps</span><span class="p">,</span><span class="s1">&#39;is running&#39;</span><span class="p">)</span>
       <span class="n">latencies</span> <span class="o">=</span> <span class="p">[]</span>
       <span class="c1">#AIPM</span>
       <span class="n">input_image_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">input_size</span><span class="p">,</span><span class="n">input_size</span><span class="p">)</span>
       <span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s2">&quot;input_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/run_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)))</span>
-      <span class="n">exp</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Experiment</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="n">alexnet</span><span class="p">,</span><span class="n">input_size</span><span class="o">=</span><span class="n">input_image_size</span><span class="p">)</span>
+      <span class="n">exp</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Experiment</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
       <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">measure_yourself</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
       <span class="n">start_xp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
       <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iters</span><span class="p">):</span>
-              <span class="n">start_iter</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-              <span class="n">y</span> <span class="o">=</span> <span class="n">alexnet</span><span class="p">(</span><span class="n">image_test</span><span class="p">)</span>
-              <span class="n">res</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_iter</span>
-              <span class="c1">#print(t,&#39;latency&#39;,res)</span>
-              <span class="n">latencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+          <span class="c1">#print(t)</span>
+          <span class="n">start_iter</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+          <span class="n">y</span> <span class="o">=</span> <span class="n">alexnet</span><span class="p">(</span><span class="n">image_test</span><span class="p">)</span>
+          <span class="n">res</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_iter</span>
+          <span class="c1">#print(t,&#39;latency&#39;,res)</span>
+          <span class="n">latencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
       <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">STOP_MESSAGE</span><span class="p">)</span>
       <span class="n">end_xp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;power measuring stopped after&quot;</span><span class="p">,</span><span class="n">end_xp</span><span class="o">-</span><span class="n">start_xp</span><span class="p">,</span><span class="s2">&quot;seconds for experience&quot;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="n">xps</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;power measuring stopped after&quot;</span><span class="p">,</span><span class="n">end_xp</span><span class="o">-</span><span class="n">start_xp</span><span class="p">,</span><span class="s2">&quot;seconds for experience&quot;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="n">xps</span><span class="p">)</span>
       <span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="s2">&quot;input_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/run_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
       <span class="c1">#write latency.csv next to power_metrics.json file</span>
       <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">&quot;input_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/run_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/latency.csv&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">latencies</span><span class="p">))</span>
 </pre></div>
 </div>
+<p>We then run <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py">concat_power_measure</a> to have the report of our experiments.</p>
+<p>We fist plot the evolution of the GPU and CPU consumption of one inference for each input size. We can note a very strong linear correlation between CPU and GPU consumption, with a factor around 10 (GPU consumption is 10 times bigger than CPU). However, the regression of the consumption with respect to the size of the input is NOT linear: the consumption of one inference seems constant from 112x112 to 672x672 images, then it increases linearly until 1680x1680 images where a second jump occurs for 1792x1792 input size.</p>
+<a class="reference internal image-reference" href="../_images/alexnet_nvidia_intel.png"><img alt="../_images/alexnet_nvidia_intel.png" class="align-center" src="../_images/alexnet_nvidia_intel.png" style="width: 400pt;" /></a>
+<p>We also plot the behaviours of latency and total consumption as a function of the input size. We highlight a smoother evolution for the latency as the input size increases but with a still very high Pearson coefficient (0.98).</p>
+<a class="reference internal image-reference" href="../_images/alexnet_gpu_latency.png"><img alt="../_images/alexnet_gpu_latency.png" class="align-center" src="../_images/alexnet_gpu_latency.png" style="width: 400pt;" /></a>
 </div>
 <div class="section" id="resnet-study">
 <h2>Resnet study<a class="headerlink" href="#resnet-study" title="Permalink to this headline">¶</a></h2>
@@ -208,7 +215,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
 
 
 
@@ -225,7 +232,7 @@
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
