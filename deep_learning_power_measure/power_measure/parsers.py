@@ -1,6 +1,11 @@
-import json, glob, os, numpy as np, datetime, shutil
+"""Contains the parsers to read the recordings. Currently, only contain parsing for json"""
+import json
+import os
+import datetime
+import shutil
 
 class JsonParser():
+    """write and parse the measurement recording from and to json files"""
     def __init__(self, location : str):
         """
         JSonParser will save the recordings of the experiment as json files
@@ -14,16 +19,19 @@ class JsonParser():
 
 
     def erase(self):
+        """delete the recordings"""
         if  os.path.isdir(self.folder):
             shutil.rmtree(self.folder)
             os.makedirs(self.folder)
 
     def save_model_card(self, model_card):
+        """save the model card as a json file"""
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
         json.dump(model_card, open(self.model_card_file, 'w'))
 
     def save_power_metrics(self, metrics):
+        """"save the power and CPU/GPU usage related metrics"""
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
         power_metric_fileout = open(self.power_metric_filename,'a')
@@ -33,6 +41,7 @@ class JsonParser():
         power_metric_fileout.write(json_str+'\n')
 
     def save_exp_metrics(self, metrics):
+        """save experiment (accuracy, latency,...) related metrics"""
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
         exp_metric_fileout = open(self.exp_metric_filename,'a')
@@ -42,10 +51,12 @@ class JsonParser():
         exp_metric_fileout.write(json_str+'\n')
 
     def get_model_card(self):
+        """read the json containing the model card"""
         if os.path.isfile(self.model_card_file):
             return json.load(open(self.model_card_file))
 
     def load_cpu_metrics(self):
+        """load the metrics related to the cpu usage and energy consumption"""
         if os.path.isfile(self.power_metric_filename):
             metrics = {}
             for line in open(self.power_metric_filename):
@@ -62,8 +73,10 @@ class JsonParser():
             if len(metrics) == 0:
                 return None
             return metrics
+        return None
 
     def load_gpu_metrics(self):
+        """load the metrics related to the GPU usage and energy consumption"""
         if os.path.isfile(self.power_metric_filename):
             metrics = {} #Streaming Processor / Shared Processor sm
             for line in open(self.power_metric_filename):
@@ -86,8 +99,10 @@ class JsonParser():
             if len(metrics) == 0:
                 return None
             return metrics
+        return None
 
     def load_exp_metrics(self):
+        """load the experiment (accuracy, latency,...) related metrics"""
         if os.path.isfile(self.exp_metric_filename):
             results = json.load(open(self.exp_metric_filename))
             metrics = {}
@@ -103,9 +118,11 @@ class JsonParser():
                     metrics[k]['dates'].append(date)
                     metrics[k]['values'].append(result[k])
             return metrics
+        return None
 
 
     def load_metrics(self):
+        """load all metrics. Returns None if the metric is not available"""
         cpu_metrics = self.load_cpu_metrics()
         gpu_metrics = self.load_gpu_metrics()
         exp_metrics = self.load_exp_metrics()

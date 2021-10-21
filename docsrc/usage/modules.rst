@@ -1,20 +1,24 @@
-Code Documentation
+Dev Documentation
 ===================
 
 
-Place a general figure of the library
-
 Experiment module
 -----------------
+This module handles the thread and call the required recording functions.
+
 
 .. autofunction:: deep_learning_power_measure.power_measure.experiment.Experiment
 
 rapl_power module
 ---------------------
 
-
+.. automodule:: deep_learning_power_measure.power_measure.rapl_power
 
 .. autofunction:: deep_learning_power_measure.power_measure.rapl_power.get_mem_uses
+
+
+.. autofunction:: deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses
+
 
 
 .. autofunction:: deep_learning_power_measure.power_measure.rapl_power.get_power
@@ -25,4 +29,6 @@ rapl_power module
 gpu_power module
 -----------------
 
+.. automodule:: deep_learning_power_measure.power_measure.gpu_power
 
+.. autofunction:: deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power

@@ -3,6 +3,7 @@
 import sys
 try:
     from torchinfo import summary
+    from torch import nn
 except ImportError as e:
     pass
 

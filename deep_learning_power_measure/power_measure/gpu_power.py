@@ -165,35 +165,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1):
         gpu_data = {}
         per_gpu_mem_use[gpu_id] = {}
 
-        #gpu_data = get_gpu_data(gpu)
-
-        name = gpu.findall("product_name")[0].text
-        gpu_data["name"] = name
-
-        # get overall memory usage for this gpu
-        memory_usage = gpu.findall("fb_memory_usage")[0]
-        total_memory = memory_usage.findall("total")[0].text
-        used_memory = memory_usage.findall("used")[0].text
-        free_memory = memory_usage.findall("free")[0].text
-        gpu_data["memory"] = {
-            "total": total_memory,
-            "used_memory": used_memory,
-            "free_memory": free_memory,
-        }
-
-        # get total utilization for this gpu
-        utilization = gpu.findall("utilization")[0]
-        gpu_util = utilization.findall("gpu_util")[0].text
-        memory_util = utilization.findall("memory_util")[0].text
-        gpu_data["utilization"] = {"gpu_util": gpu_util, "memory_util": memory_util}
-
-        # get total power for this gpu
-        power_readings = gpu.findall("power_readings")[0]
-        power_draw = power_readings.findall("power_draw")[0].text
-        power_this_gpu = float(power_draw.replace("W", ""))
-        gpu_data["power_readings"] = {"power_draw": power_this_gpu}
-
-
+        gpu_data = get_gpu_data(gpu)
 
         per_gpu_power_draw[gpu_id] = gpu_data["power_readings"]["power_draw"] # power_this_gpu
         absolute_power += power_this_gpu

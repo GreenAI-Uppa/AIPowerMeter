@@ -17,7 +17,6 @@ Welcome to AI Power Meter's documentation!
    experiments/experiments
 
 
-
 Indices and tables
 ==================
 
