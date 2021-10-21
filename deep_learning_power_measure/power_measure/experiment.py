@@ -141,9 +141,8 @@ class Experiment():
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
-            "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n Regarding rapl:\n "
+            "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
             + msg_rapl + "\n\n"
-            + "Regarding nvidia\n"
             + msg_nvidia
             )
         if not self.rapl_available:

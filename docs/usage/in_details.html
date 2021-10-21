@@ -36,18 +36,19 @@
             
   <div class="section" id="advanced-use">
 <h1>Advanced use<a class="headerlink" href="#advanced-use" title="Permalink to this headline">¶</a></h1>
+<p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
 <div class="section" id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
-<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>metric_name : {… pid_i: v_i, ….}</cite>
+<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>
 Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
 <p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
 <p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
-<p><cite>mem_use_abs</cite>: Relative number of bytes.</p>
+<p><cite>mem_use_percent</cite>: Relative number of bytes.</p>
 <p><strong>CPU power</strong></p>
 <p><cite>Intel_power</cite>: total consumption measured by RAPL</p>
 <p><cite>psys_power</cite>: System on chip consumption</p>
-<p><cite>uncore_power</cite>: some graphic cards, but not nvidia gpu</p>
+<p><cite>uncore_power</cite>: other hardware present on the cpu board, for instance, an integrated graphic card. This is NOT the nvidia gpu which is on another board.</p>
 <p><cite>total_cpu_power</cite>: core power consumption.</p>
 <p>In other words, you have the following relations:</p>
 <div class="math notranslate nohighlight">
@@ -58,11 +59,18 @@ Unless specified otherwise, the power is logged in watts.</p>
 <p><cite>sm</cite>: Streaming multiprocessor usage. Analog to the <cite>cpu_uses</cite> for the gpu.</p>
 <p><cite>memory</cite>: Number of bytes used in the GPU</p>
 <p><strong>GPU power</strong></p>
-<p>This is done by the nvidia-smi tool supported by the NVML library of nvidia. The record are done per pid and per gpu.</p>
+<p>This is done by the nvidia-smi tool supported by the NVML library of nvidia.</p>
 <p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
 </div>
 <div class="section" id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this headline">¶</a></h2>
+<p>We use a wrapper for <a class="reference external" href="https://pypi.org/project/torchinfo/">torchinfo</a> to extract statistics about your model, essentially number of parameters and mac operation counts.
+To obtain them, add additional parameters:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">net</span> <span class="pre">=</span> <span class="pre">...</span> <span class="pre">the</span> <span class="pre">model</span> <span class="pre">you</span> <span class="pre">are</span> <span class="pre">using</span> <span class="pre">for</span> <span class="pre">your</span> <span class="pre">experiment</span>
+<span class="pre">input_size</span> <span class="pre">=</span> <span class="pre">...</span> <span class="pre">(batch_size,</span> <span class="pre">*data_point_shape)</span>
+<span class="pre">exp</span> <span class="pre">=</span> <span class="pre">experiment.Experiment(driver,</span> <span class="pre">model=net,</span> <span class="pre">input_size=input_size)</span>
+<span class="pre">`</span></code></p>
 <p>You can log the number of parameters and the number of multiply and add (mac) operations of your model.
 Currently, only pytorch is supported, and tensorflow should be supported shortly</p>
 </div>
@@ -94,7 +102,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Dev Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Deep learining benchmark</a></li>
 </ul>
 
 <div class="relations">

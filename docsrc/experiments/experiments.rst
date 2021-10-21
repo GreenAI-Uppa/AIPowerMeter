@@ -1,4 +1,4 @@
-Insights into energy consumption
+Deep learining benchmark
 ====================================
 
 Experimental protocol

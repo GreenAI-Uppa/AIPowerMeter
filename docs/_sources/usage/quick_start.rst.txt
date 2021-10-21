@@ -58,7 +58,7 @@ If you wish to get the number of parameters and mac operations of your pytorch m
 Measuring my first program
 --------------------------
 
-You have an example `there <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, in a nutshell,
+You have examples `there (pytorch) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, and `there (numpy) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py>`_ in a nutshell,
 
  you instantiate an experiment and place the code you want to measure between a start and stop signal.
 

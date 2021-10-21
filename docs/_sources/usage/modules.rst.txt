@@ -2,6 +2,8 @@ Dev Documentation
 ===================
 
 
+Brief description of some key functions
+
 Experiment module
 -----------------
 .. automodule:: deep_learning_power_measure.power_measure.experiment

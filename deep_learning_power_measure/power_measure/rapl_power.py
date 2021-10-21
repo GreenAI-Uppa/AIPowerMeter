@@ -290,8 +290,9 @@ def get_metrics(pid_list, pause = 2.0):
     s2 = sample.take_sample()
     power_metrics = get_power(s2 - s1)
     metrics = {
-        'mem_use_abs':mem_pss_per_process,
-        'cpu_uses': cpu_uses, 'mem_use_percent': mem_uses,
+        'per_process_mem_use_abs':mem_pss_per_process,
+        'per_process_cpu_uses': cpu_uses,
+        'per_process_mem_use_percent': mem_uses,
         'intel_power' :power_metrics['intel_power'],
         'psys_power':power_metrics['psys_power']
     }
@@ -308,5 +309,5 @@ def get_metrics(pid_list, pause = 2.0):
         metrics['per_process_dram_power'] = dram_power_use
         metrics['total_dram_power'] = dram_power
     if len(mem_uss_per_process) > 0:
-        metrics['mem_use_uss'] = mem_uss_per_process
+        metrics['per_process_mem_use_uss'] = mem_uss_per_process
     return metrics
