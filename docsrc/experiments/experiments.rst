@@ -55,50 +55,69 @@ We then load Alexnet model and push it into our GeForce RTX 3090 GPU.
   #load the model to the device
   alexnet = alexnet.to(device)
 
-We then prepare the experiment protocol described above for a random 224X244 image. We choose to run 4000 inferences to let AIPowerMeter reports the power draws during 40 seconds.
+We then prepare the experiment protocol described above for a list of 20 input sizes from 112*112 to 2016*2016 resolution sizes. We choose to run an adequate number of inferences for each input size to let AIPowerMeter reports the power draws during around 40 seconds.
 
 .. code-block:: python
 
   #experiments protocol
-  iters = 4000#number of inferences
-  xps = 10#number of experiments to reach robustness
-  
-  #choose a resolution size
-  input_size = 224
-  
-  #create a random image
-  image_test = torch.rand(1,3,input_size,input_size)
-  #for GPU use
-  image_test = image_test.to(device)
 
-We then start the inferences and measurements.
+  #resolution size list
+  input_sizes = [112*(k+1) for k in range(20)]
+  #number of experiments
+  xps = 10
+  
+
+We then start the inferences and measurements for each input size and each experiment.
 
 .. code-block:: python
 
   #start of the experiments
-  for k in range(xps):
-  	print('Experience',k,'/',xps,'is running')
-  	latencies = []
-  	#AIPM
-  	input_image_size = (1,3,input_size,input_size)
-  	driver = parsers.JsonParser(os.path.join(os.getcwd(),"input_"+str(input_size)+"/run_"+str(k)))
-	exp = experiment.Experiment(driver,model=alexnet,input_size=input_image_size)
-	p, q = exp.measure_yourself(period=2)
-	start_xp = time.time()
-	for t in range(iters):
-		start_iter = time.time()
-		y = alexnet(image_test)
-		res = time.time()-start_iter
-		#print(t,'latency',res)
-		latencies.append(res)
-	q.put(experiment.STOP_MESSAGE)
-	end_xp = time.time()
-	print("power measuring stopped after",end_xp-start_xp,"seconds for experience",k,"/",xps)
-	driver = parsers.JsonParser("input_"+str(input_size)+"/run_"+str(k))
-	#write latency.csv next to power_metrics.json file
-	np.savetxt("input_"+str(input_size)+"/run_"+str(k)+"/latency.csv",np.array(latencies))
+  for u,input_size in enumerate(input_sizes):
+    #number of inferences
+    iters = int(40000/(u+1))
+    #create a random image
+    image_test = torch.rand(1,3,input_size,input_size)
+    image_test = image_test.to(device)
+    #start of the experiments
+    for k in range(xps):
+        print('Experience',k+1,'/',xps,'is running')
+        latencies = []
+        #AIPM
+        input_image_size = (1,3,input_size,input_size)
+        driver = parsers.JsonParser(os.path.join(os.getcwd(),"input_"+str(input_size)+"/run_"+str(k)))
+        exp = experiment.Experiment(driver)
+        p, q = exp.measure_yourself(period=2)
+        start_xp = time.time()
+        for t in range(iters):
+            #print(t)
+            start_iter = time.time()
+            y = alexnet(image_test)
+            res = time.time()-start_iter
+            #print(t,'latency',res)
+            latencies.append(res)
+        q.put(experiment.STOP_MESSAGE)
+        end_xp = time.time()
+        print("power measuring stopped after",end_xp-start_xp,"seconds for experience",k,"/",xps)
+        driver = parsers.JsonParser("input_"+str(input_size)+"/run_"+str(k))
+        #write latency.csv next to power_metrics.json file
+        np.savetxt("input_"+str(input_size)+"/run_"+str(k)+"/latency.csv",np.array(latencies))
 
 
+We then run `concat_power_measure <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py>`_ to have the report of our experiments. 
+
+We fist plot the evolution of the GPU and CPU consumption of one inference for each input size. We can note a very strong linear correlation between CPU and GPU consumption, with a factor around 10 (GPU consumption is 10 times bigger than CPU). However, the regression of the consumption with respect to the size of the input is NOT linear: the consumption of one inference seems constant from 112x112 to 672x672 images, then it increases linearly until 1680x1680 images where a second jump occurs for 1792x1792 input size.
+
+.. image:: alexnet_nvidia_intel.png
+   :width: 400pt
+   :align: center
+
+We also plot the behaviours of latency and total consumption as a function of the input size. We highlight a smoother evolution for the latency as the input size increases but with a still very high Pearson coefficient (0.98).
+
+.. image:: alexnet_gpu_latency.png
+   :width: 400pt
+   :align: center
+
+As a result, for this particular experiment protocol, we can conclude that *the latency is a reasonable statistic to describe the energy consumption of an Alexnet at inference as a function of the input size*. In the next study, we will propose the same kind of analyses varying the size of the architecture (number of layers, number of filters, size of the filters). 
 
 Resnet study
 ------------
