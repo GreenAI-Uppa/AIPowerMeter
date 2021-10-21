@@ -3,6 +3,7 @@
 Record the energy consumption of your cpu and gpu. 
 
 This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
+Check [our documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
 
 ## Requirements
 
