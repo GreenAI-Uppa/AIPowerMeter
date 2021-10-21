@@ -89,21 +89,15 @@ def get_processes(pid_list):
     return process_list
 
 def get_power(diff):
-    """
-    diff : difference between two RAPL samples
+    """return the power accumulation of the provided pair of rapl samples for
+    the different RAPL domains
 
-    this should get the power per package (e.g., total rapl power)
-    see  https://blog.chih.me/images/power-planes.jpg
-    Recent (Sandy Bridge and later) Intel processors that implement the RAPL (Running Average Power Limit)
-    interface that provides MSRs containing energy consumption estimates for up to four power planes or
-    domains of a machine, as seen in the diagram above.
-    PKG: The entire package.
-    PP0: The cores.
-    PP1: An uncore device, usually the GPU (not available on all processor models.)
-    DRAM: main memory (not available on all processor models.)
-    PSys: Skylake mobile SoC total energy
-    The following relationship holds: PP0 + PP1 <= PKG. DRAM is independent of the other three domains.
-    Most processors come in two packages so top level domains should be package-1 and package-0
+    Args:
+        diff : difference between two RAPL samples
+
+    Returns:
+        Dictionnary where each key correspond to an RAPL domain and the value
+        is the accumulated energy consumption in Joules
     """
     total_intel_power = 0
     total_dram_power = 0

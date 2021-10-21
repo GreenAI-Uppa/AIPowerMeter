@@ -9,6 +9,7 @@ Recorded fields
 ---------------------
 
 Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`
+
 Unless specified otherwise, the power is logged in watts.
 
 **CPU use**
@@ -17,7 +18,7 @@ Unless specified otherwise, the power is logged in watts.
 
 `mem_use_abs`: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses` for more details.
 
-`mem_use_percent`: Relative number of bytes.
+`mem_use_percent`: Relative number of bytes used in the CPU RAM.
 
 **CPU power**
 

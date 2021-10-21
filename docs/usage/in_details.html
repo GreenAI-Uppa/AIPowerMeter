@@ -39,12 +39,12 @@
 <p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
 <div class="section" id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
-<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>
-Unless specified otherwise, the power is logged in watts.</p>
+<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite></p>
+<p>Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
 <p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
 <p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
-<p><cite>mem_use_percent</cite>: Relative number of bytes.</p>
+<p><cite>mem_use_percent</cite>: Relative number of bytes used in the CPU RAM.</p>
 <p><strong>CPU power</strong></p>
 <p><cite>Intel_power</cite>: total consumption measured by RAPL</p>
 <p><cite>psys_power</cite>: System on chip consumption</p>
