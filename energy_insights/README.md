@@ -1,6 +1,7 @@
 # Power Metric Management 
 
-Make use of *concat_power_measure.py* to merge your multiple power_metrics.json.
+This is the code used to generate [measure energy consumption of standard deep learning models](<https://greenai-uppa.github.io/AIPowerMeter/experiments/experiments.html)
+It makes use of *concat_power_measure.py* to merge your multiple power_metrics.json.
 
 ## Requirements 
 
