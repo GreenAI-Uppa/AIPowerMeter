@@ -198,10 +198,9 @@ class Experiment():
         """
         print("we'll take the measure of the following pids", pid_list)
         while True:
-            time.sleep(period)
             metrics = {}
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=period)
             if self.nvidia_available:
                 metrics['gpu'] = gpu_power.get_nvidia_gpu_power(pid_list)
             self.db_driver.save_power_metrics(metrics)
@@ -289,7 +288,9 @@ class ExpResults():
             mem_use_abs = self.average_('mem_use_abs')
             mem_use_uss = self.average_('mem_use_uss')
 
-            if total_dram_power is None:
+            if total_dram_power is None and mem_use_abs is None:
+                print("RAM consumption not available. RAM usage not available")
+            elif total_dram_power is None: 
                 print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
             else:
                 print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))

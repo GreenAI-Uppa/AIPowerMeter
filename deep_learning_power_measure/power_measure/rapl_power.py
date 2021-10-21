@@ -167,7 +167,9 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
         cpu_util_system = delta_proc2 / float(st22 - st12)
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
-            print("cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
+            print("WARNING cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
+            print("I cannot attribute cpu time to the different pids.")
+            print("consider to set a larger period value when calling measurement function")
             attributable_compute = 0
         else:
             attributable_compute = cpu_util_process / cpu_util_system
@@ -175,7 +177,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
         cpu_percent[p.pid] = attributable_compute
     return cpu_percent # should be for multiple softwares
 
-def get_cpu_uses(process_list, pause=2.0):
+def get_cpu_uses(process_list, period=2.0):
     """Extracts the relative number of cpu clock attributed to each process
 
     Args:
@@ -191,7 +193,7 @@ def get_cpu_uses(process_list, pause=2.0):
     # get the cpu time used
     infos1, zombies = get_info_time(process_list)
     # wait a bit
-    time.sleep(pause)
+    time.sleep(period)
     # get the cpu time used
     infos2, zombies = get_info_time(process_list, zombies)
     cpu_uses = get_percent_uses(infos1, infos2, zombies, process_list)
@@ -270,7 +272,7 @@ def get_mem_uses(process_list):
             mem_uss_per_process[k] = info['uss']
     return mem_pss_per_process, mem_uss_per_process
 
-def get_metrics(pid_list, pause = 2.0):
+def get_metrics(pid_list, period = 2.0):
     """
     main function which will return power uses given a list of process ids
     pause : indicates how many seconds to wait to compute the delta of power draw and cpu uses
@@ -278,7 +280,7 @@ def get_metrics(pid_list, pause = 2.0):
     sample = rapl.RAPLSample()
     s1 = sample.take_sample()
     process_list = get_processes(pid_list)
-    cpu_uses = get_cpu_uses(process_list, pause = pause)
+    cpu_uses = get_cpu_uses(process_list, period = period)
     mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
