@@ -1,40 +1,29 @@
 Background on power measure
 ===========================
 
+This section provide general information on monitoring power on computers.
 General considerations
 ----------------------
-Main sources of energy consumption are the gpu, the cpu and memory.
 
-
-However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives.
-
-Preliminaries
--------------
-
-The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm). 
-
-The watt is the unit to measure power. 
-
-1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)
-
-1kWh = 3600000 Joules ~= 3 hours of GPU
+The main sources of energy consumption in a computer are the gpu, the cpu and memory. However, other sources are non negligible, among them, the fans, the optical drives, motherboards, and hard drives. Moreover, the consumption will vary according to external factors, such as the temperature, and obviously, the type of programs run by the user. 
 
 
 .. figure:: computer.png
     
     Different sources of energy consumption. Green boxes are measured by our library (indicative figures)
 
-A computer consumes energy from different parts. This library allows you to measure the one highlighted in red.
 
-Thousands of cores to enable parallelism
-Lower amount of RAM memory available
-Higher latency : GPU clock speed < CPU clock speed
-Higher memory throughput : GPU operates on larger chunks of data
-GPU can fetch data from its RAM more quickly
-CPU bandwidth < GPU bandwidth
-Smaller set of instructions dedicated to graphics and matrix calculus
-More power hungry and requires a CPU
-Energy efficient since the computations is faster.
+A generic solution with an easy deployment has to use the inbuilt sensors and available software models, and thus is restricted to what is provided by the constructors. As most of the monitoring tools, we use RAPL for the CPU, and nvidia-smi for the GPU.
+
+Preliminaries
+-------------
+
+The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm). The watt is the unit to measure power. In other words:
+
+1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)
+
+1kWh = 3600000 Joules ~= 3 hours of GPU
+
 
 .. _rapl:
 
@@ -42,7 +31,7 @@ CPU and RAPL
 -----------------------------------------------------
 
 The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu). 
-It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ), and there has been considerable study to validate its use for software monitoring ( [Khan2018]_ ).
+It is present since the Sandy bridge architecture in 2011 and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ), and there has been considerable study to validate its use for software monitoring ( [Khan2018]_ ).
 
 It is divided into different physically meaningfull domains:
 
@@ -69,14 +58,13 @@ The official documentation is the Intel® 64 and IA-32 Architectures Software De
 
 GPU and nvidia-smi 
 ---------------------------
-description of nvidia-smi
-Things are more simple, and unfortunately because we have much less information.
+Things are more simple with nvidia-smi, unfortunately, the reason for this is because we have much less information.
 from the man page of `nvidia-smi <https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en>`_ : *The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.*
+
+Still, nvidia provides us with the percentage of core memory used by each program for each GPU.
 
 Related work
 ------------
 
-There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repos such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter repository. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for an measurement campaign at the scale of a data center. 
-
-https://www.tensorflow.org/guide/profiler
+There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for an measurement campaign at the scale of a data center. 
 

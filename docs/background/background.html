@@ -38,29 +38,18 @@
 <h1>Background on power measure<a class="headerlink" href="#background-on-power-measure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="general-considerations">
 <h2>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h2>
-<p>Main sources of energy consumption are the gpu, the cpu and memory.</p>
-<p>However, some consumption sources will be missed by your setup, such as optical drives, motherboards, and hard drives.</p>
-</div>
-<div class="section" id="preliminaries">
-<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
-<p>The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm).</p>
-<p>The watt is the unit to measure power.</p>
-<p>1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)</p>
-<p>1kWh = 3600000 Joules ~= 3 hours of GPU</p>
+<p>The main sources of energy consumption in a computer are the gpu, the cpu and memory. However, other sources are non negligible, among them, the fans, the optical drives, motherboards, and hard drives. Moreover, the consumption will vary according to external factors, such as the temperature, and obviously, the type of programs run by the user.</p>
 <div class="figure align-default" id="id5">
 <img alt="../_images/computer.png" src="../_images/computer.png" />
 <p class="caption"><span class="caption-text">Different sources of energy consumption. Green boxes are measured by our library (indicative figures)</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
-<p>A computer consumes energy from different parts. This library allows you to measure the one highlighted in red.</p>
-<p>Thousands of cores to enable parallelism
-Lower amount of RAM memory available
-Higher latency : GPU clock speed &lt; CPU clock speed
-Higher memory throughput : GPU operates on larger chunks of data
-GPU can fetch data from its RAM more quickly
-CPU bandwidth &lt; GPU bandwidth
-Smaller set of instructions dedicated to graphics and matrix calculus
-More power hungry and requires a CPU
-Energy efficient since the computations is faster.</p>
+<p>A generic solution with an easy deployment has to use the inbuilt sensors and available software models, and thus is restricted to what is provided by the constructors. As most of the monitoring tools, we use RAPL for the CPU, and nvidia-smi for the GPU.</p>
+</div>
+<div class="section" id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
+<p>The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm). The watt is the unit to measure power. In other words:</p>
+<p>1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)</p>
+<p>1kWh = 3600000 Joules ~= 3 hours of GPU</p>
 </div>
 <div class="section" id="cpu-and-rapl">
 <span id="rapl"></span><h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
