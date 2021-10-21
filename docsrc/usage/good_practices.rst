@@ -5,15 +5,13 @@ Frequency of measure
 ---------------------
 
 
-.. code-block:: console
-
-   git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
-   pip install -r requirements.txt
-   python setup.py install
-
-Check if you have the required hardware
-
 
 
 Multiple program on the same machine
 ------------------------------------
+
+
+Correlate power use with model accuracy
+---------------------------------------
+
+If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values

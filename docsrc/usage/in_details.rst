@@ -55,15 +55,6 @@ model complexity
 You can log the number of parameters and the number of multiply and add (mac) operations of your model. 
 Currently, only pytorch is supported, and tensorflow should be supported shortly
 
-Threading
--------------------
-In practice, a thread is launched to record the energy of your program. 
-
-.. figure:: multi_threading.png
-
-   Interaction between the experiment and the recording threads
-
-If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values
 
 
 

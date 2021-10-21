@@ -36,9 +36,20 @@
             
   <div class="section" id="dev-documentation">
 <h1>Dev Documentation<a class="headerlink" href="#dev-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="experiment-module">
-<h2>Experiment module<a class="headerlink" href="#experiment-module" title="Permalink to this headline">¶</a></h2>
-<p>This module handles the thread and call the required recording functions.</p>
+<div class="section" id="module-deep_learning_power_measure.power_measure.experiment">
+<span id="experiment-module"></span><h2>Experiment module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.experiment" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>this module contains mainly two classes</dt><dd><p>Experiment is an entry point to start and end the recording of the power consumption of your Experiment
+ExpResult is used to process and format the recordings.</p>
+<p>Both classes uses a driver attribute to communicate with a database, or read and write in json files</p>
+</dd>
+</dl>
+<p>In practice, a thread is launched to record the energy of your program.</p>
+<div class="figure align-default" id="id1">
+<img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
+<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values</p>
 <dl class="py function">
 <dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
 <code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
@@ -155,7 +166,7 @@ power</p>
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="in_details.html">Advanced use</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Dev Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#experiment-module">Experiment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-deep_learning_power_measure.power_measure.experiment">Experiment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-deep_learning_power_measure.power_measure.rapl_power">rapl_power module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-deep_learning_power_measure.power_measure.gpu_power">gpu_power module</a></li>
 </ul>

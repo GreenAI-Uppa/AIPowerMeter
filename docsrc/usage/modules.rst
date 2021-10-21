@@ -2,10 +2,19 @@ Dev Documentation
 ===================
 
 
+Brief description of some key functions
+
 Experiment module
 -----------------
-This module handles the thread and call the required recording functions.
+.. automodule:: deep_learning_power_measure.power_measure.experiment
 
+In practice, a thread is launched to record the energy of your program.
+
+.. figure:: multi_threading.png
+
+   Interaction between the experiment and the recording threads
+
+If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values
 
 .. autofunction:: deep_learning_power_measure.power_measure.experiment.Experiment
 

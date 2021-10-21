@@ -66,15 +66,6 @@ Unless specified otherwise, the power is logged in watts.</p>
 <p>You can log the number of parameters and the number of multiply and add (mac) operations of your model.
 Currently, only pytorch is supported, and tensorflow should be supported shortly</p>
 </div>
-<div class="section" id="threading">
-<h2>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h2>
-<p>In practice, a thread is launched to record the energy of your program.</p>
-<div class="figure align-default" id="id1">
-<img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
-<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-<p>If you want to record also the time, accuracy and other valuable metrics in the main program and then, interpolate with the energy values</p>
-</div>
 </div>
 
 
@@ -100,11 +91,9 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#recorded-fields">Recorded fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-complexity">model complexity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Dev Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
 
