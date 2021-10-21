@@ -1,14 +1,16 @@
+"""Compute the number of parameters and mac operations"""
+
+import sys
 try:
- from torchinfo import summary
+    from torchinfo import summary
 except ImportError as e:
- pass
+    pass
 
 try:
     import tensorflow as tf
 except ImportError as e:
     pass
 
-import sys
 
 def to_bytes(num: int) -> float:
     """Converts a number (assume floats, 4 bytes each) to megabytes."""

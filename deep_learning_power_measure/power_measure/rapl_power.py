@@ -1,15 +1,15 @@
-# sudo chmod -R 555 /sys/class/powercap/intel-rapl/
-import os, time
-import psutil
+"""Handling of the CPU use and CPU consumption with RAPL"""
+import os
+import time
 import warnings
-from multiprocessing import Process, Queue
+import psutil
 
 from . import rapl
 rapl_dir = "/sys/class/powercap/intel-rapl/"
 
 def is_rapl_compatible():
     """
-    Check if rapl logs are available on this machine
+    Check if rapl logs are available on this machine.
     """
     if not os.path.isdir(rapl_dir):
         return (False, "cannot find rapl directory in "+rapl_dir)
@@ -31,15 +31,15 @@ def is_rapl_compatible():
     else:
         msg += 'RAM related energy consumption available\n'
     if 'core' not in domain_names and 'cpu' not in domain_names:
-            msg += 'CPU core related energy consumption NOT available\n'
+        msg += 'CPU core related energy consumption NOT available\n'
     else:
         msg += 'CPU core related energy consumption available\n'
     if 'uncore' not in domain_names:
-            msg += 'uncore related energy consumption NOT available\n'
+        msg += 'uncore related energy consumption NOT available\n'
     else:
         msg += 'uncore related energy consumption available\n'
     if 'psys' not in domain_names:
-            msg += 'System on Chip related energy consumption NOT available\n'
+        msg += 'System on Chip related energy consumption NOT available\n'
     else:
         msg += 'System on Chip related energy consumption available\n'
     return (True, msg)
@@ -62,7 +62,7 @@ def get_info_time(process_list, zombies=None):
     infos = {}
     if zombies is None:
         zombies = []
-    for i, p in enumerate(process_list):
+    for p in process_list:
         st11 = _timer()
         # units in terms of cpu-time, so we need the cpu in the last time period that are for the process only
         system_wide_pt1 = psutil.cpu_times()
@@ -75,6 +75,7 @@ def get_info_time(process_list, zombies=None):
     return infos, zombies
 
 def get_processes(pid_list):
+    """Obtain the process object given the list of pid integers"""
     process_list = []
     # gather processes as process objects
     for process in pid_list:
@@ -128,9 +129,9 @@ def get_power(diff):
             subdomain = subdomain.name.lower()
             domains_found.add(subdomain)
             #print(subdomain, power)
-            if subdomain == "ram" or subdomain == "dram":
+            if subdomain in ("ram", "dram"):
                 total_dram_power += power
-            elif subdomain == "core" or subdomain == "cpu":
+            elif subdomain in ("core", "cpu"):
                 total_cpu_power += power
             elif subdomain == "uncore":
                 total_uncore_power += power
@@ -158,10 +159,9 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
     infos1 and infos2 : cpu times gathered at two different times and both system and process wised.
     """
     cpu_percent = {}
-    for i, p in enumerate(process_list):
+    for p in process_list:
         if p.pid in zombies:
             continue
-
         st1, st12, system_wide_pt1, pt1 = infos1[p.pid]
         st2, st22, system_wide_pt2, pt2 = infos2[p.pid]
 
@@ -182,13 +182,16 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
     return cpu_percent # should be for multiple softwares
 
 def get_cpu_uses(process_list, pause=2.0):
-    """
-    input:
-        process_list : list of process for which the cpu use will be measured
+    """Extracts the relative number of cpu clock attributed to each process
+
+    Args:
+        process_list : list of process [pid1, pid2,...] for which the cpu use
+        will be measured
         pause : sleeping time during which the cpu use will be recorded.
-    return a dictionnary
-        cpu_uses = {soft1 : cpu_use, }
-    where cpu_use is the percentage of use of this cpu with the respect to the total use of the cpu on this period (mouthfull!!)
+
+    Returns:
+        cpu_uses = {pid1 : cpu_use, }  where cpu_use is the percentage of use
+        of this cpu with the respect to the total use of the cpu on this period
     """
 
     # get the cpu time used
@@ -229,35 +232,38 @@ def get_relative_mem_use(mem_info_per_process):
     return mem_percent
 
 def get_mem_uses(process_list):
-    """
-    input :
-        process_list : list of psutil.Process objects
-    output:
-        mem_info_per_process : memory consumption for each process
-
+    """Get memory usage.
     psutil will be used to collect pss and uss values. rss is collected if pss
     is not available
     some info from psutil documentation:
-        - uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
-         which is unique to a process and which would be freed if the process
-         was terminated right now
-        - pss (Linux): aka “Proportional Set Size”, is the amount of memory
-        shared with other processes, accounted in a way that the amount is
-        divided evenly between the processes that share it. I.e. if a process
-        has 10 MBs all to itself and 10 MBs shared with another process its
-         PSS will be 15 MBs.
-         on the other hand RSS is resident set size : the non-swapped physical
-         memory that a task has used in bytes. so with the previous example,
-         the result would be 20Mbs instead of 15Mbs
+
+    USS : (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
+    was terminated right now which is unique to a process and which would be
+    freed if the process
+
+    PSS :  (Linux): aka “Proportional Set Size”, is the amount of memory
+    shared with other processes, accounted in a way that the amount is
+    divided evenly between the processes that share it. I.e. if a process
+    has 10 MBs all to itself and 10 MBs shared with another process its
+    PSS will be 15 MBs.
+
+    RSS : On the other hand RSS is resident set size : the
+    non-swapped physical memory that a task has used in bytes. so with the
+    previous example, the result would be 20Mbs instead of 15Mbs
+
+    Args :
+        process_list : list of psutil.Process objects
+    Returns:
+        mem_info_per_process : memory consumption for each process
     """
     mem_info_per_process, mem_pss_per_process, mem_uss_per_process = {}, {}, {}
     for p in process_list:
         try:
-             try:
-                 mem_info = p.memory_full_info()
-             except psutil.AccessDenied:
-                 mem_info = p.memory_info()
-             mem_info_per_process[p.pid]= mem_info._asdict()
+            try:
+                mem_info = p.memory_full_info()
+            except psutil.AccessDenied:
+                mem_info = p.memory_info()
+            mem_info_per_process[p.pid]= mem_info._asdict()
         except (psutil.ZombieProcess, psutil.NoSuchProcess):
             pass
     for k, info in mem_info_per_process.items():

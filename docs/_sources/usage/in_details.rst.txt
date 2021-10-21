@@ -1,6 +1,8 @@
 Advanced use
 ============
 
+.. _json:
+
 Recorded fields
 ---------------------
 

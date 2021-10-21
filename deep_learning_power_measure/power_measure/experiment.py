@@ -146,7 +146,6 @@ class Experiment():
             + "Regarding nvidia\n"
             + msg_nvidia
             )
-            return
         if not self.rapl_available:
             print("RAPL not available: " + msg_rapl)
         else:
@@ -174,8 +173,6 @@ class Experiment():
     @processify
     def measure_from_pid_list(self, queue, pid_list, period=1):
         """record power use for the processes given in pid_list"""
-        if model is not None:
-            self.save_model_card(model)
         self.measure(queue, pid_list, period=period)
 
     @processify
@@ -261,10 +258,6 @@ class ExpResults():
         if metric is None:
             return None
         return integrate(metric)[-1]
-
-
-    def duration(self):
-        pass
 
     def average_(self, metric_name):
         """take the average of a metric"""

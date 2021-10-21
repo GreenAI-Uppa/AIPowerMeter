@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Code Documentation &#8212; IA Power Meter  documentation</title>
+    <title>Dev Documentation &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -34,11 +34,12 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="code-documentation">
-<h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="dev-documentation">
+<h1>Dev Documentation<a class="headerlink" href="#dev-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Place a general figure of the library</p>
 <div class="section" id="experiment-module">
 <h2>Experiment module<a class="headerlink" href="#experiment-module" title="Permalink to this headline">¶</a></h2>
+<p>This module handles the thread and call the required recording functions.</p>
 <dl class="py function">
 <dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
 <code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
@@ -51,22 +52,44 @@ to this thread</p>
 </div>
 <div class="section" id="rapl-power-module">
 <h2>rapl_power module<a class="headerlink" href="#rapl-power-module" title="Permalink to this headline">¶</a></h2>
+<p>Handling of the CPU use and CPU consumption with RAPL</p>
 <dl class="py function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses">
 <code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
-<dd><dl>
-<dt>input :</dt><dd><p>process_list : list of psutil.Process objects</p>
+<dd><p>Get memory usage.
+psutil will be used to collect pss and uss values. rss is collected if pss
+is not available
+some info from psutil documentation:</p>
+<p>USS : (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
+was terminated right now which is unique to a process and which would be
+freed if the process</p>
+<p>PSS :  (Linux): aka “Proportional Set Size”, is the amount of memory
+shared with other processes, accounted in a way that the amount is
+divided evenly between the processes that share it. I.e. if a process
+has 10 MBs all to itself and 10 MBs shared with another process its
+PSS will be 15 MBs.</p>
+<p>RSS : On the other hand RSS is resident set size : the
+non-swapped physical memory that a task has used in bytes. so with the
+previous example, the result would be 20Mbs instead of 15Mbs</p>
+<dl class="simple">
+<dt>Args :</dt><dd><p>process_list : list of psutil.Process objects</p>
 </dd>
-<dt>output:</dt><dd><p>mem_info_per_process : memory consumption for each process</p>
-<dl>
-<dt>some info from psutil documentation:</dt><dd><p>uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory which is unique to a process and which would be freed if the process was terminated right now
-pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes,
-accounted in a way that the amount is divided evenly between the processes that share it.
-I.e. if a process has 10 MBs all to itself and 10 MBs shared with another process its PSS will be 15 MBs.</p>
-<p># on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
-# so with the previous example, the result would be 20Mbs instead of 15Mbs</p>
+<dt>Returns:</dt><dd><p>mem_info_per_process : memory consumption for each process</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses">
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_cpu_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em>, <em class="sig-param"><span class="n">pause</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the relative number of cpu clock attributed to each process</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>process_list : list of process [pid1, pid2,…] for which the cpu use
+will be measured
+pause : sleeping time during which the cpu use will be recorded.</p>
+</dd>
+<dt>Returns:</dt><dd><p>cpu_uses = {pid1 : cpu_use, }  where cpu_use is the percentage of use
+of this cpu with the respect to the total use of the cpu on this period</p>
 </dd>
 </dl>
 </dd></dl>
@@ -75,11 +98,39 @@ I.e. if a process has 10 MBs all to itself and 10 MBs shared with another proces
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_power">
 <code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diff</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>diff : difference between two RAPL samples</p>
+<p>this should get the power per package (e.g., total rapl power)
+see  <a class="reference external" href="https://blog.chih.me/images/power-planes.jpg">https://blog.chih.me/images/power-planes.jpg</a>
+Recent (Sandy Bridge and later) Intel processors that implement the RAPL (Running Average Power Limit)
+interface that provides MSRs containing energy consumption estimates for up to four power planes or
+domains of a machine, as seen in the diagram above.
+PKG: The entire package.
+PP0: The cores.
+PP1: An uncore device, usually the GPU (not available on all processor models.)
+DRAM: main memory (not available on all processor models.)
+PSys: Skylake mobile SoC total energy
+The following relationship holds: PP0 + PP1 &lt;= PKG. DRAM is independent of the other three domains.
+Most processors come in two packages so top level domains should be package-1 and package-0</p>
 </dd></dl>
 
 </div>
-<div class="section" id="gpu-power-module">
-<h2>gpu_power module<a class="headerlink" href="#gpu-power-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-deep_learning_power_measure.power_measure.gpu_power">
+<span id="gpu-power-module"></span><h2>gpu_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.gpu_power" title="Permalink to this headline">¶</a></h2>
+<p>This module parses the xml provided by nvidia-smi to obtain the consumption, memory and SM used for each gpu and each pid.</p>
+<dl class="py function">
+<dt id="deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power">
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.gpu_power.</code><code class="sig-name descname">get_nvidia_gpu_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pid_list</span></em>, <em class="sig-param"><span class="n">nsample</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the power and use of each GPU.
+first, get gpu usage per process
+second get the power use of nvidia for each GPU
+then for each gpu and each process in pid_list compute its attributatble
+power</p>
+<dl>
+<dt>Args:</dt><dd><p>pid_list : list of processes to be measured</p>
+<p>nsample : number of queries to nvidia</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 
@@ -104,10 +155,10 @@ I.e. if a process has 10 MBs all to itself and 10 MBs shared with another proces
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="in_details.html">Advanced use</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dev Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#experiment-module">Experiment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rapl-power-module">rapl_power module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#gpu-power-module">gpu_power module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-deep_learning_power_measure.power_measure.gpu_power">gpu_power module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>

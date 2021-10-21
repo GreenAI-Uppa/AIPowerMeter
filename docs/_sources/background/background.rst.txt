@@ -71,10 +71,10 @@ description of nvidia-smi
 Things are more simple, and unfortunately because we have much less information.
 from the man page of `nvidia-smi <https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en>`_ : *The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.*
 
-Other tools
------------
+Related work
+------------
 
-CarbonTracker, PAPI, Experiment-Impact-Tracker
+There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repos such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter repository. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for an measurement campaign at the scale of a data center. 
 
 https://www.tensorflow.org/guide/profiler
 

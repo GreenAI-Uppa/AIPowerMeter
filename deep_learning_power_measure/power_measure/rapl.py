@@ -1,3 +1,8 @@
+"""
+module copied as is from the following repository:
+https://github.com/Breakend/experiment-impact-tracker
+"""
+
 import os
 import os.path
 import re

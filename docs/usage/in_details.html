@@ -1,13 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-<<<<<<< HEAD
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-=======
->>>>>>> 8161f95220740049ee5d5dad3988b8087ffd4780
     <title>Advanced use &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,10 +13,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Code Documentation" href="modules.html" />
+    <link rel="next" title="Dev Documentation" href="modules.html" />
     <link rel="prev" title="Background on power measure" href="../background/background.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -40,7 +37,7 @@
   <div class="section" id="advanced-use">
 <h1>Advanced use<a class="headerlink" href="#advanced-use" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="recorded-fields">
-<h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
+<span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
 <p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>metric_name : {… pid_i: v_i, ….}</cite>
 Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
@@ -106,7 +103,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 <li class="toctree-l2"><a class="reference internal" href="#threading">Threading</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Dev Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="good_practices.html">Good practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
@@ -116,7 +113,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../background/background.html" title="previous chapter">Background on power measure</a></li>
-      <li>Next: <a href="modules.html" title="next chapter">Code Documentation</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">Dev Documentation</a></li>
   </ul></li>
 </ul>
 </div>
@@ -146,11 +143,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
       &copy;2021, GreenAIUppa.
       
       |
-<<<<<<< HEAD
       Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
-=======
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
->>>>>>> 8161f95220740049ee5d5dad3988b8087ffd4780
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

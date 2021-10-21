@@ -1,13 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-<<<<<<< HEAD
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-=======
->>>>>>> 8161f95220740049ee5d5dad3988b8087ffd4780
     <title>Background on power measure &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Advanced use" href="../usage/in_details.html" />
@@ -67,9 +64,9 @@ Energy efficient since the computations is faster.</p>
 <p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).
 It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ), and there has been considerable study to validate its use for software monitoring ( <a class="reference internal" href="#khan2018" id="id2"><span>[Khan2018]</span></a> ).</p>
 <p>It is divided into different physically meaningfull domains:</p>
-<div class="figure align-default" id="id4">
+<div class="figure align-default" id="id5">
 <img alt="../_images/rapl_domain.png" src="../_images/rapl_domain.png" />
-<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">RAPL power domains (from <a class="reference internal" href="#khan2018" id="id3"><span>[Khan2018]</span></a> )</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 <ul class="simple">
 <li><p>Power Plane 0 : the cores alias the CPU</p></li>
@@ -88,9 +85,9 @@ It is present since and from Haswell is supported by integrated voltage regulato
 Things are more simple, and unfortunately because we have much less information.
 from the man page of <a class="reference external" href="https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en">nvidia-smi</a> : <em>The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.</em></p>
 </div>
-<div class="section" id="other-tools">
-<h2>Other tools<a class="headerlink" href="#other-tools" title="Permalink to this headline">¶</a></h2>
-<p>CarbonTracker, PAPI, Experiment-Impact-Tracker</p>
+<div class="section" id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Permalink to this headline">¶</a></h2>
+<p>There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repos such as <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter repository. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for an measurement campaign at the scale of a data center.</p>
 <p><a class="reference external" href="https://www.tensorflow.org/guide/profiler">https://www.tensorflow.org/guide/profiler</a></p>
 </div>
 <div class="section" id="bibliography">
@@ -130,12 +127,12 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <li class="toctree-l2"><a class="reference internal" href="#preliminaries">Preliminaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#other-tools">Other tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#related-work">Related work</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bibliography">Bibliography</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/in_details.html">Advanced use</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/modules.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/modules.html">Dev Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/good_practices.html">Good practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../experiments/experiments.html">Insights into energy consumption</a></li>
 </ul>
@@ -175,11 +172,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
       &copy;2021, GreenAIUppa.
       
       |
-<<<<<<< HEAD
       Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
-=======
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
->>>>>>> 8161f95220740049ee5d5dad3988b8087ffd4780
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

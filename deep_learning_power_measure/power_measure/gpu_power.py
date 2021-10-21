@@ -1,36 +1,36 @@
+"""This module parses the xml provided by nvidia-smi to obtain the consumption, memory and SM used for each gpu and each pid."""
+
 from subprocess import PIPE, Popen
-import subprocess
-import numpy as np
-import pandas as pd
 import re
+import subprocess
 from collections import OrderedDict
 from io import StringIO
-import csv
 from xml.etree.ElementTree import fromstring
-
+from shutil import which
+import numpy as np
+import pandas as pd
 
 def is_nvidia_compatible():
     """
     return boolean corresponding to checking Check if this system supports nvidia tools required
     """
-    from shutil import which
 
     msg = "nvidia NOT available for energy consumption\n"
     if which("nvidia-smi") is None:
         return (False, msg+"nvidia-smi program is not in the path")
     # make sure that nvidia-smi doesn't just return no devices
     p = Popen(["nvidia-smi"], stdout=PIPE)
-    stdout, stderror = p.communicate()
+    stdout, _ = p.communicate()
     output = stdout.decode("UTF-8")
     if "no devices" in output.lower():
         return (False, msg+"nvidia-smi did not found GPU device on this machine")
     if "NVIDIA-SMI has failed".lower() in output.lower():
         return (False, msg+output)
     xml = get_nvidia_xml()
-    for gpu_id, gpu in enumerate(xml.findall("gpu")):
+    for _, gpu in enumerate(xml.findall("gpu")):
         try:
             get_gpu_data(gpu)
-        except Exception as e:
+        except RuntimeError as e:
             return (False, msg+e.__str__())
         break
     msg = "GPU power will be measured with nvidia"
@@ -78,13 +78,14 @@ def get_gpu_use_pmon(nsample=1):
         "  +", "\t", out_str_final
     )  # commands may have single spaces
     out_str_final = re.sub("\n\t", "\n", out_str_final)  # remove preceding space
-    out_str_final = re.sub("\s+\n", "\n", out_str_final)  # else pd will mis-align
+    out_str_final = re.sub(r"\s+\n", "\n", out_str_final)  # else pd will mis-align
     out_str_final = out_str_final.strip()
     df = pd.read_csv(StringIO(out_str_final), engine="python", delimiter="\t")
     process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
     return  process_percentage_used_gpu
 
 def get_gpu_mem(gpu):
+    """Get the gpu memory usage from one gpu"""
     memory_usage = gpu.findall("fb_memory_usage")[0]
     total_memory = memory_usage.findall("total")[0].text
     used_memory = memory_usage.findall("used")[0].text
@@ -96,20 +97,27 @@ def get_gpu_mem(gpu):
     }
 
 def get_gpu_use(gpu):
+    """Get gpu utilization and memory usage"""
     utilization = gpu.findall("utilization")[0]
     gpu_util = utilization.findall("gpu_util")[0].text
     memory_util = utilization.findall("memory_util")[0].text
     return {"gpu_util": gpu_util, "memory_util": memory_util}
 
 def get_gpu_power(gpu):
+    """get the power draw for this gpu"""
     power_readings = gpu.findall("power_readings")[0]
     power_draw = power_readings.findall("power_draw")[0].text
     if power_draw  == 'N/A':
-        raise Exception("nvidia-smi could not retrieve power draw from the nvidia card. Check that it is supported on your hardware ?")
+        raise RuntimeError("nvidia-smi could not retrieve power draw from the nvidia card. Check that it is supported on your hardware ?")
     power_draw = float(power_draw.replace("W", ""))
     return {"power_draw": power_draw}
 
 def get_gpu_data(gpu):
+    """get consumption, SM and memory use for one gpu
+
+    Args:
+        gpu: xml part regarding one specific gpu
+    """
     gpu_data = {}
     name = gpu.findall("product_name")[0].text
     gpu_data["name"] = name
@@ -119,25 +127,29 @@ def get_gpu_data(gpu):
     return gpu_data
 
 def get_nvidia_xml():
+    """Call nvidia-smi program to obtain the details about the GPUs"""
     p = subprocess.Popen(["nvidia-smi", "-q", "-x"], stdout=subprocess.PIPE)
-    outs, errors = p.communicate()
+    outs, _ = p.communicate()
     xml = fromstring(outs)
     return xml
 
-def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
-    """
+def get_nvidia_gpu_power(pid_list, nsample = 1):
+    """Get the power and use of each GPU.
     first, get gpu usage per process
-       nsample indicates the number of queries to nvidia
-    second get the power use of nvidia
-    then for each gpu and for each process in pid_list
-        compute its attributatble power
+    second get the power use of nvidia for each GPU
+    then for each gpu and each process in pid_list compute its attributatble
+    power
+
+    Args:
+        pid_list : list of processes to be measured
+
+        nsample : number of queries to nvidia
+
     """
     process_percentage_used_gpu = get_gpu_use_pmon(nsample=nsample)
 
     # this commmand provides the full xml output
     xml = get_nvidia_xml()
-    num_gpus = int(xml.findall("attached_gpus")[0].text)
-    results = []
     power = 0
     per_gpu_absolute_percent_usage = {}
     per_gpu_relative_percent_usage = {}
@@ -197,7 +209,6 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
         percentage_of_gpu_used_by_all_processes = float(gpu_based_processes["sm"].sum())
         for info in processes.findall("process_info"):
             pid = info.findall("pid")[0].text
-            process_name = info.findall("process_name")[0].text
             used_memory = info.findall("used_memory")[0].text
             sm_absolute_percent = gpu_based_processes[
                 gpu_based_processes["pid"] == int(pid)
@@ -241,7 +252,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1, logger=None, **kwargs):
             list(per_gpu_relative_percent_usage.values())
         )
     per_gpu_average_estimated_utilization_absolute = []
-    for i, row in process_percentage_used_gpu.iterrows():
+    for _, row in process_percentage_used_gpu.iterrows():
         d = dict([(k,float(row[k])) for k in process_percentage_used_gpu.columns] )
         per_gpu_average_estimated_utilization_absolute.append(d)
     data_return_values_with_headers = {
