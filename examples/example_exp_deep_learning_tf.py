@@ -30,7 +30,7 @@ data = tf.random.normal(input_shape)
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
 # instantiating the experiment.
-exp = experiment.Experiment(driver, model=net, input_size=input_size)
+exp = experiment.Experiment(driver)
 
 # starting the record, and wait two seconds between each energy consumption measurement
 # Note that it takes the model and the input as a parameter in order to give a model summary
