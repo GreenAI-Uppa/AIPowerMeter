@@ -36,15 +36,15 @@
             
   <div class="section" id="background-on-power-measure">
 <h1>Background on power measure<a class="headerlink" href="#background-on-power-measure" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="general-considerations">
-<h2>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h2>
+<p>This section provide general information on monitoring power on computers.
+General considerations
+———————-</p>
 <p>The main sources of energy consumption in a computer are the gpu, the cpu and memory. However, other sources are non negligible, among them, the fans, the optical drives, motherboards, and hard drives. Moreover, the consumption will vary according to external factors, such as the temperature, and obviously, the type of programs run by the user.</p>
 <div class="figure align-default" id="id5">
 <img alt="../_images/computer.png" src="../_images/computer.png" />
 <p class="caption"><span class="caption-text">Different sources of energy consumption. Green boxes are measured by our library (indicative figures)</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 <p>A generic solution with an easy deployment has to use the inbuilt sensors and available software models, and thus is restricted to what is provided by the constructors. As most of the monitoring tools, we use RAPL for the CPU, and nvidia-smi for the GPU.</p>
-</div>
 <div class="section" id="preliminaries">
 <h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
 <p>The unit to measure energy is the Joule, it is the energy transferred to an object when a force of one newton acts on that object in the direction of the force’s motion through a distance of one metre (1 newton-metre or Nm). The watt is the unit to measure power. In other words:</p>
@@ -54,7 +54,7 @@
 <div class="section" id="cpu-and-rapl">
 <span id="rapl"></span><h2>CPU and RAPL<a class="headerlink" href="#cpu-and-rapl" title="Permalink to this headline">¶</a></h2>
 <p>The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu).
-It is present since and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="../bibliography.html#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ), and there has been considerable study to validate its use for software monitoring ( <a class="reference internal" href="../bibliography.html#khan2018" id="id2"><span>[Khan2018]</span></a> ).</p>
+It is present since the Sandy bridge architecture in 2011 and from Haswell is supported by integrated voltage regulators in addition to power models ( <a class="reference internal" href="../bibliography.html#hackenberg2015" id="id1"><span>[Hackenberg2015]</span></a> ), and there has been considerable study to validate its use for software monitoring ( <a class="reference internal" href="../bibliography.html#khan2018" id="id2"><span>[Khan2018]</span></a> ).</p>
 <p>It is divided into different physically meaningfull domains:</p>
 <div class="figure align-default" id="id6">
 <img alt="../_images/rapl_domain.png" src="../_images/rapl_domain.png" />
@@ -73,14 +73,13 @@ It is present since and from Haswell is supported by integrated voltage regulato
 </div>
 <div class="section" id="gpu-and-nvidia-smi">
 <h2>GPU and nvidia-smi<a class="headerlink" href="#gpu-and-nvidia-smi" title="Permalink to this headline">¶</a></h2>
-<p>description of nvidia-smi
-Things are more simple, and unfortunately because we have much less information.
+<p>Things are more simple with nvidia-smi, unfortunately, the reason for this is because we have much less information.
 from the man page of <a class="reference external" href="https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en">nvidia-smi</a> : <em>The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.</em></p>
+<p>Still, nvidia provides us with the percentage of core memory used by each program for each GPU.</p>
 </div>
 <div class="section" id="related-work">
 <h2>Related work<a class="headerlink" href="#related-work" title="Permalink to this headline">¶</a></h2>
-<p>There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repos such as <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter repository. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for an measurement campaign at the scale of a data center.</p>
-<p><a class="reference external" href="https://www.tensorflow.org/guide/profiler">https://www.tensorflow.org/guide/profiler</a></p>
+<p>There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repostories such as <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for an measurement campaign at the scale of a data center.</p>
 </div>
 </div>
 
@@ -104,7 +103,6 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../usage/quick_start.html">Quick start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Background on power measure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#general-considerations">General considerations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#preliminaries">Preliminaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
