@@ -133,7 +133,8 @@ class Experiment():
         if not cont:
             driver.erase()
         if model is not None:
-            device = 'cpu'
+            # attempting to guess the device on the model.
+            device = next(model.parameters()).device
             model.to(device)
             self.save_model_card(model, input_size, device=device)
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
