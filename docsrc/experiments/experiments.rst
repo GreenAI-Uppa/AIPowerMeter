@@ -24,7 +24,7 @@ For each set of experiments, power measurements and lattencies are written into 
         └── latency.csv
 
 
-We then compile  `here <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/power_metrics_management/concat_power_measure.py>`_ an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.  
+We then compile  `here <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/deep_learning_benchmark/concat_power_measure.py>`_ an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.  
 
 
 Alexnet study
@@ -149,14 +149,14 @@ We also compute the matrix of Spearman correlation :
 
 
 
-Bert Transformers
+Bert Transformer
 -----------------
 
-As a similar study than the previous Alexnet and Resnet one, we measure consumption of a famous NLP transformers: `Bert <https://arxiv.org/abs/1810.04805>`_.
+As a similar study than the previous Alexnet and Resnet one, we measure consumption of a famous NLP transformer: `Bert <https://arxiv.org/abs/1810.04805>`_.
 
-In this case we use torch with a sequence classifier version of Bert. Provided by the `transformers <https://huggingface.co/transformers/model_doc/bert.html>`_ library.
+In this case we use torch with a sequence classifier version of Bert, as provided by the `hugging face <https://huggingface.co/transformers/model_doc/bert.html>`_ library.
 
-The process is quite similar then before. We have a main object of 10 runs of multiplte measures. We just change the input size. Hence, we chose to set **"yes "** as main sentence. Next we juste have to repeat this "sentence" by the wanted input size.
+The process follows previous experiments. The inputs are sequences of **"yes"** tokens of different sizes. 
 
 .. code-block:: python
 
@@ -174,20 +174,17 @@ The process is quite similar then before. We have a main object of 10 runs of mu
    inputs = tokenizer(sentence*n_input, return_tensors="pt") # Tokenization + format input 
    inputs = inputs.to(device)
 
-First outputs:
+We chose to vary the input size from 50 to 500 tokens with a 50 token step. Each consumption measure lasts at least 20 seconds in order to have 10 measurements (we set the period parameter to 2).
 
-We chose to vary the input size from 50 to 500 token with a 50 tokens step (Bert is limited to 512 tokens). Each measure consumption last at least 20 seconds in order to have 10 metrics in our output.
-
-Here we can see the evolution of GPU and CPU consumption in Joule compared to the input size. The output is pretty interesting because GPU consumption seems to be linear compared to the input size. Whereas the CPU consumption decrease until a 300 tokens input size then shoot up to 0.26J per iteration. 
+In the following figure, we can see the evolution of GPU and CPU consumptions in Joules compared to the input size. Interestingly, the GPU consumption shows a linear correlation with the input size. On the other hand, the CPU consumption decreases until a 300 token input size then raises up to 0.26J per iteration. 
 
 .. image:: GPU_CPU.png
    :width: 400pt
    :align: center
 
-On the next figure we can see the evolution of latency in seconds compared to the input size. The measure is clearly not linear. A gap appears at 300-350 tokens. This observation let us think that a link exists beetween CPU consumption and latency. 
+On the next figure, we can see the evolution of latency in seconds compared to the input size. The measure is clearly not linear as a gap appears at a size of 300-350 tokens. On this plot, the link between the latency and the energy consumption is not trivial. 
 
 .. image:: latency.png
    :width: 400pt
    :align: center
 
-These outputs are interesting because iteration has been realised on GPU. We shouldn't be able to see a link between CPU consumption and latency. 
