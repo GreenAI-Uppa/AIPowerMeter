@@ -117,7 +117,7 @@ We also plot the behaviours of latency and total consumption as a function of th
    :width: 400pt
    :align: center
 
-
+As a result, for this particular experiment protocol, we can conclude that *the latency is a reasonable statistic to describe the energy consumption of an Alexnet at inference as a function of the input size*. In the next study, we will propose the same kind of analyses varying the size of the architecture (number of layers, number of filters, size of the filters). 
 
 Resnet study
 ------------
