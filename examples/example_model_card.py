@@ -1,8 +1,7 @@
-from deep_learning_power_measure.power_measure import model_complexity 
-import time, argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from deep_learning_power_measure.power_measure import model_complexity 
 
 # defining a small network with one convolution layer
 class Conv(nn.Module):
@@ -27,5 +26,3 @@ data = torch.randn(input_size)
 
 model_card = model_complexity.get_summary(net, input_size)
 print(model_card)
-time.sleep(10)
-

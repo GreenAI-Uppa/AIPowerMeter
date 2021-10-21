@@ -1,11 +1,12 @@
-import psutil, os
-from deep_learning_power_measure.power_measure import rapl_power
+import os
 from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
-
+import psutil
 import numpy as np
+from deep_learning_power_measure.power_measure import rapl_power
 
 def f(q, process_list):
+    """get the cpu uses and place them in the queue"""
     cpu_use = rapl_power.get_cpu_uses(process_list, pause=10.0)
     q.put(cpu_use)
 

@@ -1,12 +1,12 @@
-import psutil, os
-from deep_learning_power_measure.power_measure import rapl_power
+import os
 from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
-import time
 import numpy as np
+import psutil
+from deep_learning_power_measure.power_measure import rapl_power
 
 def f(q, process_list):
-    time.sleep(10)
+    """get the memory usage and place it in the queue"""
     mem_use = rapl_power.get_mem_uses(process_list)
     q.put(mem_use)
 
@@ -17,7 +17,8 @@ pid_list = [current_process.pid] + [
 print('I will measure the cpu use of the following processes',pid_list)
 process_list = rapl_power.get_processes(pid_list)
 
-n = 10000
+# taking a bit of space in the ram
+n = 1000
 a = np.random.rand(n,n)
 b = np.random.rand(n,n)
 
