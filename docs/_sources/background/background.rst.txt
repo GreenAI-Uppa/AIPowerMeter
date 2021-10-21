@@ -20,7 +20,9 @@ The watt is the unit to measure power.
 1kWh = 3600000 Joules ~= 3 hours of GPU
 
 
-**And for a computer:**
+.. figure:: computer.png
+    
+    Different sources of energy consumption. Green boxes are measured by our library (indicative figures)
 
 A computer consumes energy from different parts. This library allows you to measure the one highlighted in red.
 
@@ -78,7 +80,3 @@ There are several tools developed to monitor energy consumption of softwares, al
 
 https://www.tensorflow.org/guide/profiler
 
-Bibliography
-------------
-.. [Hackenberg2015] An Energy Efficiency Feature Survey of the Intel Haswell Processor.  IEEE International Parallel and Distributed Processing Symposium Workshop. 2015
-.. [Khan2018] Khan et al. RAPL in Action: Experiences in Using RAPL for Power Measurements. ACM Transactions on Modeling and Performance Evaluation of Computing Systems. 2018

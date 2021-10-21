@@ -14,6 +14,7 @@ Welcome to AI Power Meter's documentation!
    usage/in_details
    usage/modules
    experiments/experiments
+   bibliography
 
 
 Indices and tables

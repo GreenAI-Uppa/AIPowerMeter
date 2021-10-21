@@ -1,4 +1,4 @@
-Deep learining benchmark
+Deep learning benchmark
 ====================================
 
 Experimental protocol
