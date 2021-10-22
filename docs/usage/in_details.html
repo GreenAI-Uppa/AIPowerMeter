@@ -50,14 +50,14 @@
 <p><cite>psys_power</cite>: System on chip consumption</p>
 <p><cite>uncore_power</cite>: other hardware present on the cpu board, for instance, an integrated graphic card. This is NOT the nvidia gpu which is on another board.</p>
 <p><cite>total_cpu_power</cite>: core power consumption.</p>
-<p>In other words, you have the following relations:</p>
+<p>In other words, you have the following relation:</p>
 <div class="math notranslate nohighlight">
 \[Intel\_power = psys + uncore + total\_cpu\]</div>
 <p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
 <p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details. The support for different power domains varies according to the processor model, our library will ignore not available domains.</p>
 <p><strong>GPU use</strong></p>
 <p><cite>sm</cite>: Streaming multiprocessor usage. Analog to the <cite>cpu_uses</cite> for the gpu.</p>
-<p><cite>memory</cite>: Number of bytes used in the GPU</p>
+<p><cite>per_gpu_attributable_mem_use</cite>: Number of bytes used in the GPU</p>
 <p><strong>GPU power</strong></p>
 <p>This is done by the nvidia-smi tool supported by the NVML library of nvidia.</p>
 <p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>

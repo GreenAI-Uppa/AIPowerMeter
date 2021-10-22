@@ -3,12 +3,8 @@ Quick start
 
 Hardware requirements
 ---------------------
-**CPU** power measure is done with RAPL
 
-Support is ensured on intel processor since Sandy Bridge architecture.
-
-
-To see if your processor is compatible, first check that the CPU is a GenuineIntel:
+**CPU** power measure is done with RAPL. Support is ensured on intel processor since Sandy Bridge architecture. To see if your processor is compatible, first check that the CPU is a GenuineIntel:
 
 .. code-block:: console
 
@@ -46,10 +42,9 @@ Installation
    $ pip install -r requirements.txt
    $ python setup.py install
 
-We provide examples for pytorch and tensorflow, but the model creation is independant from the power recording part.
+The power recording part is independant of the model type, it is desirable to monitor the number of parameters and mac operations of your experiment. 
 
-
-If you wish to get the number of parameters and mac operations of your pytorch model, also install: 
+We use pytorch model for this (optional) aspect:
 
 .. code-block:: console
 
@@ -58,7 +53,7 @@ If you wish to get the number of parameters and mac operations of your pytorch m
 Measuring my first program
 --------------------------
 
-You have examples `there (pytorch) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, and `there (numpy) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py>`_ in a nutshell,
+You have examples `there (pytorch) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, `there (tensorflow) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning_tf.py>`_ and `there (numpy) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py>`_. In a nutshell,
 
  you instantiate an experiment and place the code you want to measure between a start and stop signal.
 
@@ -81,7 +76,7 @@ You can then get a summary of the recordings
 .. code-block:: python
 
   from deep_learning_power_measure.power_measure import experiment, parsers
-  driver = parsers.JsonParser(output_folder)
+  driver = parsers.JsonParser("output_folder")
   exp_result = experiment.ExpResults(driver)
   exp_result.print()
 

@@ -2,6 +2,7 @@ Background on power measure
 ===========================
 
 This section provide general information on monitoring power on computers.
+
 General considerations
 ----------------------
 
@@ -22,7 +23,9 @@ The unit to measure energy is the Joule, it is the energy transferred to an obje
 
 1 watt = 1 Joule per second = The energy required to lift a medium-sized tomato up 1 metre (wikipedia)
 
-1kWh = 3600000 Joules ~= 3 hours of GPU
+.. math::
+
+  1kWh = 3600000\text{ Joules} \approx \text{3 hours of GPU}
 
 
 .. _rapl:
@@ -30,8 +33,8 @@ The unit to measure energy is the Joule, it is the energy transferred to an obje
 CPU and RAPL
 -----------------------------------------------------
 
-The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the cpu). 
-It is present since the Sandy bridge architecture in 2011 and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ), and there has been considerable study to validate its use for software monitoring ( [Khan2018]_ ).
+The Running Average Power Limit (RAPL) reports the accumulated energy consumption of the cpu, the ram mechanism, and a few other devices (but NOT the nvidia GPU). 
+It is present since the Sandy bridge architecture in 2011 and from Haswell is supported by integrated voltage regulators in addition to power models ( [Hackenberg2015]_ ). There has been considerable study to validate its use for software monitoring ( [Khan2018]_ ).
 
 It is divided into different physically meaningfull domains:
 
@@ -66,5 +69,5 @@ Still, nvidia provides us with the percentage of core memory used by each progra
 Related work
 ------------
 
-There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for an measurement campaign at the scale of a data center. 
+There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for a measurement campaign at the scale of a data center. 
 

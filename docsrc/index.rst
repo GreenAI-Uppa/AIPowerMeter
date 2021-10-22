@@ -6,6 +6,9 @@
 Welcome to AI Power Meter's documentation!
 ==========================================
 
+The reason for this library is to easily monitor energy usage of machine learning programs. 
+It uses RAPL for the CPU and nvidia-smi for the GPU.
+
 .. toctree::
    :maxdepth: 2
 

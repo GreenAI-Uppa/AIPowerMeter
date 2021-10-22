@@ -38,9 +38,7 @@
 <h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="hardware-requirements">
 <h2>Hardware requirements<a class="headerlink" href="#hardware-requirements" title="Permalink to this headline">¶</a></h2>
-<p><strong>CPU</strong> power measure is done with RAPL</p>
-<p>Support is ensured on intel processor since Sandy Bridge architecture.</p>
-<p>To see if your processor is compatible, first check that the CPU is a GenuineIntel:</p>
+<p><strong>CPU</strong> power measure is done with RAPL. Support is ensured on intel processor since Sandy Bridge architecture. To see if your processor is compatible, first check that the CPU is a GenuineIntel:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cat /proc/cpuinfo <span class="p">|</span> grep vendor <span class="p">|</span> uniq <span class="p">|</span> awk <span class="s1">&#39;{print $3}&#39;</span>
 <span class="go">GenuineIntel</span>
 </pre></div>
@@ -65,15 +63,15 @@ Again, not all gpu cards (for ex: Jetson Nano board) include the required sensor
 <span class="gp">$</span> python setup.py install
 </pre></div>
 </div>
-<p>We provide examples for pytorch and tensorflow, but the model creation is independant from the power recording part.</p>
-<p>If you wish to get the number of parameters and mac operations of your pytorch model, also install:</p>
+<p>The power recording part is independant of the model type, it is desirable to monitor the number of parameters and mac operations of your experiment.</p>
+<p>We use pytorch model for this (optional) aspect:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install torchinfo
 </pre></div>
 </div>
 </div>
 <div class="section" id="measuring-my-first-program">
 <h2>Measuring my first program<a class="headerlink" href="#measuring-my-first-program" title="Permalink to this headline">¶</a></h2>
-<p>You have examples <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py">there (pytorch)</a>, and <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py">there (numpy)</a> in a nutshell,</p>
+<p>You have examples <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py">there (pytorch)</a>, <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning_tf.py">there (tensorflow)</a> and <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py">there (numpy)</a>. In a nutshell,</p>
 <blockquote>
 <div><p>you instantiate an experiment and place the code you want to measure between a start and stop signal.</p>
 </div></blockquote>
@@ -92,7 +90,7 @@ Again, not all gpu cards (for ex: Jetson Nano board) include the required sensor
 <p>This will create a directory <cite>output_folder</cite> in which a <cite>power_metrics.json</cite> will contain the power measurements. See the section <a class="reference internal" href="in_details.html#json"><span class="std std-ref">Recorded fields</span></a> for details on this file. If it already exists, the content folder will be replaced. So you should have one folder per experiment.
 You can then get a summary of the recordings</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
-<span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="n">output_folder</span><span class="p">)</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="s2">&quot;output_folder&quot;</span><span class="p">)</span>
 <span class="n">exp_result</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">ExpResults</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
 <span class="n">exp_result</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
 </pre></div>

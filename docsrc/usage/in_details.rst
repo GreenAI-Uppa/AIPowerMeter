@@ -31,7 +31,7 @@ Unless specified otherwise, the power is logged in watts.
 
 `total_cpu_power`: core power consumption.
 
-In other words, you have the following relations: 
+In other words, you have the following relation: 
 
 .. math::
 
@@ -45,13 +45,14 @@ Check the :ref:`rapl` section for more details on RAPL domains, and :py:func:`de
 
 `sm`: Streaming multiprocessor usage. Analog to the `cpu_uses` for the gpu.
 
-`memory`: Number of bytes used in the GPU
+`per_gpu_attributable_mem_use`: Number of bytes used in the GPU
 
 **GPU power**
 
 This is done by the nvidia-smi tool supported by the NVML library of nvidia. 
 
 `nvidia_draw_absolute`: the amount of power used by the whole nvidia card.
+
 
 model complexity
 ----------------
