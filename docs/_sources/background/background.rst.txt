@@ -48,7 +48,6 @@ It is divided into different physically meaningfull domains:
 - Psys : System on Chip energy consumption
 
 
-The recording are done for the entire cpu sockets. Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>`_ and multiply the RAPL value by the percentage of cpu and memory used.
 
 
 The rapl interface writes these values in module specific registers located in `/dev/cpu/*/msr`. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in `/sys/class/powercap/intel-rapl`.
@@ -65,6 +64,18 @@ Things are more simple with nvidia-smi, unfortunately, the reason for this is be
 from the man page of `nvidia-smi <https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en>`_ : *The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.*
 
 Still, nvidia provides us with the percentage of core memory used by each program for each GPU.
+
+.. _multiple:
+
+Measuring multiple programs
+---------------------------
+
+In general, RAPL and nvidia provide us a power measurement for the whole board or entire sockets.  Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>`_ and multiply the RAPL value by the percentage of cpu and memory used. 
+
+However, the energy consumed by programs is not exactly additive. For instance, the amount of Joules spent by two programs running on parallel and in sequence won't be the same. This is due to a fix energy waste, for instance coming from the idle state, and because the relation between the usage of the computer and the energy consumed is not linear. 
+
+In conclusion, we recommend to benchmark a program when it is running alone on the machine.
+
 
 Related work
 ------------

@@ -39,7 +39,7 @@
 <p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
 <div class="section" id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
-<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite></p>
+<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, as detailed in section <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>, the monitoring of multiple programs on the same device should be done with care.</p>
 <p>Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
 <p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>

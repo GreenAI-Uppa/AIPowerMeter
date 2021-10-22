@@ -8,7 +8,7 @@ See also the `example scripts <https://github.com/GreenAI-Uppa/AIPowerMeter/tree
 Recorded fields
 ---------------------
 
-Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`
+Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`. However, as detailed in section :ref:`multiple`, the monitoring of multiple programs on the same device should be done with care.
 
 Unless specified otherwise, the power is logged in watts.
 
