@@ -219,15 +219,19 @@ def get_value(power_metrics=None, metrics=None, debug=False):
         if debug:
             print(f'running on {metric}')
         if metric == 'pid':
-            power_metrics = list(power_metrics.values())[0]
+            # if not exist then return error -> return 0
+            try:
+                power_metrics = list(power_metrics.values())[0]
+            except IndexError:
+                print("no metrics on GPU found")
+                power_metrics = 0
         elif metric == 'sm':
             power_metrics = sum([s.get('sm') for s in power_metrics])
         else: 
             power_metrics = power_metrics.get(metric)
-        
+
     return power_metrics
-    
-    
+
 
 
 if __name__ == "__main__":  
