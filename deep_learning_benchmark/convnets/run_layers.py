@@ -20,7 +20,7 @@ image_test = torch.rand(1,3,image_size,image_size)
 image_test = image_test.to(device)
 
 
-for u,input_size in enumerate(input_sizes):
+for u,input_size in enumerate(nb_conv_layers_list):
     #load the model to the device
     nb_conv_layers = input_size
     model = nets.ConvNet(channels,nb_filters,nb_conv_layers)
@@ -32,7 +32,7 @@ for u,input_size in enumerate(input_sizes):
         print('Experience',k+1,'/',xps,'is running')
         latencies = []
         #AIPM
-        driver = parsers.JsonParser(os.path.join(os.getcwd(),"/data/convnets/input_"+str(input_size)+"/run_"+str(k)))
+        driver = parsers.JsonParser(os.path.join(os.getcwd(),"/data/sloustau/measure/convnets/input_"+str(input_size)+"/run_"+str(k)))
         exp = experiment.Experiment(driver)
         p, q = exp.measure_yourself(period=2)
         start_xp = time.time()
@@ -46,6 +46,6 @@ for u,input_size in enumerate(input_sizes):
         q.put(experiment.STOP_MESSAGE)
         end_xp = time.time()
         print("power measuring stopped after",end_xp-start_xp,"seconds for experience",k+1,"/",xps)
-        driver = parsers.JsonParser("/data/convnets/input_"+str(input_size)+"/run_"+str(k))
+        driver = parsers.JsonParser("/data/sloustau/measure/convnets/input_"+str(input_size)+"/run_"+str(k))
         #write latency.csv next to power_metrics.json file
-        np.savetxt("/data/convnets/input_"+str(input_size)+"/run_"+str(k)+"/latency.csv",np.array(latencies))
+        np.savetxt("/data/sloustau/measure/convnets/input_"+str(input_size)+"/run_"+str(k)+"/latency.csv",np.array(latencies))
