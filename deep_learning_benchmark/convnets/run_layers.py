@@ -7,8 +7,8 @@ import torch
 
 #Create your favorites CNN
 channels = 3
-nb_filters = 16
-nb_conv_layers_list = [2,4,6]
+nb_filters = 64
+nb_conv_layers_list = [2*k for k in range(1,21)]
 
 #choose your favorite device
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -16,16 +16,17 @@ print('Using {} device'.format(device))
 
 #generate a random image
 image_size = 224
-image_test = torch.rand(1,3,image_size,image_size)
+image_test = torch.rand(1,channels,image_size,image_size)
 image_test = image_test.to(device)
 
 
 for u,input_size in enumerate(nb_conv_layers_list):
     #load the model to the device
+    print('Start Number of layers',input_size)
     nb_conv_layers = input_size
     model = nets.ConvNet(channels,nb_filters,nb_conv_layers)
     model = model.to(device)
-    iters = int(40000/(u+1))#number of inferences
+    iters = int(40000/input_size)#number of inferences
     print(iters,'inferences')
     xps = 10#number of experiments to reach robustness
     for k in range(xps):
