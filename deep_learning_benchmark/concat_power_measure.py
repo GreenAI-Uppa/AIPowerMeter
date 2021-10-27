@@ -47,7 +47,7 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             # lecture de chaque json
             f = open(f'{main_folder}/{folder}/{sub_folder}/power_metrics.json')
             metrics = [json.loads(line) for line in f]
-            full_data[folder][sub_folder]['metrics'] = [json.loads(line) for line in f]
+            full_data[folder][sub_folder]['metrics'] = metrics
             f.close()
             
             if 'latency.json' in os.listdir(f'{main_folder}/{folder}/{sub_folder}'):
