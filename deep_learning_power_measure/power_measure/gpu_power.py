@@ -168,7 +168,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1):
         gpu_data = get_gpu_data(gpu)
 
         per_gpu_power_draw[gpu_id] = gpu_data["power_readings"]["power_draw"] # power_this_gpu
-        absolute_power += power_this_gpu
+        absolute_power += per_gpu_power_draw[gpu_id]
 
         # processes
         processes = gpu.findall("processes")[0]
