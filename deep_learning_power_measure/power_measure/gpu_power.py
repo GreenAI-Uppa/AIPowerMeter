@@ -210,7 +210,7 @@ def get_nvidia_gpu_power(pid_list, nsample = 1):
                     performance_state = gpu.findall("performance_state")[0].text
                     per_gpu_performance_states[gpu_id] = performance_state
 
-                power += sm_relative_percent * power_this_gpu
+                power += sm_relative_percent * per_gpu_power_draw[gpu_id]
                 # want a proportion value rather than percentage
                 per_gpu_absolute_percent_usage[gpu_id] += sm_absolute_percent / 100.0
                 per_gpu_relative_percent_usage[gpu_id] += sm_relative_percent
