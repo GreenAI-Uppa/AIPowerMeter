@@ -47,7 +47,7 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             # lecture de chaque json
             f = open(f'{main_folder}/{folder}/{sub_folder}/power_metrics.json')
             metrics = [json.loads(line) for line in f]
-            full_data[folder][sub_folder]['metrics'] = [json.loads(line) for line in f]
+            full_data[folder][sub_folder]['metrics'] = metrics
             f.close()
             
             if 'latency.json' in os.listdir(f'{main_folder}/{folder}/{sub_folder}'):
@@ -219,15 +219,19 @@ def get_value(power_metrics=None, metrics=None, debug=False):
         if debug:
             print(f'running on {metric}')
         if metric == 'pid':
-            power_metrics = list(power_metrics.values())[0]
+            # if not exist then return error -> return 0
+            try:
+                power_metrics = list(power_metrics.values())[0]
+            except IndexError:
+                print("no metrics on GPU found")
+                power_metrics = 0
         elif metric == 'sm':
             power_metrics = sum([s.get('sm') for s in power_metrics])
         else: 
             power_metrics = power_metrics.get(metric)
-        
+
     return power_metrics
-    
-    
+
 
 
 if __name__ == "__main__":  
