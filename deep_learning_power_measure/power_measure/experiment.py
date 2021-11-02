@@ -267,6 +267,12 @@ class ExpResults():
             return r
         return r /( metric[-1]['date'] - metric[0]['date'])
 
+    def total_power_draw(self):
+        # extracting cpu power draw
+        total_intel_power = self.total_('intel_power')
+        abs_nvidia_power = self.total_('nvidia_draw_absolute')
+        return total_intel_power + abs_nvidia_power
+
     def print(self):
         """
         simple print of the experiment summary
@@ -290,7 +296,7 @@ class ExpResults():
 
             if total_dram_power is None and mem_use_abs is None:
                 print("RAM consumption not available. RAM usage not available")
-            elif total_dram_power is None: 
+            elif total_dram_power is None:
                 print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
             else:
                 print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
