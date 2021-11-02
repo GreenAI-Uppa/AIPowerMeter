@@ -29,21 +29,19 @@ exp = experiment.Experiment(driver)
 # starting the record, and wait two seconds between each energy consumption measurement
 # Note that it takes the model and the input as a parameter in order to give a model summary
 p, q = exp.measure_yourself(period=2)
-for i in range(20):
-    print('iteration ',i)
+numiter = 40
+for i in range(numiter):
+    print('iteration ',i, 'over',numiter)
     tf_model_to_test.predict(test_images)
 
 q.put(experiment.STOP_MESSAGE)
 ## end of the experiment
 
-### displaying the result of the experiment.
-# reinstantiating a parser to reload the result.
-# a reload function should be used, but this way,
-# it shows how to read results from a past experiment
+# read the power recordings and print the results
 driver = parsers.JsonParser(output_folder)
 exp_result = experiment.ExpResults(driver)
-exp_result.print()
 
+exp_result.print()
 
 import json
 total_power_draw = exp_result.total_power_draw()
