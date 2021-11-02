@@ -47,6 +47,5 @@ exp_result.print()
 
 import json
 total_power_draw = exp_result.total_power_draw()
-import pdb; pdb.set_trace()
 results = {'accuracy':float(accuracy), 'power_draw':total_power_draw}
 json.dump(results, open('result.json','w'))
