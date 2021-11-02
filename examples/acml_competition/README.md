@@ -22,6 +22,8 @@ In the evaluation, we will use the following versions:
 - pytorch : 1.9.0+cu111
 - tensorflow : 2.5.0
 
+As mentioned on the competition webpage, we'll use a GeForce RTX 3090 GPU, with 16 i9 Intel cores CPU. The cuda 11.1 is installed with Cudnn v8.
+
 
 ## for non tensorflow/pytorch users. 
 
