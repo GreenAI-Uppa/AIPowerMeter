@@ -4,8 +4,7 @@ As indicated in the [competition webpage](https://greenai-uppa.github.io/acml_co
 
 More concretely, it relies on two scripts.
 - `tf_model_to_test.py` : competitors are expected to provide this module. It will load the model and provide a `predict` function which will take as input a tensor containing the cifar dataset and return the predictions.  
-In practice, you can launch the script `tf_measure_consumption.py` to perform an evaluation. 
-- `tf_measure_consumption.py` : this script will use the predict function, perform the accuracy computation, and record the power draw. The results are stored in a json file `result.json`. You can use the template provided on this repo or provide your own if you are using another framework such as pytorch.
+- `tf_measure_consumption.py` : this is the main script. It will use the predict function, perform the accuracy computation, and record the power draw. The results are stored in a json file `result.json`. You can use the template provided on this repo or provide your own if you are using another framework such as pytorch.
 
 
 To test the evaluation, just run 
