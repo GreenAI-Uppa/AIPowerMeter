@@ -74,7 +74,7 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             cube[folder][sub_folder] = {
                 'intel_power': integrate(date=date, watt=intel_power_watt)/n,
                 'total_cpu_power': integrate(date=date, watt=total_cpu_power)/n,
-                'mem_use_abs': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'mem_use_abs', 'pid'])/n,
+                'mem_use_abs': calc_median(power_metrics=metrics, metrics=['metrics', 'cpu', 'per_process_mem_use_abs', 'pid'])/n,
                 'nvidia_draw_absolute': integrate(date=date, watt=nvidia_draw_absolute)/n,
                 'nvidia_estimated_attributable_power_draw': integrate(date=date, watt=nvidia_estimated_attributable_power_draw)/n,
                 'per_gpu_attributable_mem_use': calc_median(power_metrics=metrics, metrics=['metrics', 'gpu', 'per_gpu_attributable_mem_use', '0', 'pid'])/n,
