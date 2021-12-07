@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Background on power measure &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Advanced use" href="../usage/in_details.html" />
@@ -84,6 +83,23 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <p>However, the energy consumed by programs is not exactly additive. For instance, the amount of Joules spent by two programs running on parallel and in sequence won’t be the same. This is due to a fix energy waste, for instance coming from the idle state, and because the relation between the usage of the computer and the energy consumed is not linear.</p>
 <p>In conclusion, we recommend to benchmark a program when it is running alone on the machine.</p>
 </div>
+<div class="section" id="schneider-power-meters">
+<h2>Schneider Power meters<a class="headerlink" href="#schneider-power-meters" title="Permalink to this headline">¶</a></h2>
+<p>The previous power measurements are based on specific softwares and hardwares. In order to evaluate the precision and the ground truth, we describe here how to install and use a Schneider set of power meters. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitore several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:</p>
+<ul class="simple">
+<li><p>at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,</p></li>
+<li><p>at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readible in a laptop using a given software named <strong>wattmeter_rapid1</strong> that creates log at this high frequency.</p></li>
+</ul>
+<div class="figure align-default">
+<img alt="../_images/wattmeters.png" src="../_images/wattmeters.png" />
+</div>
+<p>It is then possible to use one of these two data sources and compare the ground true to the measurements of RAPL and nvidia-smi.</p>
+<p><strong>Compilation and execution of wattmeter_rapid1</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcc -std<span class="o">=</span>c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
+./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span> &gt; logfile
+</pre></div>
+</div>
+</div>
 <div class="section" id="related-work">
 <h2>Related work<a class="headerlink" href="#related-work" title="Permalink to this headline">¶</a></h2>
 <p>There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for a measurement campaign at the scale of a data center.</p>
@@ -115,6 +131,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 <li class="toctree-l2"><a class="reference internal" href="#cpu-and-rapl">CPU and RAPL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gpu-and-nvidia-smi">GPU and nvidia-smi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#measuring-multiple-programs">Measuring multiple programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schneider-power-meters">Schneider Power meters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#related-work">Related work</a></li>
 </ul>
 </li>
@@ -142,7 +159,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
 
 
 
@@ -159,7 +176,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
