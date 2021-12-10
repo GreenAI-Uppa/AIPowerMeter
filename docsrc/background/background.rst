@@ -6,8 +6,7 @@ This section provide general information on monitoring power on computers.
 General considerations
 ----------------------
 
-The main sources of energy consumption in a computer are the gpu, the cpu and memory. However, other sources are non negligible, among them, the fans, the optical drives, motherboards, and hard drives. Moreover, the consumption will vary according to external factors, such as the temperature, and obviously, the type of programs run by the user. 
-
+The main sources of energy consumption in a computer are the gpu, the cpu and memory. However, other sources are non negligible, among them, the fans, the optical drives, motherboards, and hard drives. Moreover, the consumption will vary according to external factors, such as the temperature, and obviously, the type of programs run by the user.
 
 .. figure:: computer.png
     
@@ -60,12 +59,17 @@ The official documentation is the Intel® 64 and IA-32 Architectures Software De
 
 GPU and nvidia-smi 
 ---------------------------
-Things are more simple with nvidia-smi, unfortunately, the reason for this is because we have much less information.
+
+GPU are good for single instruction multiple data situations where they can parallelize on their numerous streaming processors
+
+
+Regardin power measurements, things are more simple with nvidia-smi, unfortunately, the reason for this is because we have much less information.
 from the man page of `nvidia-smi <https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en>`_ : *The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.*
 
 Still, nvidia provides us with the percentage of core memory used by each program for each GPU.
 
 .. _multiple:
+
 
 Measuring multiple programs
 ---------------------------
