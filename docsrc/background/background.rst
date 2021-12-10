@@ -80,9 +80,30 @@ However, the energy consumed by programs is not exactly additive. For instance, 
 
 In conclusion, we recommend to benchmark a program when it is running alone on the machine.
 
+Schneider Power meters
+---------------------------
 
-Related work
-------------
+The previous power measurements are based on specific softwares and hardwares. In order to evaluate the precision and the ground truth, we describe here how to install and use a Schneider set of power meters. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitore several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
 
-There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for a measurement campaign at the scale of a data center. 
+- at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,
+- at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readible in a laptop using a given software named **wattmeter_rapid1** that creates log at this high frequency.
+
+.. figure:: wattmeters.png
+
+It is then possible to use one of these two data sources and compare the ground true to the measurements of RAPL and nvidia-smi.
+
+
+**Compilation and execution of wattmeter_rapid1**:
+
+.. code-block:: bash
+
+  gcc -std=c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
+  ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile
+
+
+
+Related work on power meter libraries
+-------------------------------------
+
+There are several tools developed to monitor energy consumption of softwares, and the list is growing everyday, but most are based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for a measurement campaign at the scale of a data center. 
 

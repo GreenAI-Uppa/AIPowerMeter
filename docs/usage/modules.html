@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dev Documentation &#8212; IA Power Meter  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Deep learning benchmark" href="../experiments/experiments.html" />
@@ -51,9 +50,9 @@ ExpResult is used to process and format the recordings.</p>
 <p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
 <p>If you want to record also the time, accuracy and other valuable metrics, the simplest way is to do it in the main thread and then, to interpolate with the timestamps of the energy recordings if an alignement is needed.</p>
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param">driver</em>, <em class="sig-param">model=None</em>, <em class="sig-param">input_size=None</em>, <em class="sig-param">cont=False</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class provides the method to start an experiment
 by launching a thread which will record the power draw.
 The recording can be ended by sending a stop message
@@ -63,79 +62,60 @@ to this thread</p>
 </div>
 <div class="section" id="module-deep_learning_power_measure.power_measure.rapl_power">
 <span id="rapl-power-module"></span><h2>rapl_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.rapl_power" title="Permalink to this headline">¶</a></h2>
-<p>Handling of the CPU use and CPU consumption with RAPL</p>
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get memory usage.
-psutil will be used to collect pss and uss values. rss is collected if pss
-is not available
-some info from psutil documentation:</p>
-<p>USS : (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
-was terminated right now which is unique to a process and which would be
-freed if the process</p>
-<p>PSS :  (Linux): aka “Proportional Set Size”, is the amount of memory
-shared with other processes, accounted in a way that the amount is
-divided evenly between the processes that share it. I.e. if a process
-has 10 MBs all to itself and 10 MBs shared with another process its
-PSS will be 15 MBs.</p>
-<p>RSS : On the other hand RSS is resident set size : the
-non-swapped physical memory that a task has used in bytes. so with the
-previous example, the result would be 20Mbs instead of 15Mbs</p>
-<dl class="simple">
-<dt>Args :</dt><dd><p>process_list : list of psutil.Process objects</p>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_mem_uses</code><span class="sig-paren">(</span><em class="sig-param">process_list</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>input :</dt><dd><p>process_list : list of psutil.Process objects</p>
 </dd>
-<dt>Returns:</dt><dd><p>mem_info_per_process : memory consumption for each process</p>
+<dt>output:</dt><dd><p>mem_info_per_process : memory consumption for each process</p>
+<dl>
+<dt>some info from psutil documentation:</dt><dd><p>uss (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory which is unique to a process and which would be freed if the process was terminated right now
+pss (Linux): aka “Proportional Set Size”, is the amount of memory shared with other processes,
+accounted in a way that the amount is divided evenly between the processes that share it.
+I.e. if a process has 10 MBs all to itself and 10 MBs shared with another process its PSS will be 15 MBs.</p>
+<p># on the other hand RSS is resident set size : the non-swapped physical memory that a task has used in bytes.
+# so with the previous example, the result would be 20Mbs instead of 15Mbs</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_cpu_uses</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">process_list</span></em>, <em class="sig-param"><span class="n">period</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts the relative number of cpu clock attributed to each process</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>process_list : list of process [pid1, pid2,…] for which the cpu use
-will be measured
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_cpu_uses</code><span class="sig-paren">(</span><em class="sig-param">process_list</em>, <em class="sig-param">pause=2.0</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>input:</dt><dd><p>process_list : list of process for which the cpu use will be measured
 pause : sleeping time during which the cpu use will be recorded.</p>
 </dd>
-<dt>Returns:</dt><dd><p>cpu_uses = {pid1 : cpu_use, }  where cpu_use is the percentage of use
-of this cpu with the respect to the total use of the cpu on this period</p>
+<dt>return a dictionnary</dt><dd><p>cpu_uses = {soft1 : cpu_use, }</p>
 </dd>
 </dl>
+<p>where cpu_use is the percentage of use of this cpu with the respect to the total use of the cpu on this period (mouthfull!!)</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.rapl_power.get_power">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diff</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the power accumulation of the provided pair of rapl samples for
-the different RAPL domains</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>diff : difference between two RAPL samples</p>
-</dd>
-<dt>Returns:</dt><dd><p>Dictionnary where each key correspond to an RAPL domain and the value
-is the accumulated energy consumption in Joules</p>
-</dd>
-</dl>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.rapl_power.</code><code class="sig-name descname">get_power</code><span class="sig-paren">(</span><em class="sig-param">diff</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>diff : difference between two RAPL samples</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-deep_learning_power_measure.power_measure.gpu_power">
 <span id="gpu-power-module"></span><h2>gpu_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.gpu_power" title="Permalink to this headline">¶</a></h2>
-<p>This module parses the xml provided by nvidia-smi to obtain the consumption, memory and SM used for each gpu and each pid.</p>
-<dl class="py function">
+<dl class="function">
 <dt id="deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power">
-<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.gpu_power.</code><code class="sig-name descname">get_nvidia_gpu_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pid_list</span></em>, <em class="sig-param"><span class="n">nsample</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the power and use of each GPU.
-first, get gpu usage per process
-second get the power use of nvidia for each GPU
-then for each gpu and each process in pid_list compute its attributatble
-power</p>
-<dl>
-<dt>Args:</dt><dd><p>pid_list : list of processes to be measured</p>
-<p>nsample : number of queries to nvidia</p>
+<code class="sig-prename descclassname">deep_learning_power_measure.power_measure.gpu_power.</code><code class="sig-name descname">get_nvidia_gpu_power</code><span class="sig-paren">(</span><em class="sig-param">pid_list</em>, <em class="sig-param">nsample=1</em>, <em class="sig-param">logger=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>first, get gpu usage per process</dt><dd><p>nsample indicates the number of queries to nvidia</p>
 </dd>
 </dl>
+<p>second get the power use of nvidia
+then for each gpu and for each process in pid_list</p>
+<blockquote>
+<div><p>compute its attributatble power</p>
+</div></blockquote>
 </dd></dl>
 
 </div>
@@ -190,7 +170,7 @@ power</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
 
 
 
@@ -207,7 +187,7 @@ power</p>
       &copy;2021, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
