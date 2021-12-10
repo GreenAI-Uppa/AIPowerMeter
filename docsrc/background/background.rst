@@ -98,8 +98,8 @@ It is then possible to use one of these two data sources and compare the ground 
 
 
 
-Related work
-------------
+Related work on power meter libraries
+-------------------------------------
 
-There are several tools developed to monitor energy consumption of softwares, all based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for a measurement campaign at the scale of a data center. 
+There are several tools developed to monitor energy consumption of softwares, and the list is growing everyday, but most are based on RAPL and nvidia-smi. The `Performance Application Programming Interface <https://icl.utk.edu/papi/>`_ has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as `CarbonTracker <https://github.com/lfwa/carbontracker/>`_ and `Experiment Impact Tracker <https://github.com/Breakend/experiment-impact-tracker>`_ propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It's aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the `Coca4AI <https://greenai-uppa.github.io/Coca4AI/>`_ for a measurement campaign at the scale of a data center. 
 
