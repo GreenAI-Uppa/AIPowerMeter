@@ -228,6 +228,20 @@ class ExpResults():
             '".\n Please check that the folder contains valid recordings')
         self.model_card = self.db_driver.get_model_card()
 
+    def which_metrics(self):
+        print('cpu related metrics:')
+        for k in self.cpu_metrics:
+            print(k)
+
+        print()
+        print('gpu related metrics')
+        for k in self.gpu_metrics:
+            print(k)
+        print()
+        print('experiment related metrics')
+        for k in self.exp_metrics:
+            print(k)
+        print()
 
     def get_curve(self, name):
         """
@@ -248,6 +262,23 @@ class ExpResults():
             if name in self.exp_metrics:
                 return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
         return None
+
+    def get_exp_duration(self):
+        if self.cpu_metrics is not None:
+            for name, recordings in self.cpu_metrics.items():
+                times = sorted([time_to_sec(date)  for date in recordings['dates']])
+                return times[-1] - times[0]
+
+        if self.gpu_metrics is not None:
+            for name, recordings in self.gpu_metrics.items():
+                times = sorted([time_to_sec(date)  for date in recordings['dates']])
+                return times[-1] - times[0]
+
+        if self.exp_metrics is not None:
+            for name, recordings in self.exp_metrics.items():
+                times = sorted([time_to_sec(date)  for date in recordings['dates']])
+                return times[-1] - times[0]
+        return -1
 
     def total_(self, metric_name):
         """Total value for this metric. For instance if the metric is in watt and the time in seconds,
@@ -291,8 +322,8 @@ class ExpResults():
             total_cpu_power = self.total_('total_cpu_power')
             rel_dram_power = self.total_('per_process_dram_power')
             rel_cpu_power = self.total_('per_process_cpu_power')
-            mem_use_abs = self.average_('mem_use_abs')
-            mem_use_uss = self.average_('mem_use_uss')
+            mem_use_abs = self.average_('per_process_mem_use_abs')
+            mem_use_uss = self.average_('per_process_mem_use_uss')
 
             if total_dram_power is None and mem_use_abs is None:
                 print("RAM consumption not available. RAM usage not available")

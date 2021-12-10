@@ -23,7 +23,6 @@ def _get_domain_info(path):
     name = _read_sysfs_file("%s/name" % path)
     energy_uj = int(_read_sysfs_file("%s/energy_uj" % path))
     max_energy_range_uj = int(_read_sysfs_file("%s/max_energy_range_uj" % path))
-
     return name, energy_uj, max_energy_range_uj
 
 def _walk_rapl_dir(path):
