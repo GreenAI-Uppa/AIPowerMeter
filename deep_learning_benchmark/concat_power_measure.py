@@ -45,15 +45,13 @@ def main(output='csv', main_folder=None, n_iterations=None, file_to_write=None):
             # lecture des dossiers d'itérations
             
             # lecture de chaque json
-            f = open(f'{main_folder}/{folder}/{sub_folder}/power_metrics.json')
-            metrics = [json.loads(line) for line in f]
-            full_data[folder][sub_folder]['metrics'] = metrics
-            f.close()
+            with open(f'{main_folder}/{folder}/{sub_folder}/power_metrics.json') as f:
+                metrics = [json.loads(line) for line in f]
+                full_data[folder][sub_folder]['metrics'] = metrics
             
             if 'latency.json' in os.listdir(f'{main_folder}/{folder}/{sub_folder}'):
-                f = open(f'{main_folder}/{folder}/{sub_folder}/latency.json')
-                full_data[folder][sub_folder]['latency'] = json.load(f)
-                f.close()
+                with open(f'{main_folder}/{folder}/{sub_folder}/latency.json') as f:
+                    full_data[folder][sub_folder]['latency'] = json.load(f)
             else: 
                 full_data[folder][sub_folder]['latency'] = np.loadtxt(f'{main_folder}/{folder}/{sub_folder}/latency.csv').tolist()
             
@@ -128,9 +126,8 @@ def get_cube(path):
     Args:
         path (str): path to write data to.
     """
-    f = open(path, 'w')
-    json.dump(cube, f)
-    f.close()
+    with open(path, 'w') as f:
+        json.dump(cube, f)
 
 def to_pandas():
     """Transform cube to pandas dataframe
@@ -178,9 +175,8 @@ def get_raw(path):
     Args:
         path (str): path to write data to.
     """
-    f = open(path, 'w')
-    json.dump(full_data, f)
-    f.close()
+    with open(path, 'w') as f:
+        json.dump(full_data, f)
 
 
 def calc_median(power_metrics, metrics):
@@ -221,12 +217,12 @@ def get_value(power_metrics=None, metrics=None, debug=False):
         if metric == 'pid':
             # if not exist then return error -> return 0
             try:
-                power_metrics = list(power_metrics.values())[0]
+                power_metrics = sum(list(power_metrics.values()))
             except IndexError:
                 print("no metrics on GPU found")
                 power_metrics = 0
         elif metric == 'sm':
-            power_metrics = sum([s.get('sm') for s in power_metrics])
+            power_metrics = sum(s.get('sm') for s in power_metrics)
         else: 
             power_metrics = power_metrics.get(metric)
 
