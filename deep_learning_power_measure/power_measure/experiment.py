@@ -157,6 +157,7 @@ class Experiment():
         self.min_powers = gpu_power.get_min_power()
         self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
 
+
     def log_usage(self, metric_gpu, pid_list):
         now = time.time()
         log = {"timestamp": now }
