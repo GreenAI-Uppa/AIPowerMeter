@@ -83,12 +83,19 @@ class JsonParser():
                 result = json.loads(line)
                 if 'gpu' in result['metrics']:
                     date = datetime.datetime.fromisoformat(result['date'])
-                    for k in ['nvidia_estimated_attributable_power_draw', 'nvidia_draw_absolute', 'average_gpu_estimated_utilization_absolute', 'average_gpu_estimated_utilization_relative']:
-                        v = result['metrics']['gpu'][k]
-                        if k not in metrics:
-                            metrics[k] = {'dates':[], 'values':[]}
-                        metrics[k]['dates'].append(date)
-                        metrics[k]['values'].append(v)
+
+                    v = result['metrics']['gpu']['nvidia_draw_absolute']
+                    if 'nvidia_draw_absolute' not in metrics:
+                        metrics['nvidia_draw_absolute'] = {'dates':[], 'values':[]}
+                    metrics['nvidia_draw_absolute']['dates'].append(date)
+                    metrics['nvidia_draw_absolute']['values'].append(v)
+
+                    v = result['metrics']['gpu']['per_gpu_attributable_power']['all']
+                    if 'nvidia_attributable_power' not in metrics:
+                        metrics['nvidia_attributable_power'] = {'dates':[], 'values':[]}
+                    metrics['nvidia_attributable_power']['dates'].append(date)
+                    metrics['nvidia_attributable_power']['values'].append(v)
+
                     per_gpu_mem_use = result['metrics']['gpu']['per_gpu_attributable_mem_use']
                     mem_use = sum([ v for gpu, mem_uses in per_gpu_mem_use.items() for pid, v in mem_uses.items() ])
                     if 'nvidia_mem_use' not in metrics:

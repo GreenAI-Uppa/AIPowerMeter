@@ -84,10 +84,10 @@ def get_gpu_use_pmon(nsample=1):
     process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
     per_gpu_per_pid_utilization_absolute = {}
     for _, row in process_percentage_used_gpu.iterrows():
-        gpu_id = row['gpu']
+        gpu_id = int(row['gpu'])
         if gpu_id not in per_gpu_per_pid_utilization_absolute:
             per_gpu_per_pid_utilization_absolute[gpu_id] = {}
-        pid = row['pid']
+        pid = int(row['pid'])
         per_gpu_per_pid_utilization_absolute[gpu_id][pid] = row['sm']/100
     return per_gpu_per_pid_utilization_absolute 
 
@@ -153,8 +153,8 @@ def get_min_power():
     xml = get_nvidia_xml()
     for gpu_id, gpu in enumerate(xml.findall("gpu")):
         power_readings = gpu.findall("power_readings")[0]
-        power_min = power_readings.findall("min_power_limit")
-        min_powers[gpu_id] = power_min
+        power_min = power_readings.findall("min_power_limit")[0].text
+        min_powers[gpu_id] = float(power_min.replace('W',''))
     return min_powers
 
 def get_nvidia_gpu_power(pid_list=None, nsample = 1):
