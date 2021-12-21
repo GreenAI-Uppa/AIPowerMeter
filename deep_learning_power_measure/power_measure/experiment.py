@@ -153,6 +153,51 @@ class Experiment():
             print("nvidia not available: " + msg_nvidia)
         else:
             print(msg_nvidia)
+        self.gpu_logs = []
+        self.min_powers = gpu_power.get_min_power()
+        self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
+
+    def log_usage(self, metric_gpu, pid_list):
+        now = time.time()
+        log = {"timestamp": now }
+        log["per_gpu_power_draw"] = metric_gpu["per_gpu_power_draw"]
+        log["per_gpu_estimated_attributable_utilization"] = metric_gpu["per_gpu_estimated_attributable_utilization"]
+        self.gpu_logs = [t for t in self.log_gpu if now - t['timestamp'] < 3]
+        self.gpu_logs.append(log)
+
+        # update the list of pids running on the different gpus
+        # remove the ones older than 20 seconds, because at that time, this pid does not have an influence on the consumption anymore
+        for gpu_id, pid_cats in self.pid_per_gpu.items():
+            for cat, pids in pid_cats.items():
+                for pid, last_seen in pids.items():
+                    if now - last_seen > 20:
+                        del pids[pid]
+        # add the pids running at the moment
+        for gpu_id, usage in log["per_gpu_per_pid_utilization_absolute"].items():
+            for pid, u in usage.items():
+                if gpu_id not in self.pid_per_gpu:
+                    self.pid_per_gpu[gpu_id] = {'pid_this_exp':{}, 'other_pids':{}}
+                if pid in self.pid_list:
+                    self.pid_per_gpu[gpu_id]['pid_this_exp'][pid] = now
+                else:
+                    self.pid_per_gpu[gpu_id]['other_pids'][pid] = now
+
+    def allocate_gpu_power(self):
+        # computing attributable power and use
+        per_gpu_attributable_power = {}
+        per_gpu_attributable_sm_use = {}
+        for gpu_id in self.pid_per_gpu:
+            power_curve = [ {'date': t['timestamp'], 'value': t['per_gpu_power_draw'][gpu_id] } for t in self.gpu_logs ]
+            per_gpu_total_energy = integrate(power_curve)
+            use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
+            per_gpu_relative_use = integrate(use_curve)
+            per_gpu_attributable_sm_use[gpu_id] = per_gpu_relative_use
+            prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) /  len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
+            usage_power = (per_gpu_total_energy[gpu_id] - self.min_power[gpu_id])
+            fix_power = self.min_power[gpu_id] * prop_active_pid
+            attributable_power[gpu_id] = usage_power * per_gpu_relative_use[gpu_id] + fix_power
+        per_gpu_attributable_power['all'] = sum(attributable_power[gpu_id].values())
+        return per_gpu_attributable_power, per_gpu_attributable_sm_use
 
     def save_model_card(self, model, input_size, device='cpu'):
         """
@@ -197,12 +242,22 @@ class Experiment():
         period : waiting time between two RAPL samples.
         """
         print("we'll take the measure of the following pids", pid_list)
+        time_at_last_measure = 0
         while True:
+            # there have a buffer and allocate per pid with lifo
+            # with time
             metrics = {}
-            if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=period)
             if self.nvidia_available:
-                metrics['gpu'] = gpu_power.get_nvidia_gpu_power(pid_list)
+                # launch in separate threads because they won't have the same frequency
+                #metrics['gpu'] = gpu_power.get_nvidia_gpu_power(pid_list)
+                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
+                self.log_usage(metrics_gpu)
+            if self.rapl_available:
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
+            if time.time() - time_at_last_measure > period:
+                time_at_last_measure = time.time()
+                 per_gpu_attributable_power, _ = self.allocate()
+                 metrics['gpu']['per_gpu_attributable_power'] = per_gpu_attributable_power
             self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
@@ -228,19 +283,28 @@ class ExpResults():
             '".\n Please check that the folder contains valid recordings')
         self.model_card = self.db_driver.get_model_card()
 
-    def which_metrics(self):
+    def list_metrics(self):
         print('cpu related metrics:')
-        for k in self.cpu_metrics:
-            print(k)
+        if self.cpu_metrics  is not None:
+            for k in self.cpu_metrics:
+                print(k)
+        else:
+            print('not available')
 
         print()
         print('gpu related metrics')
-        for k in self.gpu_metrics:
-            print(k)
+        if self.gpu_metrics is not None:
+            for k in self.gpu_metrics:
+                print(k)
+        else:
+            print('not available')
         print()
         print('experiment related metrics')
-        for k in self.exp_metrics:
-            print(k)
+        if self.exp_metrics is not None:
+            for k in self.exp_metrics:
+                print(k)
+        else:
+            print('not available')
         print()
 
     def get_curve(self, name):
