@@ -214,12 +214,8 @@ class Experiment():
             prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) /  (len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids']))
             usage_power = (this_gpu_power_draw - self.min_gpu_powers[gpu_id])
             fix_power = self.min_gpu_powers[gpu_id] * prop_active_pid
-            print(usage_power, this_gpu_relative_use)
             per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
         per_gpu_attributable_power['all'] = sum(per_gpu_attributable_power.values())
-        print('other\n',self.min_gpu_powers, self.pid_per_gpu)
-        print(prop_active_pid)
-        print('log',per_gpu_attributable_power, per_gpu_power_draw, 'logs\n', self.gpu_logs, use_curve, '\nrelative use\n', this_gpu_relative_use)
         return per_gpu_attributable_power, per_gpu_attributable_sm_use
 
     def save_model_card(self, model, input_size, device='cpu'):
