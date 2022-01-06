@@ -219,6 +219,7 @@ class Experiment():
         per_gpu_attributable_power['all'] = sum(per_gpu_attributable_power.values())
         if per_gpu_attributable_power['all'] > this_gpu_power_draw:
             print('SO WHAT!!!')
+            print(per_gpu_power_draw)
             print(per_gpu_attributable_power)
             print(self.gpu_logs)
             print(self.pid_per_gpu)
