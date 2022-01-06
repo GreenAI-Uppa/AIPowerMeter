@@ -427,7 +427,7 @@ class ExpResults():
             print()
             print()
             print("on the gpu")
-            abs_nvidia_power = self.total_('nvidia_draw_absolute')
+            abs_nvidia_power = self.total_('nvidia_absolute_power')
             rel_nvidia_power = self.total_('nvidia_attributable_power')
             nvidia_mem_use_abs = self.average_("nvidia_attributable_mem_use")
             print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
