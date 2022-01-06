@@ -184,8 +184,9 @@ class Experiment():
         # update the list of pids running on the different gpus
         # remove the ones older than 20 seconds, because at that time, this pid does not have an influence on the consumption anymore
         for gpu_id, pid_cats in self.pid_per_gpu.items():
-            for cat, pids in pid_cats.items():
-                for pid, last_seen in pids.items():
+            for cat, pid_last_times in pid_cats.items():
+                for pid in list(pid_last_times):
+                    last_seen = pid_last_times[pid]
                     if now - last_seen > 20:
                         del pids[pid]
         # add the pids running at the moment
