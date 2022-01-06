@@ -98,7 +98,7 @@ class JsonParser():
                     # sm used by this experiment
                     per_gpu_sm_use = result['metrics']['gpu']['per_gpu_absolute_percent_usage']
                     sm_use = sum([ sm_use for gpu, sm_use in per_gpu_sm_use.items() ])
-                    if 'nvidia_sm_use' not in metrics:
+                    if 'nvidia_attributable_sm_use' not in metrics:
                         metrics['nvidia_attributable_sm_use'] = {'dates':[], 'values':[]}
                     metrics['nvidia_attributable_sm_use']['dates'].append(date)
                     metrics['nvidia_attributable_sm_use']['values'].append(sm_use)
