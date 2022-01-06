@@ -188,7 +188,7 @@ class Experiment():
                 for pid in list(pid_last_times):
                     last_seen = pid_last_times[pid]
                     if now - last_seen > 20:
-                        del pids[pid]
+                        del pid_last_times[pid]
         # add the pids running at the moment
         for gpu_id, usage in metric_gpu["per_gpu_per_pid_utilization_absolute"].items():
             for pid, u in usage.items():
