@@ -217,6 +217,7 @@ class Experiment():
             fix_power = self.min_gpu_powers[gpu_id] * prop_active_pid
             per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
         per_gpu_attributable_power['all'] = sum(per_gpu_attributable_power.values())
+        """
         if per_gpu_attributable_power['all'] > this_gpu_power_draw:
             print('SO WHAT!!!')
             print(per_gpu_power_draw)
@@ -226,6 +227,7 @@ class Experiment():
             print(self.min_gpu_powers)
             print(usage_power, this_gpu_relative_use)
             print(fix_power)
+        """
         return per_gpu_attributable_power, per_gpu_attributable_sm_use
 
     def save_model_card(self, model, input_size, device='cpu'):
