@@ -167,9 +167,8 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
         cpu_util_system = delta_proc2 / float(st22 - st12)
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
-            print("WARNING cpu_util_system is 0 for pid", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
-            print("I cannot attribute cpu time to the different pids.")
-            print("consider to set a larger period value when calling measurement function")
+            #print("WARNING cpu_util_system is 0 for pid", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
+            #print("maybe your system is not doing much at the moment, or consider to set a larger period value when calling measurement function")
             attributable_compute = 0
         else:
             attributable_compute = cpu_util_process / cpu_util_system

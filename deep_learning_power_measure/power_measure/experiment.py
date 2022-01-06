@@ -280,6 +280,7 @@ class Experiment():
                 metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
                 metrics['gpu'] = metrics_gpu
                 self.db_driver.save_power_metrics(metrics)
+                print('ok')
             try:
                 message = queue.get(block=False)
                 # so there are two types of expected messages.
@@ -428,7 +429,7 @@ class ExpResults():
             print("on the gpu")
             abs_nvidia_power = self.total_('nvidia_draw_absolute')
             rel_nvidia_power = self.total_('nvidia_attributable_power')
-            nvidia_mem_use_abs = self.average_("nvidia_mem_use")
+            nvidia_mem_use_abs = self.average_("nvidia_attributable_mem_use")
             print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
         else:
             print()
