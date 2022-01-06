@@ -83,12 +83,11 @@ class JsonParser():
                 result = json.loads(line)
                 if 'gpu' in result['metrics']:
                     date = datetime.datetime.fromisoformat(result['date'])
-
                     v = result['metrics']['gpu']['nvidia_draw_absolute']
-                    if 'nvidia_draw_absolute' not in metrics:
-                        metrics['nvidia_draw_absolute'] = {'dates':[], 'values':[]}
-                    metrics['nvidia_draw_absolute']['dates'].append(date)
-                    metrics['nvidia_draw_absolute']['values'].append(v)
+                    if 'nvidia_absolute_power' not in metrics:
+                        metrics['nvidia_absolute_power'] = {'dates':[], 'values':[]}
+                    metrics['nvidia_absolute_power']['dates'].append(date)
+                    metrics['nvidia_absolute_power']['values'].append(v)
 
                     v = result['metrics']['gpu']['per_gpu_attributable_power']['all']
                     if 'nvidia_attributable_power' not in metrics:
@@ -96,12 +95,20 @@ class JsonParser():
                     metrics['nvidia_attributable_power']['dates'].append(date)
                     metrics['nvidia_attributable_power']['values'].append(v)
 
+                    # sm used by this experiment
+                    per_gpu_sm_use = result['metrics']['gpu']['per_gpu_absolute_percent_usage']
+                    sm_use = sum([ sm_use for gpu, sm_use in per_gpu_sm_use.items() ])
+                    if 'nvidia_sm_use' not in metrics:
+                        metrics['nvidia_attributable_sm_use'] = {'dates':[], 'values':[]}
+                    metrics['nvidia_attributable_sm_use']['dates'].append(date)
+                    metrics['nvidia_attributable_sm_use']['values'].append(sm_use)
+
                     per_gpu_mem_use = result['metrics']['gpu']['per_gpu_attributable_mem_use']
                     mem_use = sum([ v for gpu, mem_uses in per_gpu_mem_use.items() for pid, v in mem_uses.items() ])
-                    if 'nvidia_mem_use' not in metrics:
-                        metrics['nvidia_mem_use'] = {'dates':[], 'values':[]}
-                    metrics['nvidia_mem_use']['dates'].append(date)
-                    metrics['nvidia_mem_use']['values'].append(mem_use)
+                    if 'nvidia_attributable_mem_use' not in metrics:
+                        metrics['nvidia_attributable_mem_use'] = {'dates':[], 'values':[]}
+                    metrics['nvidia_attributable_mem_use']['dates'].append(date)
+                    metrics['nvidia_attributable_mem_use']['values'].append(mem_use)
             if len(metrics) == 0:
                 return None
             return metrics

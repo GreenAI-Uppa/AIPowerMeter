@@ -48,12 +48,12 @@ def average(metric, start=None, end=None):
     if start is None:
         start = 0
     if end is None:
-        end = len(metric)-1    
+        end = len(metric)-1
     r = integrate(metric, start=start, end=end)
     if len(metric) == 1:
-        return r[0]    
+        return r[0]
     return r[-1]/(metric[end]['date'] - metric[start]['date'])
-            
+
 def total(metric, start=None, end=None):
     r = integrate(metric, start=start, end=end)
     return r[-1]
@@ -208,7 +208,7 @@ class Experiment():
         if len(self.pid_per_gpu) == 0:
             return {'all': 0}, {}
         for gpu_id in self.pid_per_gpu:
-            this_gpu_power_draw = per_gpu_power_draw[gpu_id] 
+            this_gpu_power_draw = per_gpu_power_draw[gpu_id]
             use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
             this_gpu_relative_use = average(use_curve)
             per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
@@ -279,7 +279,7 @@ class Experiment():
                 per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                 metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
                 metrics['gpu'] = metrics_gpu
-            self.db_driver.save_power_metrics(metrics)
+                self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
                 # so there are two types of expected messages.
