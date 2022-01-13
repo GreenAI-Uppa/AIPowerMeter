@@ -168,9 +168,9 @@ class Experiment():
             print("nvidia not available: " + msg_nvidia)
         else:
             print(msg_nvidia)
-        self.gpu_logs = []
-        self.min_gpu_powers = gpu_power.get_min_power()
-        self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
+            self.gpu_logs = []
+            self.min_gpu_powers = gpu_power.get_min_power()
+            self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
 
 
     def log_usage(self, metric_gpu, pid_list):
@@ -268,17 +268,17 @@ class Experiment():
             metrics = {}
             if self.nvidia_available:
                 # launch in separate threads because they won't have the same frequency
-                #metrics['gpu'] = gpu_power.get_nvidia_gpu_power(pid_list)
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
                 metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
             if time.time() - time_at_last_measure > period:
                 time_at_last_measure = time.time()
-                per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
-                metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
-                metrics['gpu'] = metrics_gpu
-            self.db_driver.save_power_metrics(metrics)
+                if self.nvidia_available:
+                    per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
+                    metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
+                    metrics['gpu'] = metrics_gpu
+                self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
                 # so there are two types of expected messages.
