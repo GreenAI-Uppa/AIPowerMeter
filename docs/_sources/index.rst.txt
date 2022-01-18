@@ -17,6 +17,7 @@ It uses RAPL for the CPU and nvidia-smi for the GPU.
    usage/in_details
    usage/modules
    experiments/experiments
+   experiments/schneiderbox
    bibliography
 
 
