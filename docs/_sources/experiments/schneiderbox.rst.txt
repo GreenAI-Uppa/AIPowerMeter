@@ -26,7 +26,8 @@ It is then possible to use one of these two data sources and compare the ground 
 
 
 .. code-block:: bash
-  sudo chmod 666 /dev/ttyUSB0
+
+   sudo chmod 666 /dev/ttyUSB0
 
 
 
@@ -60,28 +61,29 @@ There is a constant difference between the two measures because *the RAM consump
 At the end, we observe the following compsumptions :
 
 For FasterPAM :
-     19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter,            
+      19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter,            
 during aound 200 seconds,
 
 For PAM with multiprocessing :
-     39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter      
+      39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter      
 during around 250 seconds.    
 
 **Benchmark on image classification with AlexNet**
 
-In order to compare the AIpowermeter package and the real consumption from a wattmeter. We are interested in the power consumed during the training of an alexNET on a CIFAR10 data set, we use classical gradient descent with a learning rate of 0.001 as optimizer and the cross entropy as loss.
+In order to compare the AIpowermeter package and the real consumption from a wattmeter. We are interested in the power consumed during the training of an alexNET on a CIFAR10 data set.
+We use classical gradient descent with a learning rate of 0.001 as optimizer and the cross entropy as loss.
 
 .. image:: watt_global.png
    :align: center
 
-We can see above the *global representation* of the evolution of the power consumed by the machine during the *training* of an lexnet. Let's zoom in on the hatched part which corresponds to the first 5 epochs.
+We can see above the overview of the power consumed by the machine during the training of an alexnet. Noticed that we have both a larger variance and about 250 times more data measured by the wattmeter than by AIpowermeter.
+Let's zoom in on the hatched part which corresponds to the epoch 5 to 11.
 
 .. image:: watt_epoch.png
    :align: center
    :width: 400pt
 
-The observation of the first 5 epochs allows us to observe a clear descent of the consumption between each epoch. However the measurement taken by the wattmeter shows us that the consumption is not constant during an epoch and doesn't always decrease between each of them.
-
-It also happens that the wattmeter measurements are lower than the aipowermeter measurements. This is explained by the grouping of the wattmeter measurements made earlier. The granularity of the wattmetre being finer than aipowermeter, we had to make a choice to compare them to the same time measurements. A median was made on each interval.
+In order to "correct" the excessive variance of the wattmeter, we have represented in dark blue the moving average, with a step of 200, calculated on our data.
+The observation of these 5 epochs allows us to observe a clear descent of the consumption between some epoch. The  wattmeter is more precise and shows us that the consumption is not constant during an epoch.
 
 A complete jupyter-notebook is available `here <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/docsrc/experiments/measure.ipynb>`_.
