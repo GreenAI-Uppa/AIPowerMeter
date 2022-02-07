@@ -212,7 +212,11 @@ class Experiment():
             use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
             this_gpu_relative_use = average(use_curve)
             per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
-            prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) /  (len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids']))
+            all_pids_on_this_gpu = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
+            if all_pids_on_this_gpu == 0:
+                prop_active_pid = 0
+            else:
+                prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) / all_pids_on_this_gpu 
             usage_power = (this_gpu_power_draw - self.min_gpu_powers[gpu_id])
             fix_power = self.min_gpu_powers[gpu_id] * prop_active_pid
             per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
