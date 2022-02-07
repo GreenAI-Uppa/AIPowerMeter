@@ -48,12 +48,12 @@ def average(metric, start=None, end=None):
     if start is None:
         start = 0
     if end is None:
-        end = len(metric)-1    
+        end = len(metric)-1
     r = integrate(metric, start=start, end=end)
     if len(metric) == 1:
-        return r[0]    
+        return r[0]
     return r[-1]/(metric[end]['date'] - metric[start]['date'])
-            
+
 def total(metric, start=None, end=None):
     r = integrate(metric, start=start, end=end)
     return r[-1]
@@ -173,12 +173,20 @@ class Experiment():
             self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
 
 
-    def log_usage(self, metric_gpu, pid_list):
+    def log_usage(self, metric_gpu, pid_list, time_window=3, waiting_phase=20):
+        """
+        record the last gpu usage, and remove the usage after a
+
+        time_window : in seconds : after this duration, we remove recordings
+        from the log
+        waiting_phase : in seconds. The gpu remains under high voltage idle state
+        during this period after the last pid has finished its computation
+        """
         now = time.time()
         log = {"timestamp": now }
         log["per_gpu_power_draw"] = metric_gpu["per_gpu_power_draw"]
         log["per_gpu_estimated_attributable_utilization"] = metric_gpu["per_gpu_estimated_attributable_utilization"]
-        self.gpu_logs = [t for t in self.gpu_logs if now - t['timestamp'] < 3]
+        self.gpu_logs = [t for t in self.gpu_logs if now - t['timestamp'] < time_window]
         self.gpu_logs.append(log)
 
         # update the list of pids running on the different gpus
@@ -187,7 +195,7 @@ class Experiment():
             for cat, pid_last_times in pid_cats.items():
                 for pid in list(pid_last_times):
                     last_seen = pid_last_times[pid]
-                    if now - last_seen > 20:
+                    if now - last_seen > waiting_phase:
                         del pid_last_times[pid]
         # add the pids running at the moment
         for gpu_id, usage in metric_gpu["per_gpu_per_pid_utilization_absolute"].items():
@@ -202,15 +210,26 @@ class Experiment():
                     self.pid_per_gpu[gpu_id]['other_pids'][pid] = now
 
     def allocate_gpu_power(self, per_gpu_power_draw):
-        # computing attributable power and use
+        """
+        computing attributable power and use
+        We average the gpu use and power over a time window and share it among
+        the different processes
+
+        There is a fix power that is used by the gpu as soon as it is used. This part
+        is shared equally among all the active pids regardless of their amount of
+        stream multiprocessor used
+
+        Note that the gpu is set at this mininum voltage for a time window of
+        around 20 seconds after inactivity.
+        """
         per_gpu_attributable_power = {}
         per_gpu_attributable_sm_use = {}
         if len(self.pid_per_gpu) == 0:
             return {'all': 0}, {}
         for gpu_id in self.pid_per_gpu:
-            this_gpu_power_draw = per_gpu_power_draw[gpu_id] 
+            this_gpu_power_draw = per_gpu_power_draw[gpu_id]
             use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
-            this_gpu_relative_use = average(use_curve)
+            this_gpu_relative_use = average(use_curve) # average use of the gpu over the time window
             per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
             all_pids_on_this_gpu = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
             if all_pids_on_this_gpu == 0:
