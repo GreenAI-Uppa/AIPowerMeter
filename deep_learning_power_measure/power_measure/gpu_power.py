@@ -171,7 +171,7 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
 
     """
     # collect per gpu per pid sm usage
-    per_gpu_per_pid_utilization_absolute = get_gpu_use_pmon(nsample=nsample)
+    #per_gpu_per_pid_utilization_absolute = get_gpu_use_pmon(nsample=nsample)
 
     # this commmand provides the full xml output
     xml = get_nvidia_xml()
@@ -191,6 +191,7 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
     absolute_power = sum(per_gpu_power_draw.values())
     
     # for each gpu, get percentage of sm used for all the pid involved the experiment
+    """
     per_gpu_absolute_percent_usage = {} 
     for gpu_id, pids in per_gpu_per_pid_utilization_absolute.items():
         per_gpu_absolute_percent_usage[gpu_id] = 0 
@@ -207,13 +208,13 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
             per_gpu_relative_percent_usage[gpu_id] = 0
         else:
             per_gpu_relative_percent_usage[gpu_id] = all_sm / this_exp_sm
-
+"""
     data_return_values_with_headers = {
         "nvidia_draw_absolute": absolute_power, # total nvidia power draw
         "per_gpu_power_draw": per_gpu_power_draw,
         "per_gpu_attributable_mem_use": per_gpu_per_pid_mem_use,
-        "per_gpu_per_pid_utilization_absolute": per_gpu_per_pid_utilization_absolute, # absolute % of sm used per gpu per pid
-        "per_gpu_absolute_percent_usage": per_gpu_absolute_percent_usage, # absolute % of sm used per gpu by the experiment
-        "per_gpu_estimated_attributable_utilization": per_gpu_relative_percent_usage, # relative use of sm used per gpu by the experiment
+        #"per_gpu_per_pid_utilization_absolute": per_gpu_per_pid_utilization_absolute, # absolute % of sm used per gpu per pid
+        #"per_gpu_absolute_percent_usage": per_gpu_absolute_percent_usage, # absolute % of sm used per gpu by the experiment
+        #"per_gpu_estimated_attributable_utilization": per_gpu_relative_percent_usage, # relative use of sm used per gpu by the experiment
     }
     return data_return_values_with_headers
