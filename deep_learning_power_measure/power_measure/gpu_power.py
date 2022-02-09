@@ -68,9 +68,10 @@ def get_gpu_use_pmon(nsample=1):
     for i, x in enumerate(out_str_pruned):
         if re.match(r"#.* gpu ", x):
             position = i
-    if position == -1:
+    print(out_str_pruned)
+    print(position)
+    #if position == -1:
         #raise ValueError("Problem with output in nvidia-smi pmon -c 10")
-        position = 1
     out_str_pruned.insert(0, out_str_pruned.pop(position).strip())
     out_str_final = "\n".join(out_str_pruned)
     out_str_final = out_str_final.replace("-", "0")
