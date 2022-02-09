@@ -61,17 +61,17 @@ def get_gpu_use_pmon(nsample=1):
     out_str_pruned = [
         x for x in out_str_split if "Idx" not in x
     ]  # [out_str_split[0], ] + out_str_split[2:]
-
+    if out_str_pruned[0] != '# gpu        pid  type    sm   mem   enc   dec   command' :
+        out_str_pruned.insert(0, '# gpu        pid  type    sm   mem   enc   dec   command')
     # For some weird reason the header position sometimes gets jumbled so we need to re-order it to the front
     position = -1
 
     for i, x in enumerate(out_str_pruned):
         if re.match(r"#.* gpu ", x):
             position = i
-    print(out_str_pruned)
-    print(position)
-    #if position == -1:
-        #raise ValueError("Problem with output in nvidia-smi pmon -c 10")
+            
+    if position == -1:
+        raise ValueError("Problem with output in nvidia-smi pmon -c 10")
     out_str_pruned.insert(0, out_str_pruned.pop(position).strip())
     out_str_final = "\n".join(out_str_pruned)
     out_str_final = out_str_final.replace("-", "0")
