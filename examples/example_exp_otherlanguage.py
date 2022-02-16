@@ -16,12 +16,6 @@ args = parser.parse_args()
 
 
 
-# setting the size of the input
-# minibatch_size x nChannels x Height x Width
-input_size = (256, 256)
-# generating some fake data
-mat1 = np.random.rand(input_size[0], input_size[1])
-mat2 = np.random.rand(input_size[0], input_size[1])
 
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
