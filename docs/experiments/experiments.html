@@ -58,19 +58,19 @@
 <p>As a gentle start, we measure the consumption at inference of a vanilla <a class="reference external" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">Alexnet</a> on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.</p>
 <p>We first import necessary modules for power draws and torch models downloads.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
-<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="kn">as</span> <span class="nn">models</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 </pre></div>
 </div>
 <p>We then load Alexnet model and push it into our GeForce RTX 3090 GPU.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#load your favorite model</span>
-<span class="n">alexnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">alexnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1">#choose your favorite device</span>
 <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Using {} device&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using </span><span class="si">{}</span><span class="s1"> device&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
 
 <span class="c1">#load the model to the device</span>
 <span class="n">alexnet</span> <span class="o">=</span> <span class="n">alexnet</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -95,7 +95,7 @@
   <span class="n">image_test</span> <span class="o">=</span> <span class="n">image_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
   <span class="c1">#start of the experiments</span>
   <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xps</span><span class="p">):</span>
-      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Experience&#39;</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="n">xps</span><span class="p">,</span><span class="s1">&#39;is running&#39;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Experience&#39;</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="n">xps</span><span class="p">,</span><span class="s1">&#39;is running&#39;</span><span class="p">)</span>
       <span class="n">latencies</span> <span class="o">=</span> <span class="p">[]</span>
       <span class="c1">#AIPM</span>
       <span class="n">input_image_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">input_size</span><span class="p">,</span><span class="n">input_size</span><span class="p">)</span>
@@ -112,7 +112,7 @@
           <span class="n">latencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
       <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">STOP_MESSAGE</span><span class="p">)</span>
       <span class="n">end_xp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;power measuring stopped after&quot;</span><span class="p">,</span><span class="n">end_xp</span><span class="o">-</span><span class="n">start_xp</span><span class="p">,</span><span class="s2">&quot;seconds for experience&quot;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="n">xps</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;power measuring stopped after&quot;</span><span class="p">,</span><span class="n">end_xp</span><span class="o">-</span><span class="n">start_xp</span><span class="p">,</span><span class="s2">&quot;seconds for experience&quot;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="n">xps</span><span class="p">)</span>
       <span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="s2">&quot;input_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/run_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
       <span class="c1">#write latency.csv next to power_metrics.json file</span>
       <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">&quot;input_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/run_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/latency.csv&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">latencies</span><span class="p">))</span>
@@ -167,8 +167,8 @@
 </section>
 <section id="deep-rewiring">
 <h2>Deep rewiring<a class="headerlink" href="#deep-rewiring" title="Permalink to this headline">¶</a></h2>
-<p>In the article <a class="reference external" href="https://arxiv.org/abs/1711.05136">Training very sparse network with Deep Rewiring</a> , <a class="reference external" href="http://guillaume.bellec.eu/">G. Bellec</a> et al. introduce two algorithms allowing to train models with a very low connectivy (less than 2%).
-The laters are called Deep-R and Soft Deep-R.
+<p>In the article <a class="reference external" href="https://arxiv.org/abs/1711.05136">Training very sparse network with Deep Rewiring</a> , <a class="reference external" href="http://guillaume.bellec.eu/">G. Bellec</a> et al. introduce two algorithms allowing to train models with very low connectivy (less than 2%).
+The latter are called Deep-R and Soft Deep-R.
 The first one induced strong constraints on the network : we have a limited number of connectivity for each iteration of the training.
 The second is a relaxed form of Deep-R where the maximal number of connections is not fixed.</p>
 <p>For more details about tests and theorical guarantees on the algorithms, we invite you to read the article.

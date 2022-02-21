@@ -191,8 +191,8 @@ On the next figure, we can see the evolution of latency in seconds compared to t
 Deep rewiring 
 -----------------
 
-In the article `Training very sparse network with Deep Rewiring <https://arxiv.org/abs/1711.05136>`_ , `G. Bellec <http://guillaume.bellec.eu/>`_ et al. introduce two algorithms allowing to train models with a very low connectivy (less than 2%).
-The laters are called Deep-R and Soft Deep-R.
+In the article `Training very sparse network with Deep Rewiring <https://arxiv.org/abs/1711.05136>`_ , `G. Bellec <http://guillaume.bellec.eu/>`_ et al. introduce two algorithms allowing to train models with very low connectivy (less than 2%).
+The latter are called Deep-R and Soft Deep-R.
 The first one induced strong constraints on the network : we have a limited number of connectivity for each iteration of the training.
 The second is a relaxed form of Deep-R where the maximal number of connections is not fixed.
 
