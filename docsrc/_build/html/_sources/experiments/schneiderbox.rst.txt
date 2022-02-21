@@ -34,8 +34,6 @@ It is then possible to use one of these two data sources and compare the ground 
 Benchmarks
 ---------------------------
 
-
-
 First tests have been realized to compare measurements done with AIPowerMeter and Schneider Power meters.
 The measures with the Schneider Power Meter are stored in a logfile and looks like :
 
@@ -45,8 +43,8 @@ The measures with the Schneider Power Meter are stored in a logfile and looks li
 
 
 **Benchmark at Prof En Poche** 
-
-With Prof En Poche, we are jointly working on adaptive learning and especially on clustering of student profils.
+ 
+With `Prof En Poche <https://profenpoche.com/>`_, we are jointly working on adaptive learning and especially on clustering of student profils.
 We have compared the compsumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing `with PyClustering library <https://pyclustering.github.io/docs/0.10.1/html/index.html>`_ and an improved version FasterPAM implemented `here <https://github.com/kno10/python-kmedoids>`_ . 
 We have also measured the consumption with AIPowerMeter. Here, we only use the CPU and not GPU. The behaviour is essentially the same.
 

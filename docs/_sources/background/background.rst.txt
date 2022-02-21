@@ -74,9 +74,9 @@ Still, nvidia provides us with the percentage of core memory used by each progra
 Measuring multiple programs
 ---------------------------
 
-In general, RAPL and nvidia provide us a power measurement for the whole board or entire sockets.  Thus, to take into account the energy consumed from each program, we adopt the approach implemtented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>`_ and multiply the RAPL value by the percentage of cpu and memory used. 
+In general, RAPL and nvidia provide us a power measurement for the whole board or entire sockets.  Thus, to take into account the energy consumed from each program, we adopt the approach implemented in the `experiment impact tracker <https://github.com/Breakend/experiment-impact-tracker>`_ and multiply the RAPL value by the percentage of cpu and memory used. 
 
-However, the energy consumed by programs is not exactly additive. For instance, the amount of Joules spent by two programs running on parallel and in sequence won't be the same. This is due to a fix energy waste, for instance coming from the idle state, and because the relation between the usage of the computer and the energy consumed is not linear. 
+However, the energy consumed by programs is not exactly additive. For instance, the amount of Joules spent by two programs running on parallel and in sequence won't be the same. This is due to a fix energy waste, for instance coming from the idle state, and because the relation between the usage of the computer and the energy consumed is not linear, for instance, due to a time delay between the change of core use and the energy usage.
 
 In conclusion, we recommend to benchmark a program when it is running alone on the machine.
 

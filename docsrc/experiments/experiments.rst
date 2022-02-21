@@ -188,3 +188,38 @@ On the next figure, we can see the evolution of latency in seconds compared to t
    :width: 400pt
    :align: center
 
+Deep rewiring 
+-----------------
+
+In the article `Training very sparse network with Deep Rewiring <https://arxiv.org/abs/1711.05136>`_ , `G. Bellec <http://guillaume.bellec.eu/>`_ et al. introduce two algorithms allowing to train models with a very low connectivy (less than 2%).
+The laters are called Deep-R and Soft Deep-R.
+The first one induced strong constraints on the network : we have a limited number of connectivity for each iteration of the training.
+The second is a relaxed form of Deep-R where the maximal number of connections is not fixed.
+
+For more details about tests and theorical guarantees on the algorithms, we invite you to read the article. 
+The implementations are available `here <https://github.com/guillaumeBellec/deep_rewiring>`_. 
+
+At Green AI UPPA, we have measured the consumptions of three available scripts on the problem of classification for MNIST' images.
+We worked only on the CPU here.
+We used the default parameters (for example 10 epochs and a batch size of 10).
+
+* script_mnist_deep_rewiring.py is the basic implementation of Deep R, 
+* script_mnist_deeep_rewiring_with_global_constraint, 
+* script_mnist_soft_deep_rewiring.py is the implementation of soft Deep-R.
+
+
++---------------------------+--------------------------+------------------------------+----------------------------+
+| Model                     | CPU consumption (Joules) | Wattmeters measures (Joules) | Training duration(seconds) |
++===========================+==========================+==============================+============================+
+| Deep R                    | 19490                    | 28554                        | 249                        |
++---------------------------+--------------------------+------------------------------+----------------------------+
+| Deep R Global constraints | 19121                    | 28105                        | 240                        |
++---------------------------+--------------------------+------------------------------+----------------------------+
+| Soft Deep R               | 10405                    | 15655                        | 130                        |
++---------------------------+--------------------------+------------------------------+----------------------------+
+
+
+
+.. image:: conso_dr.png 
+   :width: 600pt
+   :align: center
