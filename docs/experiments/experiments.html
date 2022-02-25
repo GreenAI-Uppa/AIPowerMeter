@@ -280,7 +280,8 @@ To make sure our experiment is not influenced by the random initialization of pa
 </tr>
 </tbody>
 </table>
-<p>We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor a economy in energy. This can be explain because the implementation keep a high sparsity</p>
+<p>We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor an economy in energy.
+To understand those results, we argue that the implementation only put the value of every pruned neuron at zero, and then having a high sparsity.</p>
 </section>
 <section id="force">
 <h2>Force<a class="headerlink" href="#force" title="Permalink to this headline">¶</a></h2>
