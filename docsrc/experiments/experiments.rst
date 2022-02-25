@@ -233,7 +233,7 @@ In this documentation, we decided to implement two solutions called SNIP (by `Na
 
 SNIP 
 -----------------
-For our experiments, we used a non official implementation using `torch <https://github.com/mil-ad/snip>`_ because the code proposed by the author was implemented in an old tensorflow version, which doesn't allow the use of a GPU. We decided to test two architectures and each one with a specific dataset : respectively LeNet5-Caffe with MNIST dataset and vgg-D with CIFAR-10.
+For our experiments, we used an `unofficial implementation <https://github.com/mil-ad/snip>`_ using `PyTorch <https://pytorch.org/>`_ because the code proposed by the author was implemented in an old tensorflow version, which doesn't allow the use of a GPU. We decided to test two architectures and each one with a specific dataset : respectively LeNet5-Caffe with MNIST dataset and vgg-D with CIFAR-10.
 To make sure our experiment is not influenced by the random initialization of parameters, we run three times the whole training process with a different seed. At the end, we plot the precision, the computation time and of course the total energy consumption of the GPU and the machine thanks to the use of AIPowerMeter and a wattmeter.
 
 .. list-table:: Results of our experiments with SNIP
@@ -276,7 +276,8 @@ To make sure our experiment is not influenced by the random initialization of pa
      - 93.13
      - 771
 
-We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor a economy in energy. This can be explain because the implementation keep a high sparsity
+We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor an economy in energy.
+To understand those results, we argue that the implementation only put the value of every pruned neuron at zero, and then having a high sparsity.
 
 
 Force 
