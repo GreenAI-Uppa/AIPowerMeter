@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'IA Power Meter'
-copyright = '2021, GreenAIUppa'
+project = 'AI Power Meter'
+copyright = '2022, GreenAIUppa'
 author = 'GreenAIUppa'
 
 

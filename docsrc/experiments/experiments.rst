@@ -204,7 +204,7 @@ We worked only on the CPU here.
 We used the default parameters (for example 10 epochs and a batch size of 10).
 
 * script_mnist_deep_rewiring.py is the basic implementation of Deep R, 
-* script_mnist_deeep_rewiring_with_global_constraint, 
+* script_mnist_deeep_rewiring_with_global_constraint.py, 
 * script_mnist_soft_deep_rewiring.py is the implementation of soft Deep-R.
 
 
@@ -223,3 +223,61 @@ We used the default parameters (for example 10 epochs and a batch size of 10).
 .. image:: conso_dr.png 
    :width: 600pt
    :align: center
+
+
+Pruning 
+-----------------
+
+A solution for improving the size and the computation time is called pruning. It consists in selecting some neurons and removing others before, during or after the training of a model.
+In this documentation, we decided to implement two solutions called SNIP (by `Namhoon Lee & al. <https://arxiv.org/absS/1810.02340>`_) and Force (by `Pau de Jorge & al. <https://arxiv.org/absS/2006.09081>`_) who both prune a model once at initialization and achieve a deletion of 95 to 99.5% parameters without losing much precision. 
+
+SNIP 
+-----------------
+For our experiments, we used a non official implementation using `torch <https://github.com/mil-ad/snip>`_ because the code proposed by the author was implemented in an old tensorflow version, which doesn't allow the use of a GPU. We decided to test two architectures and each one with a specific dataset : respectively LeNet5-Caffe with MNIST dataset and vgg-D with CIFAR-10.
+To make sure our experiment is not influenced by the random initialization of parameters, we run three times the whole training process with a different seed. At the end, we plot the precision, the computation time and of course the total energy consumption of the GPU and the machine thanks to the use of AIPowerMeter and a wattmeter.
+
+.. list-table:: Results of our experiments with SNIP
+   :widths: 30 30 40 30 30 30 30
+   :header-rows: 1
+
+   * - Architecture
+     - Dataset
+     - Pruning ?
+     - Parameters
+     - Time (hh:mm:ss)
+     - Max precision (%)
+     - Total consumption (Wh)
+   * - LeNet5-Caffe
+     - MNIST
+     - no
+     - 430,500
+     - 30:18
+     - 99.42
+     - 145.5
+   * - 
+     - 
+     - yes (98%)
+     - 8,610
+     - 28:26
+     - 99.15
+     - 145.28
+   * - vgg-D
+     - CIFAR-10
+     - no
+     - 15,239,872
+     - 1:40:18
+     - 93.55
+     - 785
+   * -
+     -
+     - yes (95%)
+     - 761,994
+     - 1:39:01
+     - 93.13
+     - 771
+
+We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor a economy in energy. This can be explain because the implementation keep a high sparsity
+
+
+Force 
+-----------------
