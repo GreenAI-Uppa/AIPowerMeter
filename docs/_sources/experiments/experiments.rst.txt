@@ -282,3 +282,28 @@ To understand those results, we argue that the implementation only put the value
 
 Force 
 -----------------
+Force can be seen as an iterative SNIP as described by the authors of the algorithm. In this section,
+the results of the model in term of energy consumption is described. AIPowerMeter can be used like in the previous examples
+to infer the energy consumption. In this experiment, a wattmeter was also used.
+
+Force was launched on CIFAR-10 with a VGG implementation. Like in the paper, the accuracy remains very high with high pruning levels.
+Pruning is then a great solution to reduce the size of a neural network. However, the same conclusions appear. In term of energy
+consumption, there is no clear differences between the pruned model and the full model. We infer that the reason for that is
+that the optimisation algorithm is not implemented to deal with sparse matrixes. Thus, we do not obtain any gain in time complexity
+and in energy consumption.
+
+.. list-table:: Results of our experiments with Force
+   :widths: 50 50 50
+   :header-rows: 1
+
+   * - Pruning level
+     - Accuracy
+     - Inference time
+
+   * - 0
+     - 0.93
+     - 8.33e-3
+
+   * - 0.9
+     - 0.92
+     - 8.37e-3
