@@ -53,7 +53,8 @@ We use pytorch model for this (optional) aspect:
 Measuring my first program
 --------------------------
 
-You have examples `there (pytorch) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, `there (tensorflow) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning_tf.py>`_ and `there (numpy) <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py>`_. In a nutshell,
+We provide examples scripts for `pytorch <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning.py>`_, `tensorflow <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_deep_learning_tf.py>`_, `numpy <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/example_exp_matmul.py>`_ and describe an integration with :ref:`docker`.
+In a nutshell,
 
  you instantiate an experiment and place the code you want to measure between a start and stop signal.
 

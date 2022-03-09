@@ -47,12 +47,44 @@
 </figure>
 <p>It is then possible to use one of these two data sources and compare the ground true to the measurements of RAPL and nvidia-smi.</p>
 <p><strong>Compilation and execution of wattmeter_rapid1</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcc -std<span class="o">=</span>c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
-./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span> &gt; logfile
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -std<span class="o">=</span>c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
+<span class="gp">$ </span>./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span> &gt; logfile
 </pre></div>
 </div>
 <p><em>Remark</em> : if you have trouble to access to <em>/dev/ttyUSB0</em>, we should use the following command :</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo chmod <span class="m">666</span> /dev/ttyUSB0
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo chmod <span class="m">666</span> /dev/ttyUSB0
+</pre></div>
+</div>
+</section>
+<section id="track-a-training-with-high-frequency-measures">
+<h2>Track a training with high frequency measures<a class="headerlink" href="#track-a-training-with-high-frequency-measures" title="Permalink to this headline">¶</a></h2>
+<p>You’ve just seen how to execute the wattmeter high frequency tracking and log the power over time with a bash command.
+But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you’re using for your training :</p>
+<p><strong>From the machine where the USB is connected</strong>:</p>
+<p>I used the <cite>os</cite> library  and the <cite>system</cite> method built-in Python. Those let you run any linux command through a python script.
+To start logging, you have to add this line to your code before the training :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;/path/to/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 &gt; logfile 2&gt;&amp;1 &amp; echo $! &gt; wm_pid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And finally, at the end of your training you have to kill the process otherwise it will track forever the active power in background.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;kill -10 `cat wm_pid`&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>From another machine</strong>:</p>
+<p>This time we need to add a ssh connection to start the tracking, and copy the result afterwards.
+Please, make sure to copy your ssh public key to the remote machine allowing the script to connect to the destination without the need of the password.
+To copy your public key, you just need to run the two following commands (or only the second if you have already generated a RSA key)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen -t rsa -b <span class="m">2048</span>
+<span class="gp">$ </span>ssh-copy-id -i ~/.ssh/id_rsa.pub username@example.org
+</pre></div>
+</div>
+<p>Instead of <cite>os</cite>, we used the <cite>subprocess</cite> package, but it’s the same principle :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;ssh&#39;</span><span class="p">,</span> <span class="s1">&#39;username@example.org&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/wattmetre-read&#39;</span><span class="p">,</span> <span class="s1">&#39;--tty=/dev/ttyUSB0&#39;</span><span class="p">,</span> <span class="s1">&#39;--nb=6&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="n">logfile</span><span class="p">,</span> <span class="s1">&#39;2&gt;&amp;1&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;echo&#39;</span><span class="p">,</span> <span class="s1">&#39;$!&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;wm_pid&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>You need also to add a <cite>scp</cite> command to copy the logfile afterwards to your local machine.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;ssh&#39;</span><span class="p">,</span> <span class="s1">&#39;username@example.org&#39;</span><span class="p">,</span> <span class="s1">&#39;kill&#39;</span><span class="p">,</span> <span class="s1">&#39;-10&#39;</span><span class="p">,</span> <span class="s1">&#39;`cat&#39;</span><span class="p">,</span> <span class="s1">&#39;wm_pid`&#39;</span><span class="p">])</span>
+<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;scp&#39;</span><span class="p">,</span> <span class="s1">&#39;username@example.org:/path/to/logfile&#39;</span><span class="p">,</span> <span class="s1">&#39;/local/path/&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
@@ -63,7 +95,7 @@ The measures with the Schneider Power Meter are stored in a logfile and looks li
 <a class="reference internal image-reference" href="../_images/gcc_watt.png"><img alt="../_images/gcc_watt.png" class="align-center" src="../_images/gcc_watt.png" style="width: 400pt;" /></a>
 <p><strong>Benchmark at Prof En Poche</strong></p>
 <p>With <a class="reference external" href="https://profenpoche.com/">Prof En Poche</a>, we are jointly working on adaptive learning and especially on clustering of student profils.
-We have compared the compsumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing <a class="reference external" href="https://pyclustering.github.io/docs/0.10.1/html/index.html">with PyClustering library</a> and an improved version FasterPAM implemented <a class="reference external" href="https://github.com/kno10/python-kmedoids">here</a> .
+We have compared the consumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing <a class="reference external" href="https://pyclustering.github.io/docs/0.10.1/html/index.html">with PyClustering library</a> and an improved version FasterPAM implemented <a class="reference external" href="https://github.com/kno10/python-kmedoids">here</a> .
 We have also measured the consumption with AIPowerMeter. Here, we only use the CPU and not GPU. The behaviour is essentially the same.</p>
 <img alt="../_images/fasterpam_comparaison.png" class="align-center" src="../_images/fasterpam_comparaison.png" />
 <img alt="../_images/multiproc_pam_comparaison.png" class="align-center" src="../_images/multiproc_pam_comparaison.png" />
@@ -117,6 +149,7 @@ The observation of these 5 epochs allows us to observe a clear descent of the co
 <li class="toctree-l1"><a class="reference internal" href="experiments.html">Deep learning benchmark</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Machine and Deep Learning Benchmarks with wattmeters</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#schneider-power-meters">Schneider Power meters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#track-a-training-with-high-frequency-measures">Track a training with high frequency measures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#benchmarks">Benchmarks</a></li>
 </ul>
 </li>

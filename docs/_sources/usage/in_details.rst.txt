@@ -59,11 +59,28 @@ model complexity
 
 We use a wrapper for `torchinfo <https://pypi.org/project/torchinfo/>`_ to extract statistics about your model, essentially number of parameters and mac operation counts.
 To obtain them, add additional parameters:
-```
-net = ... the model you are using for your experiment
-input_size = ... (batch_size, *data_point_shape)
-exp = experiment.Experiment(driver, model=net, input_size=input_size)
-```
+
+.. code-block:: python
+
+  net = ... the model you are using for your experiment
+  input_size = ... (batch_size, *data_point_shape)
+  exp = experiment.Experiment(driver, model=net, input_size=input_size)
+
 
 You can log the number of parameters and the number of multiply and add (mac) operations of your model. 
 Currently, only pytorch is supported, and tensorflow should be supported shortly
+
+.. _docker:
+
+Docker integration
+---------------------
+
+For the implementation of AIPowerMeter in a docker container, we need to use a special branch of the code because of the behaviour of the command :
+
+.. code-block:: console
+
+  $ nvidia-smi pmon
+
+An hot fix has been implemented, it forces the tracking of all the GPU processes. It's then impossible to isolate a process running at the same time than others.
+
+See the github repo `docker_AIPM <https://github.com/GreenAI-Uppa/docker_AIPM>`_ for more details. You will also find slides explaining the motivations for the use of Docker images and container.

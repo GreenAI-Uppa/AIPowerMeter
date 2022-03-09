@@ -1,5 +1,5 @@
 Machine and Deep Learning Benchmarks with wattmeters
-================================
+================================================================
 
 
 Schneider Power meters
@@ -17,19 +17,62 @@ It is then possible to use one of these two data sources and compare the ground 
 
 **Compilation and execution of wattmeter_rapid1**:
 
-.. code-block:: bash
+.. code-block:: console
 
-  gcc -std=c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
-  ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile
+  $ gcc -std=c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
+  $ ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile
 
 *Remark* : if you have trouble to access to */dev/ttyUSB0*, we should use the following command : 
 
 
-.. code-block:: bash
+.. code-block:: console
 
-   sudo chmod 666 /dev/ttyUSB0
+   $ sudo chmod 666 /dev/ttyUSB0
 
+Track a training with high frequency measures
+------------------------------------------------------
 
+You've just seen how to execute the wattmeter high frequency tracking and log the power over time with a bash command.
+But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you're using for your training : 
+
+**From the machine where the USB is connected**:
+
+I used the `os` library (so you need to import os before using it) and the `system` method built-in Python. Those let you run any linux command through a python script.
+To start logging, you have to add this line to your code before the training :
+
+.. code-block:: python
+
+   os.system("/path/to/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile 2>&1 & echo $! > wm_pid")
+
+And finally, at the end of your training you have to kill the process otherwise it will track forever the active power in background.
+
+.. code-block:: python
+
+   os.system("kill -10 `cat wm_pid`")
+
+**From another machine**:
+
+This time we need to add a ssh connection to start the tracking, and copy the result afterwards.
+Please, make sure to copy your ssh public key to the remote machine allowing the script to connect to the destination without the need of the password.
+To copy your public key, you just need to run the two following commands (or only the second if you have already generated a RSA key)
+
+.. code-block:: console
+
+   $ ssh-keygen -t rsa -b 2048
+   $ ssh-copy-id -i ~/.ssh/id_rsa.pub username@example.org
+
+Instead of `os`, we used the `subprocess` package (as earlier, don't forget to import subprocess), but it's the same principle :
+
+.. code-block:: python
+
+   subprocess.call(['ssh', 'username@example.org', '/path/to/wattmetre-read', '--tty=/dev/ttyUSB0', '--nb=6', '>', logfile, '2>&1', '&', 'echo', '$!', '>', 'wm_pid'])
+
+You need also to add a `scp` command to copy the logfile afterwards to your local machine.
+
+.. code-block:: python
+
+   subprocess.call(['ssh', 'username@example.org', 'kill', '-10', '`cat', 'wm_pid`'])
+   subprocess.call(['scp', 'username@example.org:/path/to/logfile', '/local/path/'])
 
 Benchmarks
 ---------------------------
@@ -45,7 +88,7 @@ The measures with the Schneider Power Meter are stored in a logfile and looks li
 **Benchmark at Prof En Poche** 
  
 With `Prof En Poche <https://profenpoche.com/>`_, we are jointly working on adaptive learning and especially on clustering of student profils.
-We have compared the compsumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing `with PyClustering library <https://pyclustering.github.io/docs/0.10.1/html/index.html>`_ and an improved version FasterPAM implemented `here <https://github.com/kno10/python-kmedoids>`_ . 
+We have compared the consumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing `with PyClustering library <https://pyclustering.github.io/docs/0.10.1/html/index.html>`_ and an improved version FasterPAM implemented `here <https://github.com/kno10/python-kmedoids>`_ . 
 We have also measured the consumption with AIPowerMeter. Here, we only use the CPU and not GPU. The behaviour is essentially the same.
 
 .. image:: fasterpam_comparaison.png 
