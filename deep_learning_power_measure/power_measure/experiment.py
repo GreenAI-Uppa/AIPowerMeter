@@ -407,9 +407,10 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        r = integrate(metric)[-1]
+        r = integrate(metric)
         if r is None:
             return r
+        r = r[-1]
         if len(metric) == 1:
             return r
         return r /( metric[-1]['date'] - metric[0]['date'])
