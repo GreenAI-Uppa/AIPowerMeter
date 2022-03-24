@@ -425,7 +425,8 @@ class ExpResults():
         simple print of the experiment summary
         """
         print("============================================ EXPERIMENT SUMMARY ============================================")
-        if self.model_card is not None:
+        if self.model_card is not None and len(self.model_card)!=0:
+            print(self.model_card)
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
         if self.cpu_metrics is not None:
