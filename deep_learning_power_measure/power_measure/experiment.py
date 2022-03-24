@@ -26,7 +26,7 @@ def joules_to_wh(n):
         return [i*3600/1000 for i in n]
     return n*3600/1000
 
-def integrate(metric, start=None, end=None):
+def integrate(metric, start=None, end=None, allow_None=False):
     """integral of the metric values over time"""
     r = [0]
     if start is None:
@@ -39,8 +39,11 @@ def integrate(metric, start=None, end=None):
         y1 = metric[i]['value']
         y2 = metric[i+1]['value']
         if y1 is None or y2 is None:
-            r.append(None)
-            continue
+            if allow_None:
+                r.append(None)
+                continue
+            else:
+                return None
         v = (x2-x1)*(y2+y1)/2
         v += r[-1]
         r.append(v)
@@ -405,6 +408,8 @@ class ExpResults():
         if metric is None:
             return None
         r = integrate(metric)[-1]
+        if r is None:
+            return r
         if len(metric) == 1:
             return r
         return r /( metric[-1]['date'] - metric[0]['date'])
