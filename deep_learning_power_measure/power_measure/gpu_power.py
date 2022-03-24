@@ -89,7 +89,7 @@ def get_gpu_use_pmon(nsample=1):
             per_gpu_per_pid_utilization_absolute[gpu_id] = {}
         pid = int(row['pid'])
         per_gpu_per_pid_utilization_absolute[gpu_id][pid] = row['sm']/100
-    return per_gpu_per_pid_utilization_absolute 
+    return per_gpu_per_pid_utilization_absolute
 
 def get_gpu_mem(gpu):
     """Get the gpu memory usage from one gpu"""
@@ -97,13 +97,22 @@ def get_gpu_mem(gpu):
     total_memory = memory_usage.findall("total")[0].text
     used_memory = memory_usage.findall("used")[0].text
     free_memory = memory_usage.findall("free")[0].text
+    if total_memory == 'N/A':
+        total_memory = None
+    if used_memory == 'N/A':
+        used_memory = None
+    if memory_usage == 'N/A':
+        memory_usage = None
     per_pid_mem_use = {}
     processes = gpu.findall("processes")[0]
     for info in processes.findall("process_info"):
         pid = info.findall("pid")[0].text
         # memory used for this pid for this gpu
         used_memory = info.findall("used_memory")[0].text
-        per_pid_mem_use[int(pid)] = int(used_memory.replace('MiB',''))*1048576 # convert from mbytes to bytes
+        if used_memory != 'N/A':
+            per_pid_mem_use[int(pid)] = int(used_memory.replace('MiB',''))*1048576 # convert from mbytes to bytes
+        else:
+            per_pid_mem_use[int(pid)] = None
     return {
         "total": total_memory,
         "used_memory": used_memory,
@@ -189,17 +198,17 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
 
     # power attributed over all the gpus involved in the experiment
     absolute_power = sum(per_gpu_power_draw.values())
-    
+
     # for each gpu, get percentage of sm used for all the pid involved the experiment
-    per_gpu_absolute_percent_usage = {} 
+    per_gpu_absolute_percent_usage = {}
     for gpu_id, pids in per_gpu_per_pid_utilization_absolute.items():
-        per_gpu_absolute_percent_usage[gpu_id] = 0 
+        per_gpu_absolute_percent_usage[gpu_id] = 0
         for pid, sm_use in pids.items():
-            if pid_list is None or pid in pid_list: 
+            if pid_list is None or pid in pid_list:
                 per_gpu_absolute_percent_usage[gpu_id] += sm_use
 
-    # relative value compared to per_gpu_absolute_percent_usage 
-    per_gpu_relative_percent_usage = {} 
+    # relative value compared to per_gpu_absolute_percent_usage
+    per_gpu_relative_percent_usage = {}
     for gpu_id, pids in per_gpu_per_pid_utilization_absolute.items():
         all_sm = sum([ v for (pid,v) in pids.items()])
         this_exp_sm = per_gpu_absolute_percent_usage[gpu_id]

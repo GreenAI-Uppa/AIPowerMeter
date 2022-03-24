@@ -38,6 +38,9 @@ def integrate(metric, start=None, end=None):
         x2 = metric[i+1]['date']
         y1 = metric[i]['value']
         y2 = metric[i+1]['value']
+        if y1 is None or y2 is None:
+            r.append(None)
+            continue
         v = (x2-x1)*(y2+y1)/2
         v += r[-1]
         r.append(v)
@@ -235,7 +238,7 @@ class Experiment():
             if all_pids_on_this_gpu == 0:
                 prop_active_pid = 0
             else:
-                prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) / all_pids_on_this_gpu 
+                prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) / all_pids_on_this_gpu
             usage_power = (this_gpu_power_draw - self.min_gpu_powers[gpu_id])
             fix_power = self.min_gpu_powers[gpu_id] * prop_active_pid
             per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
@@ -452,7 +455,10 @@ class ExpResults():
             abs_nvidia_power = self.total_('nvidia_draw_absolute')
             rel_nvidia_power = self.total_('nvidia_attributable_power')
             nvidia_mem_use_abs = self.average_("nvidia_mem_use")
-            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
+            if nvidia_mem_use_abs is None:
+                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', memory used not available')
+            else:
+                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
         else:
             print()
             print("gpu consumption not available")

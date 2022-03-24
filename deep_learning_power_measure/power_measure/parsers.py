@@ -97,7 +97,11 @@ class JsonParser():
                     metrics['nvidia_attributable_power']['values'].append(v)
 
                     per_gpu_mem_use = result['metrics']['gpu']['per_gpu_attributable_mem_use']
-                    mem_use = sum([ v for gpu, mem_uses in per_gpu_mem_use.items() for pid, v in mem_uses.items() ])
+                    mem_uses = [ v for gpu, mem_uses in per_gpu_mem_use.items() for pid, v in mem_uses.items()  if v is not None ]
+                    if len(mem_uses) == 0:
+                        mem_use = None
+                    else:
+                        mem_use = sum(mem_uses)
                     if 'nvidia_mem_use' not in metrics:
                         metrics['nvidia_mem_use'] = {'dates':[], 'values':[]}
                     metrics['nvidia_mem_use']['dates'].append(date)
