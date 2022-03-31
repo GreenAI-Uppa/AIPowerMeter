@@ -400,8 +400,10 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        return integrate(metric)[-1]
-
+        r =integrate(metric)
+        if r is None:
+            return r
+        return r[-1]
     def average_(self, metric_name):
         """take the average of a metric"""
         metric = self.get_curve(metric_name)

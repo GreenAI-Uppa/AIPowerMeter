@@ -5,14 +5,14 @@ Machine and Deep Learning Benchmarks with wattmeters
 Schneider Power meters
 ---------------------------
 
-The previous power measurements are based on specific softwares and hardwares. In order to evaluate the precision and the ground truth, we describe here how to install and use a Schneider set of power meters. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitore several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
+The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use a Schneider set of power meters to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
 
 - at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,
-- at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readible in a laptop using a given software named **wattmeter_rapid1** that creates log at this high frequency.
+- at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readable in a laptop using a given software named **wattmeter_rapid1** that creates a log at this high frequency.
 
 .. figure:: wattmeters.png
 
-It is then possible to use one of these two data sources and compare the ground true to the measurements of RAPL and nvidia-smi.
+It is then possible to use one of these two data sources and compare the ground truth to the measurements of RAPL and nvidia-smi.
 
 
 **Compilation and execution of wattmeter_rapid1**:
@@ -37,7 +37,7 @@ But if you want to track automatically before and after a training, we then invi
 
 **From the machine where the USB is connected**:
 
-I used the `os` library  and the `system` method built-in Python. Those let you run any linux command through a python script.
+I used the `os` library (so you need to import os before using it) and the `system` method built-in Python. Those let you run any linux command through a python script.
 To start logging, you have to add this line to your code before the training :
 
 .. code-block:: python
@@ -61,7 +61,7 @@ To copy your public key, you just need to run the two following commands (or onl
    $ ssh-keygen -t rsa -b 2048
    $ ssh-copy-id -i ~/.ssh/id_rsa.pub username@example.org
 
-Instead of `os`, we used the `subprocess` package, but it's the same principle :
+Instead of `os`, we used the `subprocess` package (as earlier, don't forget to import subprocess), but it's the same principle :
 
 .. code-block:: python
 
