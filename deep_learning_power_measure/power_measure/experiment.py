@@ -1,9 +1,9 @@
 """
 this module contains mainly two classes
-    Experiment is an entry point to start and end the recording of the power consumption of your Experiment
-    ExpResult is used to process and format the recordings.
+    - Experiment is an entry point to start and end the recording of the power consumption of your Experiment
+    - ExpResult is used to process and format the recordings.
 
-    Both classes uses a driver attribute to communicate with a database, or read and write in json files
+Both classes uses a driver attribute to communicate with a database, or read and write in json files
 """
 from functools import wraps
 import os

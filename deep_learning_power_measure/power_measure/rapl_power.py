@@ -48,16 +48,16 @@ _timer = getattr(time, "monotonic", time.time)
 
 def get_info_time(process_list, zombies=None):
     """
-    input
-    process_list : a list of process objects
-    zombies : a list of zombies processes that will be enlarged
+    Args:
+        process_list : a list of process objects
+        zombies : a list of zombies processes that will be enlarged
 
-    output:
-    for each process in process_list: (st11, st12, system_wide_pt1, pt1)
-    st11 : starting time
-    st12 :
-    system_wide_pt1 : system wide process time
-    pt1 : process time for this process
+    Returns:
+        for each process in process_list: (st11, st12, system_wide_pt1, pt1)
+        st11 : starting time
+        st12 : end time
+        system_wide_pt1 : system wide process time
+        pt1 : process time for this process
     """
     infos = {}
     if zombies is None:
@@ -96,8 +96,9 @@ def get_power(diff):
         diff : difference between two RAPL samples
 
     Returns:
-        Dictionnary where each key correspond to an RAPL domain and the value
-        is the accumulated energy consumption in Joules
+        Dictionnary where each key correspond to an RAPL (core, uncore, ram)
+        domain and the value is the accumulated energy consumption in Joules
+        https://greenai-uppa.github.io/AIPowerMeter/background/background.html#cpu-and-rapl
     """
     total_intel_power = 0
     total_dram_power = 0
@@ -274,8 +275,11 @@ def get_mem_uses(process_list):
 
 def get_metrics(pid_list, period = 2.0):
     """
-    main function which will return power uses given a list of process ids
-    pause : indicates how many seconds to wait to compute the delta of power draw and cpu uses
+    main function which will return power, memory and cpu usages
+    Args: pid_list :
+        list of process pids on which the metrics will be measure
+        period : indicates how many seconds to wait to compute the delta
+            of power draw and cpu uses
     """
     sample = rapl.RAPLSample()
     s1 = sample.take_sample()

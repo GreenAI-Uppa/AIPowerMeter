@@ -141,6 +141,13 @@ def get_gpu_data(gpu):
 
     Args:
         gpu: xml part regarding one specific gpu
+
+    Returns:
+        Raw nvidia output as a dictionnary with the following keys:
+            name : gpu name
+            memory : gpu memory usage
+            utilization : Streaming Multiprocessor usage
+            power_readings : power board consumption
     """
     gpu_data = {}
     name = gpu.findall("product_name")[0].text
@@ -174,10 +181,20 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
     power
 
     Args:
-        pid_list : list of processes to be measured
+        - pid_list : list of processes to be measured
+        - nsample : number of queries to nvidia
 
-        nsample : number of queries to nvidia
-
+    Returns:
+        a dictionnary with the following keys:
+            - nvidia_draw_absolute : total nvidia power draw for all the gpus
+            - per_gpu_power_draw : nvidia power draw per gpu
+            - per_gpu_attributable_mem_use : memory usage for each gpu
+            - per_gpu_per_pid_utilization_absolute : absolute % of Streaming
+                Multiprocessor (SM) used per gpu per pid
+            - per_gpu_absolute_percent_usage : absolute % of SM used per gpu
+                for the given pid list
+            - per_gpu_estimated_attributable_utilization : relative use of SM
+                used per gpu by the experiment
     """
     # collect per gpu per pid sm usage
     per_gpu_per_pid_utilization_absolute = get_gpu_use_pmon(nsample=nsample)
