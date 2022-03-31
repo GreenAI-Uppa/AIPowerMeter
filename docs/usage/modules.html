@@ -36,21 +36,17 @@
             
   <div class="section" id="dev-documentation">
 <h1>Dev Documentation<a class="headerlink" href="#dev-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Brief description of some key functions</p>
+<p>This part is a brief description of some key functions</p>
 <div class="section" id="module-deep_learning_power_measure.power_measure.experiment">
 <span id="experiment-module"></span><h2>Experiment module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.experiment" title="Permalink to this headline">¶</a></h2>
-<dl>
-<dt>this module contains mainly two classes</dt><dd><p>Experiment is an entry point to start and end the recording of the power consumption of your Experiment
-ExpResult is used to process and format the recordings.</p>
-<p>Both classes uses a driver attribute to communicate with a database, or read and write in json files</p>
+<dl class="simple">
+<dt>this module contains mainly two classes</dt><dd><ul class="simple">
+<li><p>Experiment is an entry point to start and end the recording of the power consumption of your Experiment</p></li>
+<li><p>ExpResult is used to process and format the recordings.</p></li>
+</ul>
 </dd>
 </dl>
-<p>In practice, a thread is launched to record the energy of your program.</p>
-<div class="figure align-default" id="id1">
-<img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
-<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-<p>If you want to record also the time, accuracy and other valuable metrics, the simplest way is to do it in the main thread and then, to interpolate with the timestamps of the energy recordings if an alignement is needed.</p>
+<p>Both classes uses a driver attribute to communicate with a database, or read and write in json files</p>
 <dl class="py function">
 <dt id="deep_learning_power_measure.power_measure.experiment.Experiment">
 <code class="sig-prename descclassname">deep_learning_power_measure.power_measure.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cont</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
@@ -60,6 +56,12 @@ The recording can be ended by sending a stop message
 to this thread</p>
 </dd></dl>
 
+<p>In practice, a thread is launched to record the energy of your program.</p>
+<div class="figure align-default" id="id1">
+<img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
+<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>If you want to record also the time, accuracy and other valuable metrics, the simplest way is to do it in the main thread and then, to interpolate with the timestamps of the energy recordings if an alignement is needed.</p>
 </div>
 <div class="section" id="module-deep_learning_power_measure.power_measure.rapl_power">
 <span id="rapl-power-module"></span><h2>rapl_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.rapl_power" title="Permalink to this headline">¶</a></h2>
@@ -113,8 +115,9 @@ the different RAPL domains</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>diff : difference between two RAPL samples</p>
 </dd>
-<dt>Returns:</dt><dd><p>Dictionnary where each key correspond to an RAPL domain and the value
-is the accumulated energy consumption in Joules</p>
+<dt>Returns:</dt><dd><p>Dictionnary where each key correspond to an RAPL (core, uncore, ram)
+domain and the value is the accumulated energy consumption in Joules
+<a class="reference external" href="https://greenai-uppa.github.io/AIPowerMeter/background/background.html#cpu-and-rapl">https://greenai-uppa.github.io/AIPowerMeter/background/background.html#cpu-and-rapl</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -131,9 +134,35 @@ first, get gpu usage per process
 second get the power use of nvidia for each GPU
 then for each gpu and each process in pid_list compute its attributatble
 power</p>
-<dl>
-<dt>Args:</dt><dd><p>pid_list : list of processes to be measured</p>
-<p>nsample : number of queries to nvidia</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>pid_list : list of processes to be measured</p></li>
+<li><p>nsample : number of queries to nvidia</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>a dictionnary with the following keys:</dt><dd><ul class="simple">
+<li><p>nvidia_draw_absolute : total nvidia power draw for all the gpus</p></li>
+<li><p>per_gpu_power_draw : nvidia power draw per gpu</p></li>
+<li><p>per_gpu_attributable_mem_use : memory usage for each gpu</p></li>
+<li><dl class="simple">
+<dt>per_gpu_per_pid_utilization_absolute<span class="classifier">absolute % of Streaming</span></dt><dd><p>Multiprocessor (SM) used per gpu per pid</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>per_gpu_absolute_percent_usage<span class="classifier">absolute % of SM used per gpu</span></dt><dd><p>for the given pid list</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>per_gpu_estimated_attributable_utilization<span class="classifier">relative use of SM</span></dt><dd><p>used per gpu by the experiment</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

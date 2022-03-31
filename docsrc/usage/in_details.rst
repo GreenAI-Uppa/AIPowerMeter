@@ -8,17 +8,17 @@ See also the `example scripts <https://github.com/GreenAI-Uppa/AIPowerMeter/tree
 Recorded fields
 ---------------------
 
-Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`. However, as detailed in section :ref:`multiple`, the monitoring of multiple programs on the same device should be done with care.
+Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`. However, the monitoring of multiple programs on the same device should be done with care (see :ref:`multiple`).
 
 Unless specified otherwise, the power is logged in watts.
 
 **CPU use**
 
-`cpu_uses`: percentage of cpu clock used by this pid during the recording. 
+- `cpu_uses`: percentage of cpu clock used by this pid during the recording. 
 
-`mem_use_abs`: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses` for more details.
+- `mem_use_abs`: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses` for more details.
 
-`mem_use_percent`: Relative number of bytes used in the CPU RAM.
+- `mem_use_percent`: Relative number of bytes used in the CPU RAM.
 
 **CPU power**
 
@@ -43,14 +43,16 @@ Check the :ref:`rapl` section for more details on RAPL domains, and :py:func:`de
 
 **GPU use**
 
-`sm`: Streaming multiprocessor usage. Analog to the `cpu_uses` for the gpu.
-
-`per_gpu_attributable_mem_use`: Number of bytes used in the GPU
+- `per_gpu_attributable_mem_use` : memory usage for each gpu
+- `per_gpu_per_pid_utilization_absolute` : absolute % of Streaming Multiprocessor (SM) used per gpu per pid
+- `per_gpu_absolute_percent_usage` : absolute % of SM used per gpu for the given pid list
+- `per_gpu_estimated_attributable_utilization` : relative use of SM used per gpu by the experiment
 
 **GPU power**
 
 This is done by the nvidia-smi tool supported by the NVML library of nvidia. 
 
+`nvidia_draw_absolute` : total nvidia power draw for all the gpus per_gpu_power_draw : nvidia power draw per gpu
 `nvidia_draw_absolute`: the amount of power used by the whole nvidia card.
 
 

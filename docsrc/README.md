@@ -45,6 +45,8 @@ Then, add the file path to the toc in the `index.rst`
    usage/quick_start
 ```
 
+Note: if you modify the docstring in the .py source files, you'll have to rebuild the module with `python setup.py install` so that sphinx takes into account these changes
+
 ### TODO 
 
 Check if a github action is possible to automate the building process

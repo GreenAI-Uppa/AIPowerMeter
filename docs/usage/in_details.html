@@ -39,12 +39,14 @@
 <p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
 <div class="section" id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this headline">¶</a></h2>
-<p>Recording are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, as detailed in section <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>, the monitoring of multiple programs on the same device should be done with care.</p>
+<p>Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, the monitoring of multiple programs on the same device should be done with care (see <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>).</p>
 <p>Unless specified otherwise, the power is logged in watts.</p>
 <p><strong>CPU use</strong></p>
-<p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p>
-<p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p>
-<p><cite>mem_use_percent</cite>: Relative number of bytes used in the CPU RAM.</p>
+<ul class="simple">
+<li><p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p></li>
+<li><p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p></li>
+<li><p><cite>mem_use_percent</cite>: Relative number of bytes used in the CPU RAM.</p></li>
+</ul>
 <p><strong>CPU power</strong></p>
 <p><cite>Intel_power</cite>: total consumption measured by RAPL</p>
 <p><cite>psys_power</cite>: System on chip consumption</p>
@@ -56,11 +58,16 @@
 <p>For the ram and the core power, we multiply by the cpu and memory use of each pid to get the per process value in the fields <cite>per_process_cpu_power</cite> and <cite>per_process_dram_power</cite>.</p>
 <p>Check the <a class="reference internal" href="../background/background.html#rapl"><span class="std std-ref">CPU and RAPL</span></a> section for more details on RAPL domains, and <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_power" title="deep_learning_power_measure.power_measure.rapl_power.get_power"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_power()</span></code></a> for implementation details. The support for different power domains varies according to the processor model, our library will ignore not available domains.</p>
 <p><strong>GPU use</strong></p>
-<p><cite>sm</cite>: Streaming multiprocessor usage. Analog to the <cite>cpu_uses</cite> for the gpu.</p>
-<p><cite>per_gpu_attributable_mem_use</cite>: Number of bytes used in the GPU</p>
+<ul class="simple">
+<li><p><cite>per_gpu_attributable_mem_use</cite> : memory usage for each gpu</p></li>
+<li><p><cite>per_gpu_per_pid_utilization_absolute</cite> : absolute % of Streaming Multiprocessor (SM) used per gpu per pid</p></li>
+<li><p><cite>per_gpu_absolute_percent_usage</cite> : absolute % of SM used per gpu for the given pid list</p></li>
+<li><p><cite>per_gpu_estimated_attributable_utilization</cite> : relative use of SM used per gpu by the experiment</p></li>
+</ul>
 <p><strong>GPU power</strong></p>
 <p>This is done by the nvidia-smi tool supported by the NVML library of nvidia.</p>
-<p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
+<p><cite>nvidia_draw_absolute</cite> : total nvidia power draw for all the gpus per_gpu_power_draw : nvidia power draw per gpu
+<cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
 </div>
 <div class="section" id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this headline">¶</a></h2>

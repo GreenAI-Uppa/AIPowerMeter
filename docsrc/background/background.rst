@@ -78,8 +78,12 @@ In general, RAPL and nvidia provide us a power measurement for the whole board o
 
 However, the energy consumed by programs is not exactly additive. For instance, the amount of Joules spent by two programs running on parallel and in sequence won't be the same. This is due to a fix energy waste, for instance coming from the idle state, and because the relation between the usage of the computer and the energy consumed is not linear, for instance, due to a time delay between the change of core use and the energy usage.
 
-In conclusion, we recommend to benchmark a program when it is running alone on the machine.
+In conclusion, we recommend to benchmark a program when it is running alone on the machine*.
 
+
+.. note::
+
+  \*Actually, others causes can have an influence such as the wear, the temperature of the room and so on. See [heinrich2017]_, Figure 11 for an inventory of all parameters that may influence the behavior of the system)
 
 Related work on power meter libraries
 -------------------------------------
