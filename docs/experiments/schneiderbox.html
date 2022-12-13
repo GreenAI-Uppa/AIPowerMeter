@@ -36,8 +36,8 @@
             
   <div class="section" id="machine-and-deep-learning-benchmarks-with-wattmeters">
 <h1>Machine and Deep Learning Benchmarks with wattmeters<a class="headerlink" href="#machine-and-deep-learning-benchmarks-with-wattmeters" title="Permalink to this heading">¶</a></h1>
-<div class="section" id="schneider-power-meters">
-<h2>Schneider Power meters<a class="headerlink" href="#schneider-power-meters" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="schneider-omegawatt-power-meters">
+<h2>Schneider OmegaWatt Power meters<a class="headerlink" href="#schneider-omegawatt-power-meters" title="Permalink to this heading">¶</a></h2>
 <p>The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30% with respect to these measures. We describe here how to install and use a Schneider set of power meters embedded by the <a class="reference external" href="http://omegawatt.fr">OmegaWatt</a> company to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:</p>
 <ul class="simple">
 <li><p>at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,</p></li>
@@ -156,7 +156,7 @@ The observation of these 5 epochs allows us to observe a clear descent of the co
 <li class="toctree-l1"><a class="reference internal" href="../usage/modules.html">Dev Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="experiments.html">Deep learning benchmark</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Machine and Deep Learning Benchmarks with wattmeters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#schneider-power-meters">Schneider Power meters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schneider-omegawatt-power-meters">Schneider OmegaWatt Power meters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tracking-at-low-frequency-from-wifi">Tracking at Low Frequency from wifi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#track-a-training-with-high-frequency-measures">Track a training with high frequency measures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#benchmarks">Benchmarks</a></li>
