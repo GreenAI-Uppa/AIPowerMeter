@@ -54,6 +54,9 @@
 <div class="figure align-default">
 <img alt="../_images/recording_wifi.png" src="../_images/recording_wifi.png" />
 </div>
+</div>
+<div class="section" id="track-a-training-with-high-frequency-measures">
+<h2>Track a training with high frequency measures<a class="headerlink" href="#track-a-training-with-high-frequency-measures" title="Permalink to this heading">¶</a></h2>
 <p><strong>Compilation and execution of wattmeter_rapid1</strong>:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -std<span class="o">=</span>c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
 <span class="gp">$ </span>./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span> &gt; logfile
@@ -63,10 +66,7 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo chmod <span class="m">666</span> /dev/ttyUSB0
 </pre></div>
 </div>
-</div>
-<div class="section" id="track-a-training-with-high-frequency-measures">
-<h2>Track a training with high frequency measures<a class="headerlink" href="#track-a-training-with-high-frequency-measures" title="Permalink to this heading">¶</a></h2>
-<p>You’ve just seen how to execute the wattmeter high frequency tracking and log the power over time with a bash command.
+<p>Ok, this is to execute the wattmeter high frequency tracking and log the power over time with a bash command.
 But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you’re using for your training :</p>
 <p><strong>From the machine where the USB is connected</strong>:</p>
 <p>I used the <cite>os</cite> library (so you need to import os before using it) and the <cite>system</cite> method built-in Python. Those let you run any linux command through a python script.

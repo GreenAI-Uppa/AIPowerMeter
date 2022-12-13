@@ -23,6 +23,8 @@ The OmegaWatt box has its own wifi and you can connect to acquire the power read
 
 .. figure:: recording_wifi.png
 
+Track a training with high frequency measures
+------------------------------------------------------
 **Compilation and execution of wattmeter_rapid1**:
 
 .. code-block:: console
@@ -37,10 +39,8 @@ The OmegaWatt box has its own wifi and you can connect to acquire the power read
 
    $ sudo chmod 666 /dev/ttyUSB0
 
-Track a training with high frequency measures
-------------------------------------------------------
 
-You've just seen how to execute the wattmeter high frequency tracking and log the power over time with a bash command.
+Ok, this is to execute the wattmeter high frequency tracking and log the power over time with a bash command.
 But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you're using for your training : 
 
 **From the machine where the USB is connected**:
