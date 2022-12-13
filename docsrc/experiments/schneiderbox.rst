@@ -5,7 +5,7 @@ Machine and Deep Learning Benchmarks with wattmeters
 Schneider Power meters
 ---------------------------
 
-The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use a Schneider set of power meters to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
+The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use a Schneider set of power meters embedded by the `OmegaWatt <http://omegawatt.fr>`_ company to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
 
 - at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,
 - at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readable in a laptop using a given software named **wattmeter_rapid1** that creates a log at this high frequency.
@@ -14,6 +14,14 @@ The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of
 
 It is then possible to use one of these two data sources and compare the ground truth to the measurements of RAPL and nvidia-smi.
 
+
+
+Tracking at Low Frequency from wifi
+----------------------------------------------
+
+The OmegaWatt box has its own wifi and you can connect to acquire the power readings from the different devices which are connected to this box. The recordings are updated in live on a web page.
+
+.. figure:: recording_wifi.png
 
 **Compilation and execution of wattmeter_rapid1**:
 
