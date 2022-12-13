@@ -2,7 +2,7 @@ Machine and Deep Learning Benchmarks with wattmeters
 ================================================================
 
 
-Schneider Power meters
+Schneider OmegaWatt Power meters
 ---------------------------
 
 The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use a Schneider set of power meters embedded by the `OmegaWatt <http://omegawatt.fr>`_ company to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
