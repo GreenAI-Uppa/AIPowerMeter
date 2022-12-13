@@ -2,10 +2,10 @@ Machine and Deep Learning Benchmarks with wattmeters
 ================================================================
 
 
-Schneider OmegaWatt Power meters
+OmegaWatt Power meters
 ---------------------------
 
-The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use a Schneider set of power meters embedded by the `OmegaWatt <http://omegawatt.fr>`_ company to evaluate this global consumption. The raw material described in this section is a Schneider box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
+The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30\% with respect to these measures. We describe here how to install and use an `OmegaWatt <http://omegawatt.fr>`_ set of power meters to evaluate this global consumption. The raw material described in this section is a box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:
 
 - at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,
 - at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readable in a laptop using a given software named **wattmeter_rapid1** that creates a log at this high frequency.
@@ -85,8 +85,8 @@ You need also to add a `scp` command to copy the logfile afterwards to your loca
 Benchmarks
 ---------------------------
 
-First tests have been realized to compare measurements done with AIPowerMeter and Schneider Power meters.
-The measures with the Schneider Power Meter are stored in a logfile and looks like :
+First tests have been realized to compare measurements done with AIPowerMeter and OmegaWatt Power meters.
+The measures with the Power Meter are stored in a logfile and looks like :
 
 .. image:: gcc_watt.png
    :width: 400pt
