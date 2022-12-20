@@ -12,9 +12,6 @@ The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of
 
 .. figure:: wattmeters.png
 
-It is then possible to use one of these two data sources and compare the ground truth to the measurements of RAPL and nvidia-smi.
-
-
 
 Tracking at Low Frequency from wifi
 ----------------------------------------------
@@ -23,8 +20,11 @@ The OmegaWatt box has its own wifi and you can connect to acquire the power read
 
 .. figure:: recording_wifi.png
 
+For more details, you can refer to the french OmegaWatt documentation :download:`pdf <../MV2_guide4.pdf>`
+
 Track a training with high frequency measures
 ------------------------------------------------------
+
 **Compilation and execution of wattmeter_rapid1**:
 
 .. code-block:: console
@@ -32,16 +32,27 @@ Track a training with high frequency measures
   $ gcc -std=c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
   $ ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile
 
-*Remark* : if you have trouble to access to */dev/ttyUSB0*, we should use the following command : 
+And this should provides a similar output
+
+.. code-block:: console
+
+  #timestamp,#frame_is_ok,#U1,#U2,#U3,#current1,#activepow1,...
+  1671527189.294241015,false,,,,,,,,,,,,,,,
+  1671527189.304214184,false,,,,,,,,,,,,,,,
+  1671527189.314471465,true,232.3,0.0,0.0,0.1,20.9,...
+  1671527189.324185946,true,233.0,0.0,0.0,0.1,21.0,...
+  1671527189.334488177,true,233.0,0.0,0.0,0.1,21.0,...
+
+ 
+
+*Remark:* if you have trouble to access to */dev/ttyUSB0*, we should use the following command : 
 
 
 .. code-block:: console
 
    $ sudo chmod 666 /dev/ttyUSB0
 
-
-Ok, this is to execute the wattmeter high frequency tracking and log the power over time with a bash command.
-But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you're using for your training : 
+To record your experiment, one quick and dirty way is to call these commands from your python code as explained in the following. 
 
 **From the machine where the USB is connected**:
 
@@ -60,7 +71,7 @@ And finally, at the end of your training you have to kill the process otherwise 
 
 **From another machine**:
 
-This time we need to add a ssh connection to start the tracking, and copy the result afterwards.
+This time we need to add an ssh connection to start the tracking, and copy the result afterwards.
 Please, make sure to copy your ssh public key to the remote machine allowing the script to connect to the destination without the need of the password.
 To copy your public key, you just need to run the two following commands (or only the second if you have already generated a RSA key)
 
@@ -97,7 +108,7 @@ The measures with the Power Meter are stored in a logfile and looks like :
  
 With `Prof En Poche <https://profenpoche.com/>`_, we are jointly working on adaptive learning and especially on clustering of student profils.
 We have compared the consumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing `with PyClustering library <https://pyclustering.github.io/docs/0.10.1/html/index.html>`_ and an improved version FasterPAM implemented `here <https://github.com/kno10/python-kmedoids>`_ . 
-We have also measured the consumption with AIPowerMeter. Here, we only use the CPU and not GPU. The behaviour is essentially the same.
+We have also measured the consumption with AIPowerMeter. 
 
 .. image:: fasterpam_comparaison.png 
    :align: center
@@ -105,17 +116,12 @@ We have also measured the consumption with AIPowerMeter. Here, we only use the C
 .. image:: multiproc_pam_comparaison.png 
    :align: center
 
-There is a constant difference between the two measures because *the RAM consumption and other hardware components are not necessarily available*.
 
 At the end, we observe the following compsumptions :
 
-For FasterPAM :
-      19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter,            
-during aound 200 seconds,
+For FasterPAM : 19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter, during 200 seconds,
 
-For PAM with multiprocessing :
-      39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter      
-during around 250 seconds.    
+For PAM with multiprocessing : 39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter, during 250 seconds.    
 
 **Benchmark on image classification with AlexNet**
 

@@ -20,7 +20,9 @@
 project = 'AI Power Meter'
 copyright = '2022, GreenAIUppa'
 author = 'GreenAIUppa'
-
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ---------------------------------------------------
 

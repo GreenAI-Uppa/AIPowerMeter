@@ -46,7 +46,6 @@
 <div class="figure align-default">
 <img alt="../_images/wattmeters.png" src="../_images/wattmeters.png" />
 </div>
-<p>It is then possible to use one of these two data sources and compare the ground truth to the measurements of RAPL and nvidia-smi.</p>
 </div>
 <div class="section" id="tracking-at-low-frequency-from-wifi">
 <h2>Tracking at Low Frequency from wifi<a class="headerlink" href="#tracking-at-low-frequency-from-wifi" title="Permalink to this heading">¶</a></h2>
@@ -54,6 +53,7 @@
 <div class="figure align-default">
 <img alt="../_images/recording_wifi.png" src="../_images/recording_wifi.png" />
 </div>
+<p>For more details, you can refer to the french OmegaWatt documentation <a class="reference download internal" download="" href="../_downloads/1364f531f65f32da832bb14f9b50e65b/MV2_guide4.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a></p>
 </div>
 <div class="section" id="track-a-training-with-high-frequency-measures">
 <h2>Track a training with high frequency measures<a class="headerlink" href="#track-a-training-with-high-frequency-measures" title="Permalink to this heading">¶</a></h2>
@@ -62,12 +62,20 @@
 <span class="gp">$ </span>./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span> &gt; logfile
 </pre></div>
 </div>
-<p><em>Remark</em> : if you have trouble to access to <em>/dev/ttyUSB0</em>, we should use the following command :</p>
+<p>And this should provides a similar output</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">#</span>timestamp,#frame_is_ok,#U1,#U2,#U3,#current1,#activepow1,...
+<span class="go">1671527189.294241015,false,,,,,,,,,,,,,,,</span>
+<span class="go">1671527189.304214184,false,,,,,,,,,,,,,,,</span>
+<span class="go">1671527189.314471465,true,232.3,0.0,0.0,0.1,20.9,...</span>
+<span class="go">1671527189.324185946,true,233.0,0.0,0.0,0.1,21.0,...</span>
+<span class="go">1671527189.334488177,true,233.0,0.0,0.0,0.1,21.0,...</span>
+</pre></div>
+</div>
+<p><em>Remark:</em> if you have trouble to access to <em>/dev/ttyUSB0</em>, we should use the following command :</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo chmod <span class="m">666</span> /dev/ttyUSB0
 </pre></div>
 </div>
-<p>Ok, this is to execute the wattmeter high frequency tracking and log the power over time with a bash command.
-But if you want to track automatically before and after a training, we then invite you to do one of this solutions depending on the machine you’re using for your training :</p>
+<p>To record your experiment, one quick and dirty way is to call these commands from your python code as explained in the following.</p>
 <p><strong>From the machine where the USB is connected</strong>:</p>
 <p>I used the <cite>os</cite> library (so you need to import os before using it) and the <cite>system</cite> method built-in Python. Those let you run any linux command through a python script.
 To start logging, you have to add this line to your code before the training :</p>
@@ -79,7 +87,7 @@ To start logging, you have to add this line to your code before the training :</
 </pre></div>
 </div>
 <p><strong>From another machine</strong>:</p>
-<p>This time we need to add a ssh connection to start the tracking, and copy the result afterwards.
+<p>This time we need to add an ssh connection to start the tracking, and copy the result afterwards.
 Please, make sure to copy your ssh public key to the remote machine allowing the script to connect to the destination without the need of the password.
 To copy your public key, you just need to run the two following commands (or only the second if you have already generated a RSA key)</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen -t rsa -b <span class="m">2048</span>
@@ -104,21 +112,12 @@ The measures with the Power Meter are stored in a logfile and looks like :</p>
 <p><strong>Benchmark at Prof En Poche</strong></p>
 <p>With <a class="reference external" href="https://profenpoche.com/">Prof En Poche</a>, we are jointly working on adaptive learning and especially on clustering of student profils.
 We have compared the consumption of two clustering methods, the PAM KMedoids algorithm in multiprocessing <a class="reference external" href="https://pyclustering.github.io/docs/0.10.1/html/index.html">with PyClustering library</a> and an improved version FasterPAM implemented <a class="reference external" href="https://github.com/kno10/python-kmedoids">here</a> .
-We have also measured the consumption with AIPowerMeter. Here, we only use the CPU and not GPU. The behaviour is essentially the same.</p>
+We have also measured the consumption with AIPowerMeter.</p>
 <img alt="../_images/fasterpam_comparaison.png" class="align-center" src="../_images/fasterpam_comparaison.png" />
 <img alt="../_images/multiproc_pam_comparaison.png" class="align-center" src="../_images/multiproc_pam_comparaison.png" />
-<p>There is a constant difference between the two measures because <em>the RAM consumption and other hardware components are not necessarily available</em>.</p>
 <p>At the end, we observe the following compsumptions :</p>
-<dl class="simple">
-<dt>For FasterPAM :</dt><dd><p>19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter,</p>
-</dd>
-</dl>
-<p>during aound 200 seconds,</p>
-<dl class="simple">
-<dt>For PAM with multiprocessing :</dt><dd><p>39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter</p>
-</dd>
-</dl>
-<p>during around 250 seconds.</p>
+<p>For FasterPAM : 19,181.3 J (Joules) with the wattmeter and 14,107.4 J with AIPowerMeter, during 200 seconds,</p>
+<p>For PAM with multiprocessing : 39,061.5 J with the wattmeter and 28,027.0 with AIPowerMeter, during 250 seconds.</p>
 <p><strong>Benchmark on image classification with AlexNet</strong></p>
 <p>In order to compare the AIpowermeter package and the real consumption from a wattmeter. We are interested in the power consumed during the training of an alexNET on a CIFAR10 data set.
 We use classical gradient descent with a learning rate of 0.001 as optimizer and the cross entropy as loss.</p>

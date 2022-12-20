@@ -70,6 +70,10 @@ It is present since the Sandy bridge architecture in 2011 and from Haswell is su
 <li><p>Psys : System on Chip energy consumption</p></li>
 </ul>
 <p>The rapl interface writes these values in module specific registers located in <cite>/dev/cpu/*/msr</cite>. These values are updated every 1ms. Although reading from these files is possible, our code relies on the powercap linux tool which updates the energy consumption for the different domains in <cite>/sys/class/powercap/intel-rapl</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>RAPL does not measure every piece of hardware in the computer. Tipycally fans and harddrive are not recorded. A difference of 30% between the RAPL power and the results from a powermeter is not uncommon.</p>
+</div>
 <p><strong>More readings on RAPL</strong>:</p>
 <p>The official documentation is the Intel® 64 and IA-32 Architectures Software Developer Manual, Volume 3: System Programming Guide. But it is not trivial for most data scientists.</p>
 </div>
@@ -92,7 +96,7 @@ from the man page of <a class="reference external" href="https://man.archlinux.o
 </div>
 <div class="section" id="related-work-on-power-meter-libraries">
 <h2>Related work on power meter libraries<a class="headerlink" href="#related-work-on-power-meter-libraries" title="Permalink to this heading">¶</a></h2>
-<p>There are several tools developed to monitor energy consumption of softwares, and the list is growing everyday, but most are based on RAPL and nvidia-smi. The <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for a measurement campaign at the scale of a data center.</p>
+<p>There are several tools developed to monitor energy consumption of softwares, and the list is growing everyday, but most are based on RAPL and nvidia-smi. The <a class="reference external" href="https://icl.utk.edu/papi/">Performance Application Programming Interface</a> has a long history and is a very complete library to measure numerous aspects of a program run. In the specific field of AI and deep learning, serveral repostories such as <a class="reference external" href="https://codecarbon.io/">CodeCarbon</a>, <a class="reference external" href="https://github.com/lfwa/carbontracker/">CarbonTracker</a> and <a class="reference external" href="https://github.com/Breakend/experiment-impact-tracker">Experiment Impact Tracker</a> propose to compute a carbon footprint of your experiment. The development of our own library has started as a fork of this latter project. It’s aim is to focus on fine grained energy consumption of deep learning models. Stay tuned with the <a class="reference external" href="https://greenai-uppa.github.io/Coca4AI/">Coca4AI</a> for a measurement campaign at the scale of a data center.</p>
 </div>
 </div>
 
