@@ -158,6 +158,7 @@ class Experiment():
             device = next(model.parameters()).device
             model.to(device)
             self.save_model_card(model, input_size, device=device)
+        #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
         if not self.rapl_available and not self.nvidia_available:
@@ -292,6 +293,10 @@ class Experiment():
         """
         print("we'll take the measure of the following pids", pid_list)
         time_at_last_measure = 0
+        ## if self.power_meter_available
+        ## launch power meter recording
+        ## logfile = self.wattmeter_logfile
+        ## wm_pid = os.system("/path/to/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > "+self.wattmeter_logfile+"  2>&1 & echo $! ")
         while True:
             # there have a buffer and allocate per pid with lifo
             # with time
@@ -318,6 +323,7 @@ class Experiment():
                     return
             except EmptyQueueException:
                 pass
+        #os.system("kill -10 `cat wm_pid`")
 
 class ExpResults():
     """
@@ -326,7 +332,7 @@ class ExpResults():
     """
     def __init__(self, db_driver):
         self.db_driver = db_driver
-        self.cpu_metrics, self.gpu_metrics, self.exp_metrics = self.db_driver.load_metrics()
+        self.cpu_metrics, self.gpu_metrics, self.exp_metrics, self.wattmeter_metrics = self.db_driver.load_metrics()
         if self.cpu_metrics is None and self.gpu_metrics is None and self.exp_metrics is None:
             raise Exception('I could not load any recordings from folder: "' +
             self.db_driver.folder +
@@ -375,6 +381,11 @@ class ExpResults():
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
                 return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
+        """
+        if self.wattmeter_metrics is not None:
+            if name in self.exp_metrics:
+                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
+        """        
         return None
 
     def get_exp_duration(self):
@@ -443,7 +454,6 @@ class ExpResults():
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('per_process_mem_use_abs')
             mem_use_uss = self.average_('per_process_mem_use_uss')
-
             if total_dram_power is None and mem_use_abs is None:
                 print("RAM consumption not available. RAM usage not available")
             elif total_dram_power is None:
@@ -467,6 +477,11 @@ class ExpResults():
                 print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', memory used not available')
             else:
                 print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
+        if self.wattmeter_metrics is not None:
+            print()
+            print()
+            print("Recorded by the wattmeter")
+            #total_power = self.total_('U2')            
         else:
             print()
             print("gpu consumption not available")

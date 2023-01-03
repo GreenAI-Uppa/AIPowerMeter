@@ -13,6 +13,7 @@ class JsonParser():
         cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
         self.folder = location
+        self.wattmeter_logfile = os.path.join(self.folder, '/omegawatt.csv')
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
@@ -130,10 +131,15 @@ class JsonParser():
             return metrics
         return None
 
+    def load_wattmeter_metrics(self):
+        if os.path.isfile(self.wattmeter_logfile):
+            pass
+        return None
 
     def load_metrics(self):
         """load all metrics. Returns None if the metric is not available"""
         cpu_metrics = self.load_cpu_metrics()
         gpu_metrics = self.load_gpu_metrics()
         exp_metrics = self.load_exp_metrics()
-        return cpu_metrics, gpu_metrics, exp_metrics
+        wattmeter_metrics = self.load_wattmeter_metrics()
+        return cpu_metrics, gpu_metrics, exp_metrics, wattmeter_metrics
