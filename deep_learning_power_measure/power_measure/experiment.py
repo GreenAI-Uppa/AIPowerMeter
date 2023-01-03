@@ -161,6 +161,8 @@ class Experiment():
         #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
+        # self.wattmeter_available, msg_nvidia = gpu_power.is_wattmeter_compatible()
+        self.wattmeter_available = True
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
             "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
@@ -293,10 +295,11 @@ class Experiment():
         """
         print("we'll take the measure of the following pids", pid_list)
         time_at_last_measure = 0
-        ## if self.power_meter_available
-        ## launch power meter recording
-        ## logfile = self.wattmeter_logfile
-        ## wm_pid = os.system("/path/to/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > "+self.wattmeter_logfile+"  2>&1 & echo $! ")
+        if self.wattmeter_available:
+            ## launch power meter recording
+            ## logfile = self.wattmeter_logfile
+            self.db_driver.save_wattmeter_metrics()
+
         while True:
             # there have a buffer and allocate per pid with lifo
             # with time
@@ -320,10 +323,11 @@ class Experiment():
                 # The STOP message which is a string, and the metrics dictionnary that this function is sending
                 if message == STOP_MESSAGE:
                     print("Done with measuring")
+                    os.system("kill -10 `cat /tmp/pid`")
                     return
             except EmptyQueueException:
                 pass
-        #os.system("kill -10 `cat wm_pid`")
+        
 
 class ExpResults():
     """
@@ -363,6 +367,15 @@ class ExpResults():
             print('not available')
         print()
 
+        print()
+        print('wattmeter metrics')
+        if self.wattmeter_metrics is not None:
+            for k in self.wattmeter_metrics:
+                print(k)
+        else:
+            print('not available')
+        print()
+
     def get_curve(self, name):
         """
         name : key to one of the metric dictionnaries
@@ -381,11 +394,10 @@ class ExpResults():
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
                 return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
-        """
         if self.wattmeter_metrics is not None:
-            if name in self.exp_metrics:
-                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
-        """        
+            if name in self.wattmeter_metrics:
+                return [{'date':x, 'value':v} for (x,v) in zip(self.wattmeter_metrics[name]['dates'], self.wattmeter_metrics[name]['values']) ]
+
         return None
 
     def get_exp_duration(self):
@@ -481,7 +493,10 @@ class ExpResults():
             print()
             print()
             print("Recorded by the wattmeter")
-            #total_power = self.total_('U2')            
+            pow_machine1 = self.total_('#activepow1')
+            pow_machine2 = self.total_('#activepow2')
+            pow_machine3 = self.total_('#activepow3')
+            print(f"consumption from machine 1: {pow_machine1} joules, consumption from machine 2: {pow_machine2} joules, consumption from machine 3: {pow_machine3} joules")
         else:
             print()
             print("gpu consumption not available")
