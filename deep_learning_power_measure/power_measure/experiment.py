@@ -17,6 +17,7 @@ import psutil
 from . import rapl_power
 from . import gpu_power
 from . import model_complexity
+import signal
 
 STOP_MESSAGE = "Stop"
 
@@ -162,7 +163,7 @@ class Experiment():
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
         # self.wattmeter_available, msg_nvidia = gpu_power.is_wattmeter_compatible()
-        self.wattmeter_available = True
+        self.wattmeter_available = False
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
             "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
@@ -298,7 +299,7 @@ class Experiment():
         if self.wattmeter_available:
             ## launch power meter recording
             ## logfile = self.wattmeter_logfile
-            self.db_driver.save_wattmeter_metrics()
+            proc = self.db_driver.save_wattmeter_metrics()
 
         while True:
             # there have a buffer and allocate per pid with lifo
@@ -323,7 +324,9 @@ class Experiment():
                 # The STOP message which is a string, and the metrics dictionnary that this function is sending
                 if message == STOP_MESSAGE:
                     print("Done with measuring")
-                    os.system("kill -10 `cat /tmp/pid`")
+                    if proc:
+                        os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                    # os.system("kill -10 `cat /tmp/pid`")
                     return
             except EmptyQueueException:
                 pass

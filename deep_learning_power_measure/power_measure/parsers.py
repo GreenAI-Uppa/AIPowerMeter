@@ -4,6 +4,7 @@ import os
 import datetime
 import shutil
 import pandas as pd
+import subprocess
 
 class JsonParser():
     """write and parse the measurement recording from and to json files"""
@@ -44,7 +45,9 @@ class JsonParser():
 
     def save_wattmeter_metrics(self):
         """save the model card as a json file"""
-        os.system(f"libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 & echo $! > /tmp/pid")
+        proc = subprocess.Popen(f"/home/ntirel/libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 &", shell=True, preexec_fn=os.setsid)
+        return proc
+        #os.system(f"libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 & echo $! > /tmp/pid")
 
     def save_exp_metrics(self, metrics):
         """save experiment (accuracy, latency,...) related metrics"""
