@@ -5,6 +5,7 @@ import datetime
 import shutil
 import pandas as pd
 import subprocess
+import logging
 
 class JsonParser():
     """write and parse the measurement recording from and to json files"""
@@ -16,6 +17,7 @@ class JsonParser():
         """
         self.folder = location
         self.wattmeter_logfile = os.path.join(self.folder, 'omegawatt.csv')
+        self.wattemeter_exec = "/home/ntirel/libs/wattmeter_rapid_omegawatt/wattmetre-read"
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
@@ -45,7 +47,11 @@ class JsonParser():
 
     def save_wattmeter_metrics(self):
         """save the model card as a json file"""
-        proc = subprocess.Popen(f"/home/ntirel/libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 &", shell=True, preexec_fn=os.setsid)
+        if not os.path.isdir(self.folder):
+            os.makedirs(self.folder)
+        print("OMMEGAWATT")
+        print(self.wattemeter_exec + f" --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 &")
+        proc = subprocess.Popen(self.wattemeter_exec + f" --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 &", shell=True, preexec_fn=os.setsid)
         return proc
         #os.system(f"libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 & echo $! > /tmp/pid")
 
@@ -143,9 +149,18 @@ class JsonParser():
     def load_wattmeter_metrics(self):
         """load the metrics related to the wattmeter"""
         if os.path.isfile(self.wattmeter_logfile):
-            results = pd.read_csv(self.wattmeter_logfile, header=1)
+            try:
+                results = pd.read_csv(self.wattmeter_logfile, header=1)
+            except pd.errors.ParserError as e:
+                print(e)
+                return None
             # drop last line to make sure to have a good csvyyy
             results.drop(results.tail(1).index,inplace=True)
+            # convert to boolean
+            if '#frame_is_ok' not in results:
+                logging.error("ERROR check the omegawatt csv")
+                return None
+            results['#frame_is_ok'] = results['#frame_is_ok'].map({'true': True, 'false': False})
             results = results[results["#frame_is_ok"]]
             metrics = {}
             for k in results.columns:

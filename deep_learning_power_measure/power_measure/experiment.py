@@ -163,7 +163,7 @@ class Experiment():
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
         # self.wattmeter_available, msg_nvidia = gpu_power.is_wattmeter_compatible()
-        self.wattmeter_available = False
+        self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec)
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
             "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
@@ -174,6 +174,10 @@ class Experiment():
             print("RAPL not available: " + msg_rapl)
         else:
             print(msg_rapl)
+        if self.wattmeter_available:
+            print("wattmeter available at: "+self.db_driver.wattemeter_exec)
+        else:
+            print("power meter not avaible: "+msg_omegawatt)
         if not self.nvidia_available:
             print("nvidia not available: " + msg_nvidia)
         else:
@@ -386,22 +390,25 @@ class ExpResults():
         return a series of data points [{ "date": date1, "value" : value1}, {"date": date2 ,... }]
         where the dates are in seconds and the value unit is taken from the dictionnaries without transformation.
         """
+        curve = None
         if self.cpu_metrics is not None:
             if name in self.cpu_metrics:
-                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.cpu_metrics[name]['dates'], self.cpu_metrics[name]['values']) ]
+                curve = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.cpu_metrics[name]['dates'], self.cpu_metrics[name]['values']) if v is not None]
 
         if self.gpu_metrics is not None:
             if name in self.gpu_metrics:
-                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) ]
+                curve = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) if v is not None]
 
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
-                return [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) ]
+                curve = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.exp_metrics[name]['dates'], self.exp_metrics[name]['values']) if v is not None]
         if self.wattmeter_metrics is not None:
             if name in self.wattmeter_metrics:
-                return [{'date':x, 'value':v} for (x,v) in zip(self.wattmeter_metrics[name]['dates'], self.wattmeter_metrics[name]['values']) ]
+                curve = [{'date':x, 'value':v} for (x,v) in zip(self.wattmeter_metrics[name]['dates'], self.wattmeter_metrics[name]['values']) if v is not None]
 
-        return None
+        if curve is not None and len(curve) == 0:
+            curve = None
+        return curve
 
     def get_exp_duration(self):
         if self.cpu_metrics is not None:
@@ -420,8 +427,8 @@ class ExpResults():
                 return times[-1] - times[0]
         return -1
 
-    def total_(self, metric_name):
-        """Total value for this metric. For instance if the metric is in watt and the time in seconds,
+    def total_(self, metric_name: str):
+        """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
         the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
         if metric is None:
@@ -430,7 +437,7 @@ class ExpResults():
         if r is None:
             return r
         return r[-1]
-    def average_(self, metric_name):
+    def average_(self, metric_name: str):
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
         if metric is None:
@@ -442,6 +449,14 @@ class ExpResults():
         if len(metric) == 1:
             return r
         return r /( metric[-1]['date'] - metric[0]['date'])
+
+    def max_(self, metric_name: str):
+        """return the max of a metric"""
+        metric = self.get_curve(metric_name)
+        if metric is None:
+            return None
+        print(metric)
+        return max([m["value"] for m in metric])
 
     def total_power_draw(self):
         # extracting cpu power draw
@@ -487,11 +502,11 @@ class ExpResults():
             print("on the gpu")
             abs_nvidia_power = self.total_('nvidia_draw_absolute')
             rel_nvidia_power = self.total_('nvidia_attributable_power')
-            nvidia_mem_use_abs = self.average_("nvidia_mem_use")
+            nvidia_mem_use_abs = self.max_("nvidia_mem_use")
             if nvidia_mem_use_abs is None:
                 print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', memory used not available')
             else:
-                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', average memory used:',humanize_bytes(nvidia_mem_use_abs))
+                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', Max memory used:',humanize_bytes(nvidia_mem_use_abs))
         if self.wattmeter_metrics is not None:
             print()
             print()
@@ -502,4 +517,4 @@ class ExpResults():
             print(f"consumption from machine 1: {pow_machine1} joules, consumption from machine 2: {pow_machine2} joules, consumption from machine 3: {pow_machine3} joules")
         else:
             print()
-            print("gpu consumption not available")
+            print("PowerMeter recordings not available")
