@@ -328,7 +328,7 @@ class Experiment():
 class ExpResults():
     """
     Process the power recording from an experiment.
-    The actual reading of the recording is done by the driver.
+    The actual reading of the recording is done by the fb_driver attribute.
     """
     def __init__(self, db_driver):
         self.db_driver = db_driver
@@ -433,6 +433,11 @@ class ExpResults():
         total_intel_power = self.total_('intel_power')
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
+
+    def display_curve(metric_names):
+        """
+        """
+        
 
     def print(self):
         """

@@ -56,11 +56,14 @@ To record your experiment, one quick and dirty way is to call these commands fro
 
 **From the machine where the USB is connected**:
 
-I used the `os` library (so you need to import os before using it) and the `system` method built-in Python. Those let you run any linux command through a python script.
-To start logging, you have to add this line to your code before the training :
 
 .. code-block:: python
-
+  
+  p, q = exp.measure_yourself(period=2) # measure every 2 seconds
+  ###################
+  #  place here the code that you want to profile
+  ################
+  q.put(experiment.STOP_MESSAGE)   
    os.system("/path/to/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile 2>&1 & echo $! > wm_pid")
 
 And finally, at the end of your training you have to kill the process otherwise it will track forever the active power in background.
