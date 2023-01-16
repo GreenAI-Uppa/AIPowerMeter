@@ -4,7 +4,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
     <title>Advanced use &#8212; AI Power Meter  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
@@ -13,7 +14,6 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -35,10 +35,10 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="advanced-use">
+  <section id="advanced-use">
 <h1>Advanced use<a class="headerlink" href="#advanced-use" title="Permalink to this heading">¶</a></h1>
 <p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
-<div class="section" id="recorded-fields">
+<section id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this heading">¶</a></h2>
 <p>Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, the monitoring of multiple programs on the same device should be done with care (see <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>).</p>
 <p>Unless specified otherwise, the power is logged in watts.</p>
@@ -69,8 +69,8 @@
 <p>This is done by the nvidia-smi tool supported by the NVML library of nvidia.</p>
 <p><cite>nvidia_draw_absolute</cite> : total nvidia power draw for all the gpus per_gpu_power_draw : nvidia power draw per gpu
 <cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
-</div>
-<div class="section" id="model-complexity">
+</section>
+<section id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this heading">¶</a></h2>
 <p>We use a wrapper for <a class="reference external" href="https://pypi.org/project/torchinfo/">torchinfo</a> to extract statistics about your model, essentially number of parameters and mac operation counts.
 To obtain them, add additional parameters:</p>
@@ -81,8 +81,8 @@ To obtain them, add additional parameters:</p>
 </div>
 <p>You can log the number of parameters and the number of multiply and add (mac) operations of your model.
 Currently, only pytorch is supported, and tensorflow should be supported shortly</p>
-</div>
-<div class="section" id="docker-integration">
+</section>
+<section id="docker-integration">
 <span id="docker"></span><h2>Docker integration<a class="headerlink" href="#docker-integration" title="Permalink to this heading">¶</a></h2>
 <p>For the implementation of AIPowerMeter in a docker container, we need to use a special branch of the code because of the behaviour of the command :</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nvidia-smi pmon
@@ -90,8 +90,8 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 </div>
 <p>An hot fix has been implemented, it forces the tracking of all the GPU processes. It’s then impossible to isolate a process running at the same time than others.</p>
 <p>See the github repo <a class="reference external" href="https://github.com/GreenAI-Uppa/docker_AIPM">docker_AIPM</a> for more details. You will also find slides explaining the motivations for the use of Docker images and container.</p>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -160,7 +160,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
       &copy;2022, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

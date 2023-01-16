@@ -25,7 +25,7 @@ def get_summary(model, input_size, device=None):
         data = {"input_size": summ.input_size,
                 "total_params":summ.total_params,
                 "trainable_params": summ.trainable_params,
-                "total_output": summ.total_output,
+                "total_input": summ.total_input,
                 "total_mult_adds": summ.total_mult_adds,
                 "input_size": summ.total_input}
     elif 'tensorflow' in sys.modules:

@@ -22,17 +22,24 @@ The OmegaWatt box has its own wifi and you can connect to acquire the power read
 
 For more details, you can refer to the french OmegaWatt documentation :download:`pdf <../MV2_guide4.pdf>`
 
-Track a training with high frequency measures
+Track with High Frequency measures
 ------------------------------------------------------
 
 **Compilation and execution of wattmeter_rapid1**:
 
+To compile the wattmeter from OmegaWatt, you need to use the following command :
+
 .. code-block:: console
 
   $ gcc -std=c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
-  $ ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > logfile
 
-And this should provides a similar output
+Once you get the executable file "wattmetre-read", you can execute it whenever you want to track your consumption :
+
+.. code-block:: console
+   
+  $ ./wattmetre-read --tty=/dev/ttyUSB0 --nb=6
+
+And this should provides a similar output (you can keep it in a logfile using the linux redirection symbol **>**) :
 
 .. code-block:: console
 
@@ -43,7 +50,16 @@ And this should provides a similar output
   1671527189.324185946,true,233.0,0.0,0.0,0.1,21.0,...
   1671527189.334488177,true,233.0,0.0,0.0,0.1,21.0,...
 
- 
+Definition of each column :
+
+:#timestamp: (float) time of the current frame
+:#frame_is_ok: (boolean) do we have data from the current frame
+:#U1: (float) tension in Volt for phase 1
+:#U2: (float) tension in Volt for phase 2
+:#U3: (float) tension in Volt for phase 3
+:#currentn: (float) current of the machine connected to socket **n** in Ampere
+:#activepown: (float) active power of the machine connected to socket **n** in Watt
+
 
 *Remark:* if you have trouble to access to */dev/ttyUSB0*, we should use the following command : 
 
