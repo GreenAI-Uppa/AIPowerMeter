@@ -13,6 +13,7 @@ from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
 import numpy as np
+import pandas as pd
 import psutil
 from . import rapl_power
 from . import gpu_power
@@ -356,7 +357,7 @@ class ExpResults():
             for k in self.cpu_metrics:
                 print(k)
         else:
-            print('not available')
+            print('      NOT AVAILABLE')
 
         print()
         print('gpu related metrics')
@@ -364,14 +365,14 @@ class ExpResults():
             for k in self.gpu_metrics:
                 print(k)
         else:
-            print('not available')
+            print('      NOT AVAILABLE')
         print()
         print('experiment related metrics')
         if self.exp_metrics is not None:
             for k in self.exp_metrics:
                 print(k)
         else:
-            print('not available')
+            print('      NOT AVAILABLE')
         print()
 
         print()
@@ -380,7 +381,7 @@ class ExpResults():
             for k in self.wattmeter_metrics:
                 print(k)
         else:
-            print('not available')
+            print('      NOT AVAILABLE')
         print()
 
     def get_curve(self, name):
@@ -437,6 +438,7 @@ class ExpResults():
         if r is None:
             return r
         return r[-1]
+
     def average_(self, metric_name: str):
         """take the average of a metric"""
         metric = self.get_curve(metric_name)
@@ -455,7 +457,6 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        print(metric)
         return max([m["value"] for m in metric])
 
     def total_power_draw(self):
@@ -464,10 +465,17 @@ class ExpResults():
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
 
-    def display_curve(metric_names):
+    def display_curve(self, metric_names):
         """
         """
-        
+        for metric_name in metric_names:
+            curve = self.get_curve(metric_name)
+            if curve is None:
+                continue
+            df = pd.DataFrame(gpu_results)
+            df['timestamp'] = pd.to_datetime(df['date'])
+
+
 
     def print(self):
         """
