@@ -5,17 +5,15 @@ import warnings
 import psutil
 
 from . import rapl
-rapl_dir = "/sys/class/powercap/intel-rapl/"
 
 def is_rapl_compatible():
     """
     Check if rapl logs are available on this machine.
     """
-    if not os.path.isdir(rapl_dir):
-        return (False, "cannot find rapl directory in "+rapl_dir)
+    if not os.path.isdir(rapl.rapl_dir):
+        return (False, "cannot find rapl directory in "+rapl.rapl_dir)
     if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
-        return (False, "the energy_uj files in "+rapl_dir+" are not readeable. Change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/")
-
+        return (False, "the energy_uj files in "+rapl.rapl_dir+" are not readeable. Change the permissions of these files : \n sudo chmod -R 755 /sys/class/powercap/intel-rapl/")
     sample = rapl.RAPLSample()
     domain_names = set()
     s1 = sample.take_sample()

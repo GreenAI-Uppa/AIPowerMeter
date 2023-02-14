@@ -355,6 +355,22 @@ class ExpResults():
         self.model_card = self.db_driver.get_model_card()
 
     def list_metrics(self):
+        metrics = {'CPU':[],'GPU':[],'Experiment':[],'wattmeter':[]}
+        if self.cpu_metrics is not None:
+            for k in self.cpu_metrics:
+                metrics['CPU'].append(k)
+        if self.gpu_metrics is not None:
+            for k in self.gpu_metrics:
+                metrics['GPU'].append(k)
+        if self.exp_metrics is not None:
+            for k in self.exp_metrics:
+                metrics['Experiment'].append(k)
+        if self.wattmeter_metrics is not None:
+            for k in self.wattmeter_metrics:
+                metrics['wattmeter'].append(k)
+        return metrics
+
+    def print_metrics(self):
         print('cpu related metrics:')
         if self.cpu_metrics  is not None:
             for k in self.cpu_metrics:
@@ -560,7 +576,26 @@ class ExpResults():
         plt.xticks(rotation=45)
         plt.show()
 
-
+    def __str__(self) -> str:
+        r = ['available metrics']
+        r.append('CPU')
+        if self.cpu_metrics is not None:
+            r.append(','.join([k for k in self.cpu_metrics.keys()]))
+        else:
+            r.append('NOT AVAILABLE')
+        r.append('GPU')
+        if self.gpu_metrics is not None:
+            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+        else:
+            r.append('NOT AVAILABLE')
+        r.append('Experiments')
+        if self.gpu_metrics is not None:
+            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+        else:
+            r.append('NOT AVAILABLE')
+        r.append('\ncall print() method to display power consumption')
+        return '\n'.join(r)
+    
     def print(self):
         """
         simple print of the experiment summary

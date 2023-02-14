@@ -8,16 +8,15 @@ import os.path
 import re
 from datetime import datetime
 
+rapl_dir = "/sys/class/powercap/intel-rapl"
 UJOULES = 1
 JOULES = 2
 WATT_HOURS = 3
-
 
 def _read_sysfs_file(path):
     with open(path, "r") as f:
         contents = f.read().strip()
         return contents
-
 
 def _get_domain_info(path):
     name = _read_sysfs_file("%s/name" % path)
