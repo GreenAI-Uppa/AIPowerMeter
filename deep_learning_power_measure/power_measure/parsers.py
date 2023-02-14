@@ -112,15 +112,27 @@ class JsonParser():
                     metrics['nvidia_attributable_power']['values'].append(v)
 
                     per_gpu_mem_use = result['metrics']['gpu']['per_gpu_attributable_mem_use']
-                    mem_uses = [ v for gpu, mem_uses in per_gpu_mem_use.items() for pid, v in mem_uses.items()  if v is not None ]
-                    if len(mem_uses) == 0:
-                        mem_use = None
-                    else:
-                        mem_use = sum(mem_uses)
                     if 'nvidia_mem_use' not in metrics:
-                        metrics['nvidia_mem_use'] = {'dates':[], 'values':[]}
-                    metrics['nvidia_mem_use']['dates'].append(date)
-                    metrics['nvidia_mem_use']['values'].append(mem_use)
+                        metrics['nvidia_mem_use'] = {}
+                    for gpu, mem_uses in per_gpu_mem_use.items():
+                        if gpu not in metrics['nvidia_mem_use']:
+                            metrics['nvidia_mem_use'][gpu] = {'dates':[], 'values':[]}
+                        v = [v for pid, v in mem_uses.items() if v is not None ]
+                        if len(v) == 0:
+                            v = None
+                        else:
+                            v = sum(v)
+                        metrics['nvidia_mem_use'][gpu]['dates'].append(date)
+                        metrics['nvidia_mem_use'][gpu]['values'].append(v)
+                    
+                    per_gpu_sm_use = result['metrics']['gpu']['per_gpu_absolute_percent_usage']
+                    if 'nvidia_sm_use' not in metrics:
+                        metrics['nvidia_sm_use'] = {} 
+                    for gpu, sm_use in per_gpu_sm_use.items():
+                        if gpu not in metrics['nvidia_sm_use']:
+                            metrics['nvidia_sm_use'][gpu] = {'dates':[], 'values':[]}
+                        metrics['nvidia_sm_use'][gpu]['dates'].append(date)
+                        metrics['nvidia_sm_use'][gpu]['values'].append(sm_use)
             if len(metrics) == 0:
                 return None
             return metrics

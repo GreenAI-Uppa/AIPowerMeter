@@ -14,6 +14,9 @@ from queue import Empty as EmptyQueueException
 import time
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import datetime
 import psutil
 from . import rapl_power
 from . import gpu_power
@@ -398,7 +401,12 @@ class ExpResults():
 
         if self.gpu_metrics is not None:
             if name in self.gpu_metrics:
-                curve = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) if v is not None]
+                if "dates" in self.gpu_metrics[name]:
+                    curve = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name]['dates'], self.gpu_metrics[name]['values']) if v is not None]
+                else:
+                    curve = {}
+                    for device_id, metric in self.gpu_metrics[name].items():
+                        curve[device_id] = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name][device_id]['dates'], self.gpu_metrics[name][device_id]['values']) if v is not None]
 
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
@@ -444,20 +452,40 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        r = integrate(metric)
-        if r is None:
-            return r
-        r = r[-1]
-        if len(metric) == 1:
-            return r
-        return r /( metric[-1]['date'] - metric[0]['date'])
+        elif isinstance(metric, list):
+            r = integrate(metric)
+            if r is None:
+                return r
+            r = r[-1]
+            if len(metric) == 1:
+                return r
+            return r /( metric[-1]['date'] - metric[0]['date'])
+        else:
+            averages = {}
+            for device_id, mtrc in metric.items():
+                r = integrate(mtrc)
+                if r is not None:
+                    r = r[-1]
+                    if len(mtrc) > 1:
+                        r = r /( mtrc[-1]['date'] - mtrc[0]['date'])
+                averages[device_id] = r
+            return averages
 
     def max_(self, metric_name: str):
         """return the max of a metric"""
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        return max([m["value"] for m in metric])
+        elif isinstance(metric, list):
+            return max([m["value"] for m in metric])
+        else:
+            maxs = {}
+            for device_id, mtrc in metric.items():
+                if mtrc is None:
+                    maxs[device_id] = None
+                else:
+                    maxs[device_id] = max([m["value"] for m in mtrc])
+            return maxs
 
     def total_power_draw(self):
         # extracting cpu power draw
@@ -465,16 +493,72 @@ class ExpResults():
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
 
-    def display_curve(self, metric_names):
+    def display_curves(self, metric_names):
         """
         """
+        fig, ax = plt.subplots()
         for metric_name in metric_names:
             curve = self.get_curve(metric_name)
             if curve is None:
                 continue
-            df = pd.DataFrame(gpu_results)
-            df['timestamp'] = pd.to_datetime(df['date'])
+            if isinstance(curve,list):
+                df = pd.DataFrame(curve)
+                df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+                df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+                ax.plot(df['date_datetime'], df['value'], label=metric_name)
+            else:
+                for device_id, metric in curve.items():
+                    df = pd.DataFrame(metric)
+                    df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+                    df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+                    ax.plot(df['date_datetime'], df['value'],label=metric_name+":"+device_id)
+        ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
+        plt.xticks(rotation=45)
+        plt.show()
 
+
+    def display_2_curves(self, metric_name1, metric_name2):
+        """
+        """
+        fig, ax = plt.subplots()
+        curve = self.get_curve(metric_name1)
+        #if curve is None:
+        #    raise Exception('invalide metric name')
+        if isinstance(curve,list):
+            df = pd.DataFrame(curve)
+            df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+            df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+            ax.plot(df['date_datetime'], df['value'], label=metric_name1)
+            ax.set_ylabel(metric_name1, color="blue",fontsize=14)
+        else:
+            for device_id, metric in curve.items():
+                df = pd.DataFrame(metric)
+                df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+                df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+                ax.plot(df['date_datetime'], df['value'],label=metric_name1+":"+device_id)
+                ax.set_ylabel(metric_name1+":"+device_id, color="blue",fontsize=14)
+        ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
+
+        ax2 = ax.twinx()
+        curve = self.get_curve(metric_name2)
+        #if curve is None:
+        #    raise Exception('invalide metric name')
+        if isinstance(curve,list):
+            df = pd.DataFrame(curve)
+            df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+            df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+            ax2.plot(df['date_datetime'], df['value'], label=metric_name2)
+            ax2.set_ylabel(metric_name2, color="red",fontsize=14)
+        else:
+            for device_id, metric in curve.items():
+                df = pd.DataFrame(metric)
+                df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+                df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+                ax2.plot(df['date_datetime'], df['value'],label=metric_name2+":"+device_id, color='red')
+                ax2.set_ylabel(metric_name2+":"+device_id, color="red",fontsize=14)
+        ax2.format_xdata = mdates.DateFormatter('%H:%M:%S')
+        plt.xticks(rotation=45)
+        plt.show()
 
 
     def print(self):
@@ -512,14 +596,24 @@ class ExpResults():
         if self.gpu_metrics is not None:
             print()
             print()
-            print("on the gpu")
+            print("GPU")
             abs_nvidia_power = self.total_('nvidia_draw_absolute')
             rel_nvidia_power = self.total_('nvidia_attributable_power')
+            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power,"joules")
             nvidia_mem_use_abs = self.max_("nvidia_mem_use")
-            if nvidia_mem_use_abs is None:
-                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', memory used not available')
-            else:
-                print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power, ', Max memory used:',humanize_bytes(nvidia_mem_use_abs))
+            print('Max memory used:')
+            for device_id, mx in nvidia_mem_use_abs.items():
+                if mx is None:
+                    print('    gpu:',device_id, 'memory used not available')
+                else:
+                    print('    gpu:',device_id,":", humanize_bytes(mx))
+            nvidia_average_sm = self.average_("nvidia_sm_use")
+            print('GPU usage:')
+            for device_id, mx in nvidia_average_sm.items():
+                if mx is None:
+                    print('    gpu:',device_id, 'sm usage not available')
+                else:
+                    print('    gpu: {}: {:0.3f} %'.format(device_id, mx*100))
         if self.wattmeter_metrics is not None:
             print()
             print()
