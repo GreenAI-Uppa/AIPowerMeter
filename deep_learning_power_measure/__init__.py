@@ -1,5 +1,6 @@
 import sys, os
 from deep_learning_power_measure.power_measure import experiment, parsers
+import subprocess
 
 def main():
     """TODO parse arguments and make a system call"""
@@ -9,10 +10,9 @@ def main():
     driver = parsers.JsonParser(output_folder)
     exp = experiment.Experiment(driver)
     p, q = exp.measure_yourself(period=period)
-
     ## calling the experiment script
-    os.system("python "+" ".join(sys.argv[1:]))
-    
+    cmd = " ".join(sys.argv[1:])
+    subprocess.run(cmd, shell=True, check=True)
     q.put(experiment.STOP_MESSAGE)
     driver = parsers.JsonParser(output_folder)
     exp_result = experiment.ExpResults(driver)

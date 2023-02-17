@@ -54,6 +54,15 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
+def get_pid_list(current_pid):
+    current_process = psutil.Process(os.getppid())
+    pid_list = [current_process.pid] + [
+        child.pid for child in current_process.children(recursive=True)
+    ]
+    if current_pid in pid_list:
+        pid_list.remove(current_pid)
+    return pid_list
+
 def average(metric, start=None, end=None):
     """average of the metric values over time"""
     if start is None:
@@ -286,14 +295,9 @@ class Experiment():
         record power use for the process which calls this method
         """
         current_pid = queue.get()
-        current_process = psutil.Process(os.getppid())
-        pid_list = [current_process.pid] + [
-            child.pid for child in current_process.children(recursive=True)
-        ]
-        pid_list.remove(current_pid)
-        self.measure(queue, pid_list, period=period)
+        self.measure(queue, None, current_pid=current_pid, period=period)
 
-    def measure(self, queue, pid_list, period=1):
+    def measure(self, queue, pid_args, current_pid = None, period=1):
         """
         performs power use recording
 
@@ -302,14 +306,18 @@ class Experiment():
         pid_list : the recording will be done for these process
         period : waiting time between two RAPL samples.
         """
-        print("we'll take the measure of the following pids", pid_list)
         time_at_last_measure = 0
         if self.wattmeter_available:
             ## launch power meter recording
             ## logfile = self.wattmeter_logfile
             proc = self.db_driver.save_wattmeter_metrics()
-
         while True:
+            if pid_args is None:
+                # will obtain the pid from the parents, ie the script from which the measure function has been called
+                pid_list = get_pid_list(current_pid)
+            else:
+                # the user specified a set of process he wants to monitor
+                pid_list = pid_args
             # there have a buffer and allocate per pid with lifo
             # with time
             metrics = {}
@@ -643,7 +651,7 @@ class ExpResults():
                 else:
                     print('    gpu:',device_id,":", humanize_bytes(mx))
             nvidia_average_sm = self.average_("nvidia_sm_use")
-            print('GPU usage:')
+            print('Average GPU usage:')
             for device_id, mx in nvidia_average_sm.items():
                 if mx is None:
                     print('    gpu:',device_id, 'sm usage not available')
