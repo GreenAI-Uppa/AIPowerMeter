@@ -371,37 +371,13 @@ class ExpResults():
         return metrics
 
     def print_metrics(self):
-        print('cpu related metrics:')
-        if self.cpu_metrics  is not None:
-            for k in self.cpu_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-
-        print()
-        print('gpu related metrics')
-        if self.gpu_metrics is not None:
-            for k in self.gpu_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
-        print('experiment related metrics')
-        if self.exp_metrics is not None:
-            for k in self.exp_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
-
-        print()
-        print('wattmeter metrics')
-        if self.wattmeter_metrics is not None:
-            for k in self.wattmeter_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
+        metrics = self.list_metrics()
+        for k, mets in metrics.items():
+            print(k)
+            if len(mets) == 0:
+                print('      NOT AVAILABLE')
+            else:
+                print(mets)
 
     def get_curve(self, name):
         """
@@ -511,6 +487,9 @@ class ExpResults():
 
     def display_curves(self, metric_names):
         """
+        Input:
+          metric_names [metric_name1, metric_name2,...]
+          see print_metrics() function for what's available 
         """
         fig, ax = plt.subplots()
         for metric_name in metric_names:
@@ -530,6 +509,7 @@ class ExpResults():
                     ax.plot(df['date_datetime'], df['value'],label=metric_name+":"+device_id)
         ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
         plt.xticks(rotation=45)
+        plt.legend()
         plt.show()
 
 
@@ -557,13 +537,11 @@ class ExpResults():
 
         ax2 = ax.twinx()
         curve = self.get_curve(metric_name2)
-        #if curve is None:
-        #    raise Exception('invalide metric name')
         if isinstance(curve,list):
             df = pd.DataFrame(curve)
             df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
             df['date_datetime'] = pd.to_datetime(df['date_datetime'])
-            ax2.plot(df['date_datetime'], df['value'], label=metric_name2)
+            ax2.plot(df['date_datetime'], df['value'], label=metric_name2, color="red")
             ax2.set_ylabel(metric_name2, color="red",fontsize=14)
         else:
             for device_id, metric in curve.items():
