@@ -99,3 +99,9 @@ and the console output should looks like:
 
   on the gpu
   nvidia total consumption: 543.126 joules, your consumption:  543.126, average memory used: 1.6GiB
+
+You can also measure the consumption of a script, for example, if you want to evaluate script.py
+
+.. code-block:: console
+
+  python -m deep_learning_power_measure python script.py
