@@ -85,6 +85,8 @@ In conclusion, we recommend to benchmark a program when it is running alone on t
 
   \*Actually, others causes can have an influence such as the wear, the temperature of the room and so on. See [heinrich2017]_, Figure 11 for an inventory of all parameters that may influence the behavior of the system)
 
+.. figure:: orgerie.png
+
 Related work on power meter libraries
 -------------------------------------
 
