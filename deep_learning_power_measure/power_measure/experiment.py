@@ -590,6 +590,8 @@ class ExpResults():
         if self.model_card is not None:
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
+
+        print('Experiment duration: ', self.get_exp_duration(), 'seconds')
         if self.cpu_metrics is not None:
             print("ENERGY CONSUMPTION: ")
             print("on the cpu")
