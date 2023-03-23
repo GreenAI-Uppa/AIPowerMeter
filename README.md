@@ -19,10 +19,9 @@ Empty folder? If your cpu is very recent, it is worth to check the most recent l
 
 ## Installation
 
-Install pytorch, then,
 ```
 pip install -r requirements.txt
-python setup.py install
+pip install --force-reinstall --no-cache-dir .
 ```
 
 You need to authorize the reading of the rapl related files: 
