@@ -175,7 +175,6 @@ class Experiment():
         #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
-        # self.wattmeter_available, msg_nvidia = gpu_power.is_wattmeter_compatible()
         self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec)
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
@@ -190,7 +189,7 @@ class Experiment():
         if self.wattmeter_available:
             print("wattmeter available at: "+self.db_driver.wattemeter_exec)
         else:
-            print("power meter not avaible: "+msg_omegawatt)
+            print("power meter not avaible: "+self.db_driver.wattemeter_exec," does not exist")
         if not self.nvidia_available:
             print("nvidia not available: " + msg_nvidia)
         else:
@@ -340,7 +339,7 @@ class Experiment():
                 # The STOP message which is a string, and the metrics dictionnary that this function is sending
                 if message == STOP_MESSAGE:
                     print("Done with measuring")
-                    if proc:
+                    if self.wattmeter_available  and proc:
                         os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     # os.system("kill -10 `cat /tmp/pid`")
                     return
@@ -587,7 +586,8 @@ class ExpResults():
         simple print of the experiment summary
         """
         print("============================================ EXPERIMENT SUMMARY ============================================")
-        if self.model_card is not None:
+        if self.model_card is not None and 'total_params' in self.model_card and 'total_mult_adds' in self.model_card:
+            print(self.model_card)
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
 
