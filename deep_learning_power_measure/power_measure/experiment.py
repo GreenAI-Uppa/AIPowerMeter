@@ -59,8 +59,12 @@ def get_pid_list(current_pid):
     pid_list = [current_process.pid] + [
         child.pid for child in current_process.children(recursive=True)
     ]
-    if current_pid in pid_list:
-        pid_list.remove(current_pid)
+    # removing the pids from the measurement AIPowerMeter functions
+    queue_process = psutil.Process(current_pid)
+    queue_pids = [queue_process.pid] + [child.pid for child in queue_process.children(recursive=True)]
+    for queue_pid in queue_pids:
+        if queue_pid in pid_list:
+            pid_list.remove(queue_pid)
     return pid_list
 
 def average(metric, start=None, end=None):

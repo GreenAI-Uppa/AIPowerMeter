@@ -81,9 +81,9 @@ def get_processes(pid_list):
             p = psutil.Process(process)
             process_list.append(p)
         except psutil.NoSuchProcess:
-            warnings.warn(
-                    "Process with pid {} used to be part of this process chain, but was shut down. Skipping."
-                )
+            pass # Actually this can happens, for instance there are some quick calls to nvidia-smi when running pytorch
+            #s = "Process with pid {} used to be part of this process chain, but was shut down. Skipping.".format(process)
+            #warnings.warn(s)
     return process_list
 
 def get_power(diff):
