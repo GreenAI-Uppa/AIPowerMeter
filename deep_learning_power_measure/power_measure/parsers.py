@@ -172,7 +172,9 @@ class JsonParser():
             if '#frame_is_ok' not in results:
                 logging.error("ERROR check the omegawatt csv")
                 return None
-            results['#frame_is_ok'] = results['#frame_is_ok'].map({'true': True, 'false': False})
+            if results['#frame_is_ok'].dtype != bool:
+                logging.warning('omegawatt csv column #frame_is_ok is not loaded as boolean, trying to cast from "false" and "true"')  
+                results['#frame_is_ok'] = results['#frame_is_ok'].map({'true': True, 'false': False})
             results = results[results["#frame_is_ok"]]
             metrics = {}
             for k in results.columns:

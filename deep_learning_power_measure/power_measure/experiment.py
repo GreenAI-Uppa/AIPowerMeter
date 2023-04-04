@@ -481,7 +481,7 @@ class ExpResults():
         else:
             maxs = {}
             for device_id, mtrc in metric.items():
-                if mtrc is None:
+                if mtrc is None or len(mtrc)==0:
                     maxs[device_id] = None
                 else:
                     maxs[device_id] = max([m["value"] for m in mtrc])
