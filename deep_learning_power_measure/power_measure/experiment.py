@@ -445,10 +445,19 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        r =integrate(metric)
-        if r is None:
-            return r
-        return r[-1]
+        elif isinstance(metric, list):
+            r =integrate(metric)
+            if r is None:
+                return r
+            return r[-1]
+        else:
+            totals = {}
+            for device_id, mtrc in metric.items():
+                r = integrate(mtrc)
+                if r is not None:
+                    r = r[-1]
+                totals[device_id] = r
+            return totals
 
     def average_(self, metric_name: str):
         """take the average of a metric"""
@@ -463,7 +472,7 @@ class ExpResults():
             if len(metric) == 1:
                 return r
             return r /( metric[-1]['date'] - metric[0]['date'])
-        else:
+        else:# compute the average for each device
             averages = {}
             for device_id, mtrc in metric.items():
                 r = integrate(mtrc)
@@ -491,7 +500,7 @@ class ExpResults():
             return maxs
 
     def total_power_draw(self):
-        # extracting cpu power draw
+        """extracting cpu and GPU power draw"""
         total_intel_power = self.total_('intel_power')
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
@@ -512,7 +521,7 @@ class ExpResults():
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax.plot(df['date_datetime'], df['value'], label=metric_name)
-            else:
+            else: # compute the average for each device
                 for device_id, metric in curve.items():
                     df = pd.DataFrame(metric)
                     df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
@@ -566,23 +575,23 @@ class ExpResults():
         plt.show()
 
     def __str__(self) -> str:
-        r = ['available metrics']
+        r = ['Available metrics : ']
         r.append('CPU')
         if self.cpu_metrics is not None:
-            r.append(','.join([k for k in self.cpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.cpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('GPU')
         if self.gpu_metrics is not None:
-            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('Experiments')
         if self.gpu_metrics is not None:
-            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
-        r.append('\ncall print() method to display power consumption')
+        r.append('\n\ncall print() method to display power consumption')
         return '\n'.join(r)
     
     def print(self):
@@ -641,6 +650,16 @@ class ExpResults():
                     print('    gpu:',device_id, 'sm usage not available')
                 else:
                     print('    gpu: {}: {:0.3f} %'.format(device_id, mx*100))
+            per_gpu_attributable_power = self.total_('per_gpu_attributable_power')
+            print('Attributable usage per GPU')
+            for device_id, mx in per_gpu_attributable_power.items():
+                if device_id == 'all':
+                    continue
+                if mx is None:
+                    print('    gpu:',device_id, 'power draw not available')
+                else:
+                    print('    gpu: {}: {:0.3f} joules'.format(device_id, mx))
+            
         if self.wattmeter_metrics is not None:
             print()
             print()
