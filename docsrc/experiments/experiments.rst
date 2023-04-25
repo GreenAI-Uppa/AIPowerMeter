@@ -1,10 +1,10 @@
 Deep learning benchmark
 ====================================
 
-Experimental protocol
----------------------
+This section describes energy measurements for classic deep learning models. For each model, the experiment is as follows: 
 
-We've started to run experiments to measure the energy consumption of classical deep learning pretrained model at inference. Our protocol acts as follows:
+
+To measure the energy consumption of classical deep learning pretrained model at inference, our protocol acts as follows:
 
 - we load a pretrained architecture,
 
@@ -13,6 +13,32 @@ We've started to run experiments to measure the energy consumption of classical 
 - we run x inferences and measure power draws with AIPowerMeter,
 
 - we repeat the experiment 10 times to have more robustness.
+
+
+Experiments were run with a NVIDIA GeForce RTX 3090 with 24Gb of ram.
+
+Summary : One inference with classic deep learning models
+---------------------------------------------------------
+
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+| Model Type                | CNN Object Detection     | CNNs / image Classification  | Transformer Image classification | Transformer Inference on Text |
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+| Model Name                |          Yolov5s         |  ResNet                      | VIT B 16                         |         Bert                  |
++===========================+==========================+==============================+==================================+===============================+
+| Joules Consumption        | 0.61                     | 0.27                         | 0.94                             |         0.07                  |
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+| Batch Size                | 32                       | 128                          | 64                               |        128                    |
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+| %GPU SM used              | 91%                      | 60%                          | 92%                              | 76%                           |
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+| GPU MEM USED  (GB)        | 11.3                     | 23.2                         | 18.8                             | 1.7                           |
++---------------------------+--------------------------+------------------------------+----------------------------------+-------------------------------+
+
+
+
+
+Experimental protocol
+---------------------
 
 For each set of experiments, power measurements and lattencies are written into several power_metrics.json  and latency.csv files: one by tuple (format,x) where format is the chosen input size an integer and x =0, ... 9 following this architecture:
 

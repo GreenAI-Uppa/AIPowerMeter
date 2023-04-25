@@ -54,6 +54,19 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
+def get_pid_list(current_pid):
+    current_process = psutil.Process(os.getppid())
+    pid_list = [current_process.pid] + [
+        child.pid for child in current_process.children(recursive=True)
+    ]
+    # removing the pids from the measurement AIPowerMeter functions
+    queue_process = psutil.Process(current_pid)
+    queue_pids = [queue_process.pid] + [child.pid for child in queue_process.children(recursive=True)]
+    for queue_pid in queue_pids:
+        if queue_pid in pid_list:
+            pid_list.remove(queue_pid)
+    return pid_list
+
 def average(metric, start=None, end=None):
     """average of the metric values over time"""
     if start is None:
@@ -166,7 +179,6 @@ class Experiment():
         #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
-        # self.wattmeter_available, msg_nvidia = gpu_power.is_wattmeter_compatible()
         self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec)
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
@@ -181,7 +193,7 @@ class Experiment():
         if self.wattmeter_available:
             print("wattmeter available at: "+self.db_driver.wattemeter_exec)
         else:
-            print("power meter not avaible: "+msg_omegawatt)
+            print("power meter not avaible: "+self.db_driver.wattemeter_exec," does not exist")
         if not self.nvidia_available:
             print("nvidia not available: " + msg_nvidia)
         else:
@@ -286,14 +298,9 @@ class Experiment():
         record power use for the process which calls this method
         """
         current_pid = queue.get()
-        current_process = psutil.Process(os.getppid())
-        pid_list = [current_process.pid] + [
-            child.pid for child in current_process.children(recursive=True)
-        ]
-        pid_list.remove(current_pid)
-        self.measure(queue, pid_list, period=period)
+        self.measure(queue, None, current_pid=current_pid, period=period)
 
-    def measure(self, queue, pid_list, period=1):
+    def measure(self, queue, pid_args, current_pid = None, period=1):
         """
         performs power use recording
 
@@ -302,14 +309,18 @@ class Experiment():
         pid_list : the recording will be done for these process
         period : waiting time between two RAPL samples.
         """
-        print("we'll take the measure of the following pids", pid_list)
         time_at_last_measure = 0
         if self.wattmeter_available:
             ## launch power meter recording
             ## logfile = self.wattmeter_logfile
             proc = self.db_driver.save_wattmeter_metrics()
-
         while True:
+            if pid_args is None:
+                # will obtain the pid from the parents, ie the script from which the measure function has been called
+                pid_list = get_pid_list(current_pid)
+            else:
+                # the user specified a set of process he wants to monitor
+                pid_list = pid_args
             # there have a buffer and allocate per pid with lifo
             # with time
             metrics = {}
@@ -332,7 +343,7 @@ class Experiment():
                 # The STOP message which is a string, and the metrics dictionnary that this function is sending
                 if message == STOP_MESSAGE:
                     print("Done with measuring")
-                    if proc:
+                    if self.wattmeter_available  and proc:
                         os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     # os.system("kill -10 `cat /tmp/pid`")
                     return
@@ -371,37 +382,13 @@ class ExpResults():
         return metrics
 
     def print_metrics(self):
-        print('cpu related metrics:')
-        if self.cpu_metrics  is not None:
-            for k in self.cpu_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-
-        print()
-        print('gpu related metrics')
-        if self.gpu_metrics is not None:
-            for k in self.gpu_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
-        print('experiment related metrics')
-        if self.exp_metrics is not None:
-            for k in self.exp_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
-
-        print()
-        print('wattmeter metrics')
-        if self.wattmeter_metrics is not None:
-            for k in self.wattmeter_metrics:
-                print(k)
-        else:
-            print('      NOT AVAILABLE')
-        print()
+        metrics = self.list_metrics()
+        for k, mets in metrics.items():
+            print(k)
+            if len(mets) == 0:
+                print('      NOT AVAILABLE')
+            else:
+                print(mets)
 
     def get_curve(self, name):
         """
@@ -458,10 +445,19 @@ class ExpResults():
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
-        r =integrate(metric)
-        if r is None:
-            return r
-        return r[-1]
+        elif isinstance(metric, list):
+            r =integrate(metric)
+            if r is None:
+                return r
+            return r[-1]
+        else:
+            totals = {}
+            for device_id, mtrc in metric.items():
+                r = integrate(mtrc)
+                if r is not None:
+                    r = r[-1]
+                totals[device_id] = r
+            return totals
 
     def average_(self, metric_name: str):
         """take the average of a metric"""
@@ -476,7 +472,7 @@ class ExpResults():
             if len(metric) == 1:
                 return r
             return r /( metric[-1]['date'] - metric[0]['date'])
-        else:
+        else:# compute the average for each device
             averages = {}
             for device_id, mtrc in metric.items():
                 r = integrate(mtrc)
@@ -497,20 +493,23 @@ class ExpResults():
         else:
             maxs = {}
             for device_id, mtrc in metric.items():
-                if mtrc is None:
+                if mtrc is None or len(mtrc)==0:
                     maxs[device_id] = None
                 else:
                     maxs[device_id] = max([m["value"] for m in mtrc])
             return maxs
 
     def total_power_draw(self):
-        # extracting cpu power draw
+        """extracting cpu and GPU power draw"""
         total_intel_power = self.total_('intel_power')
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
 
     def display_curves(self, metric_names):
         """
+        Input:
+          metric_names [metric_name1, metric_name2,...]
+          see print_metrics() function for what's available 
         """
         fig, ax = plt.subplots()
         for metric_name in metric_names:
@@ -522,7 +521,7 @@ class ExpResults():
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax.plot(df['date_datetime'], df['value'], label=metric_name)
-            else:
+            else: # compute the average for each device
                 for device_id, metric in curve.items():
                     df = pd.DataFrame(metric)
                     df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
@@ -530,6 +529,7 @@ class ExpResults():
                     ax.plot(df['date_datetime'], df['value'],label=metric_name+":"+device_id)
         ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
         plt.xticks(rotation=45)
+        plt.legend()
         plt.show()
 
 
@@ -557,13 +557,11 @@ class ExpResults():
 
         ax2 = ax.twinx()
         curve = self.get_curve(metric_name2)
-        #if curve is None:
-        #    raise Exception('invalide metric name')
         if isinstance(curve,list):
             df = pd.DataFrame(curve)
             df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
             df['date_datetime'] = pd.to_datetime(df['date_datetime'])
-            ax2.plot(df['date_datetime'], df['value'], label=metric_name2)
+            ax2.plot(df['date_datetime'], df['value'], label=metric_name2, color="red")
             ax2.set_ylabel(metric_name2, color="red",fontsize=14)
         else:
             for device_id, metric in curve.items():
@@ -577,23 +575,23 @@ class ExpResults():
         plt.show()
 
     def __str__(self) -> str:
-        r = ['available metrics']
+        r = ['Available metrics : ']
         r.append('CPU')
         if self.cpu_metrics is not None:
-            r.append(','.join([k for k in self.cpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.cpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('GPU')
         if self.gpu_metrics is not None:
-            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('Experiments')
         if self.gpu_metrics is not None:
-            r.append(','.join([k for k in self.gpu_metrics.keys()]))
+            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
-        r.append('\ncall print() method to display power consumption')
+        r.append('\n\ncall print() method to display power consumption')
         return '\n'.join(r)
     
     def print(self):
@@ -601,9 +599,12 @@ class ExpResults():
         simple print of the experiment summary
         """
         print("============================================ EXPERIMENT SUMMARY ============================================")
-        if self.model_card is not None:
+        if self.model_card is not None and 'total_params' in self.model_card and 'total_mult_adds' in self.model_card:
+            print(self.model_card)
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
+
+        print('Experiment duration: ', self.get_exp_duration(), 'seconds')
         if self.cpu_metrics is not None:
             print("ENERGY CONSUMPTION: ")
             print("on the cpu")
@@ -643,12 +644,22 @@ class ExpResults():
                 else:
                     print('    gpu:',device_id,":", humanize_bytes(mx))
             nvidia_average_sm = self.average_("nvidia_sm_use")
-            print('GPU usage:')
+            print('Average GPU usage:')
             for device_id, mx in nvidia_average_sm.items():
                 if mx is None:
                     print('    gpu:',device_id, 'sm usage not available')
                 else:
                     print('    gpu: {}: {:0.3f} %'.format(device_id, mx*100))
+            per_gpu_attributable_power = self.total_('per_gpu_attributable_power')
+            print('Attributable usage per GPU')
+            for device_id, mx in per_gpu_attributable_power.items():
+                if device_id == 'all':
+                    continue
+                if mx is None:
+                    print('    gpu:',device_id, 'power draw not available')
+                else:
+                    print('    gpu: {}: {:0.3f} joules'.format(device_id, mx))
+            
         if self.wattmeter_metrics is not None:
             print()
             print()

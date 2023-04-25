@@ -105,6 +105,8 @@ class JsonParser():
                     metrics['nvidia_draw_absolute']['dates'].append(date)
                     metrics['nvidia_draw_absolute']['values'].append(v)
 
+
+
                     v = result['metrics']['gpu']['per_gpu_attributable_power']['all']
                     if 'nvidia_attributable_power' not in metrics:
                         metrics['nvidia_attributable_power'] = {'dates':[], 'values':[]}
@@ -124,7 +126,7 @@ class JsonParser():
                             v = sum(v)
                         metrics['nvidia_mem_use'][gpu]['dates'].append(date)
                         metrics['nvidia_mem_use'][gpu]['values'].append(v)
-                    
+
                     per_gpu_sm_use = result['metrics']['gpu']['per_gpu_absolute_percent_usage']
                     if 'nvidia_sm_use' not in metrics:
                         metrics['nvidia_sm_use'] = {} 
@@ -133,6 +135,36 @@ class JsonParser():
                             metrics['nvidia_sm_use'][gpu] = {'dates':[], 'values':[]}
                         metrics['nvidia_sm_use'][gpu]['dates'].append(date)
                         metrics['nvidia_sm_use'][gpu]['values'].append(sm_use)
+
+                    per_gpu_power_draw = result['metrics']['gpu']['per_gpu_power_draw']
+                    if 'per_gpu_power_draw' not in metrics:
+                        metrics['per_gpu_power_draw'] = {} 
+                    for gpu, sm_use in per_gpu_power_draw.items():
+                        if gpu not in metrics['per_gpu_power_draw']:
+                            metrics['per_gpu_power_draw'][gpu] = {'dates':[], 'values':[]}
+                        metrics['per_gpu_power_draw'][gpu]['dates'].append(date)
+                        metrics['per_gpu_power_draw'][gpu]['values'].append(sm_use)
+
+                    per_gpu_attributable_power = result['metrics']['gpu']['per_gpu_attributable_power']
+                    if 'per_gpu_attributable_power' not in metrics:
+                        metrics['per_gpu_attributable_power'] = {} 
+                    for gpu, sm_use in per_gpu_attributable_power.items():
+                        if gpu not in metrics['per_gpu_attributable_power']:
+                            metrics['per_gpu_attributable_power'][gpu] = {'dates':[], 'values':[]}
+                        metrics['per_gpu_attributable_power'][gpu]['dates'].append(date)
+                        metrics['per_gpu_attributable_power'][gpu]['values'].append(sm_use)
+
+                    per_gpu_estimated_attributable_utilization = result['metrics']['gpu']['per_gpu_estimated_attributable_utilization']
+                    if 'per_gpu_estimated_attributable_utilization' not in metrics:
+                        metrics['per_gpu_estimated_attributable_utilization'] = {} 
+                    for gpu, sm_use in per_gpu_estimated_attributable_utilization.items():
+                        if gpu not in metrics['per_gpu_estimated_attributable_utilization']:
+                            metrics['per_gpu_estimated_attributable_utilization'][gpu] = {'dates':[], 'values':[]}
+                        metrics['per_gpu_estimated_attributable_utilization'][gpu]['dates'].append(date)
+                        metrics['per_gpu_estimated_attributable_utilization'][gpu]['values'].append(sm_use)
+
+
+
             if len(metrics) == 0:
                 return None
             return metrics
@@ -172,7 +204,9 @@ class JsonParser():
             if '#frame_is_ok' not in results:
                 logging.error("ERROR check the omegawatt csv")
                 return None
-            results['#frame_is_ok'] = results['#frame_is_ok'].map({'true': True, 'false': False})
+            if results['#frame_is_ok'].dtype != bool:
+                logging.warning('omegawatt csv column #frame_is_ok is not loaded as boolean, trying to cast from "false" and "true"')  
+                results['#frame_is_ok'] = results['#frame_is_ok'].map({'true': True, 'false': False})
             results = results[results["#frame_is_ok"]]
             metrics = {}
             for k in results.columns:

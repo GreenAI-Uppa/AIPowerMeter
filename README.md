@@ -19,7 +19,6 @@ Empty folder? If your cpu is very recent, it is worth to check the most recent l
 
 ## Installation
 
-Install pytorch, then,
 ```
 pip install -r requirements.txt
 pip install --force-reinstall --no-cache-dir .
@@ -30,6 +29,8 @@ You need to authorize the reading of the rapl related files:
 sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 ```
 
+
+> some examples requires pytorch or tensorflow.
 ## Usage
 
 See `examples/example_exp_deep_learning.py`.
