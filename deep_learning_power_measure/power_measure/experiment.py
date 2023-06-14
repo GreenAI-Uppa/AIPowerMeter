@@ -322,6 +322,10 @@ class Experiment():
         time_at_last_measure = 0
         monitoring_process_pid = os.getppid()
         while True:
+            time.sleep(period)
+            #if time.time() - time_at_last_measure < period:
+            #    continue
+            time_at_last_measure = time.time()
             if pid_args is None:
                 # will obtain the pid from the parents, ie the script from which the measure function has been called
                 pid_list = get_pid_list(monitoring_process_pid, parent_pid=parent_pid)
@@ -337,13 +341,11 @@ class Experiment():
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
                 metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
-            if time.time() - time_at_last_measure > period:
-                time_at_last_measure = time.time()
-                if self.nvidia_available:
-                    per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
-                    metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
-                    metrics['gpu'] = metrics_gpu
-                self.db_driver.save_power_metrics(metrics)
+            if self.nvidia_available:
+                per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
+                metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
+                metrics['gpu'] = metrics_gpu
+            self.db_driver.save_power_metrics(metrics)
 
     def measure(self, queue, pid_args, current_pid = None, period=1):
         """

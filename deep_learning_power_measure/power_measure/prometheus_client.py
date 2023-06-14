@@ -42,7 +42,6 @@ class PrometheusClient():
         https://prometheus.io/docs/instrumenting/pushing/
         https://github.com/prometheus/pushgateway/blob/master/README.md
         """
-    
         if 'cpu' in metrics:
             power_draw_cpu = float(metrics['cpu']['total_cpu_power'])
             self.gauges["power_draw_cpu"].set(power_draw_cpu)

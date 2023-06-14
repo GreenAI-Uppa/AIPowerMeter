@@ -2,5 +2,4 @@ from deep_learning_power_measure.power_measure import experiment, prometheus_cli
 
 driver = prometheus_client.PrometheusClient()
 exp = experiment.Experiment(driver)
-print('launching')
-exp.monitor_machine()
+exp.monitor_machine(period=5)
