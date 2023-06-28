@@ -24,6 +24,7 @@ from . import model_complexity
 import signal
 
 STOP_MESSAGE = "Stop"
+EXP_DONE = "Done"
 
 def joules_to_wh(n):
     """conversion function"""
@@ -393,6 +394,7 @@ class Experiment():
                     if self.wattmeter_available  and proc:
                         os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     # os.system("kill -10 `cat /tmp/pid`")
+                    queue.put(EXP_DONE)
                     return
             except EmptyQueueException:
                 pass

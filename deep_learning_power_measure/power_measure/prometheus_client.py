@@ -17,6 +17,7 @@ class PrometheusClient():
         self.gauges = {}
         for metric, description in metric_metadata.items():
             self.gauges[metric] = Gauge(metric, description)
+            
         self.app = Flask(__name__)
         @self.app.route('/metrics')
         def metrics():
