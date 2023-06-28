@@ -54,8 +54,15 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
-def get_pid_list(current_pid):
-    current_process = psutil.Process(os.getppid())
+def get_pid_list(current_pid, parent_pid=None):
+    """
+    get pid list of the experiment, or the processes spawned from parent_pid
+    current_pid correspond to the pid of AIPowerMeter and it and its children are removed from the pid list
+    """
+    if parent_pid is None:
+        current_process = psutil.Process(os.getppid())
+    else:
+        current_process = psutil.Process(parent_pid)
     pid_list = [current_process.pid] + [
         child.pid for child in current_process.children(recursive=True)
     ]
@@ -178,8 +185,8 @@ class Experiment():
             self.save_model_card(model, input_size, device=device)
         #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
-        self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible()
-        self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec)
+        self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible() 
+        self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec) if (self.db_driver.wattemeter_exec is not None) else False
         if not self.rapl_available and not self.nvidia_available:
             raise Exception(
             "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
@@ -192,6 +199,8 @@ class Experiment():
             print(msg_rapl)
         if self.wattmeter_available:
             print("wattmeter available at: "+self.db_driver.wattemeter_exec)
+        elif self.db_driver.wattemeter_exec is None:
+            print("Power Meter not supported")
         else:
             print("power meter not avaible: "+self.db_driver.wattemeter_exec," does not exist")
         if not self.nvidia_available:
@@ -300,19 +309,57 @@ class Experiment():
         current_pid = queue.get()
         self.measure(queue, None, current_pid=current_pid, period=period)
 
+    def monitor_machine(self, pid_args=None, parent_pid = 1, period=1):
+        """
+        performs power use recording
+
+        queue : queue used to communicate to the thread which ask
+        for the recording
+        period : waiting time between two RAPL samples.
+        pid_args : list of pid : will monitor exclusively these pids. If set to None, will update the list of pid starting from current_pid
+        parent_pid : root process from which we collect subprocesses to be monitored. Used only if pid_args is set to None
+        """
+        time_at_last_measure = 0
+        monitoring_process_pid = os.getppid()
+        while True:
+            time.sleep(period)
+            #if time.time() - time_at_last_measure < period:
+            #    continue
+            time_at_last_measure = time.time()
+            if pid_args is None:
+                # will obtain the pid from the parents, ie the script from which the measure function has been called
+                pid_list = get_pid_list(monitoring_process_pid, parent_pid=parent_pid)
+            else:
+                # the user specified a set of process he wants to monitor
+                pid_list = pid_args
+            # there have a buffer and allocate per pid with lifo
+            # with time
+            metrics = {}
+            if self.nvidia_available:
+                # launch in separate threads because they won't have the same frequency
+                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
+                self.log_usage(metrics_gpu, pid_list)
+            if self.rapl_available:
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
+            if self.nvidia_available:
+                per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
+                metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
+                metrics['gpu'] = metrics_gpu
+            self.db_driver.save_power_metrics(metrics)
+
     def measure(self, queue, pid_args, current_pid = None, period=1):
         """
         performs power use recording
 
         queue : queue used to communicate to the thread which ask
         for the recording
-        pid_list : the recording will be done for these process
         period : waiting time between two RAPL samples.
+        pid_args : list of pid : will monitor exclusively these pids. If set to None, will update the list of pid starting from current_pid
+        current_pid : root process from which we collect subprocesses to be monitored. Used only if pid_args is set to None
         """
         time_at_last_measure = 0
         if self.wattmeter_available:
             ## launch power meter recording
-            ## logfile = self.wattmeter_logfile
             proc = self.db_driver.save_wattmeter_metrics()
         while True:
             if pid_args is None:

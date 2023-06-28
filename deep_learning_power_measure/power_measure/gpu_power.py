@@ -234,7 +234,7 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
         if this_exp_sm == 0:
             per_gpu_relative_percent_usage[gpu_id] = 0
         else:
-            per_gpu_relative_percent_usage[gpu_id] = all_sm / this_exp_sm
+            per_gpu_relative_percent_usage[gpu_id] =  this_exp_sm / all_sm
 
     data_return_values_with_headers = {
         "nvidia_draw_absolute": absolute_power, # total nvidia power draw
