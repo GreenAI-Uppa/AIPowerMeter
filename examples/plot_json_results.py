@@ -12,14 +12,19 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--output_folder',
                     help='directory to save the energy consumption records',
                     default='measure_power', type=str)
+parser.add_argument('--metric_name',help='name of the metric you want to plot', default=None)
 args = parser.parse_args()
-
 
 ### displaying the result of the experiment.
 # reinstantiating a parser to reload the result.
 # a reload function should be used, but this way,
 # it shows how to read results from a past experiment
+
 driver = parsers.JsonParser(args.output_folder)
 exp_result = experiment.ExpResults(driver)
-print(exp_result)
-exp_result.display_curves(['nvidia_sm_use'])
+if args.metric_name is None:
+    print('metric_name argument empty please provide a value')
+    print()
+    print(exp_result)
+else:
+    exp_result.display_curves([args.metric_name])

@@ -20,7 +20,7 @@ class Conv(nn.Module):
     """one conv layer model"""
     def __init__(self):
         super().__init__()
-        self.conv = nn.Conv2d(3,1, (3,3))
+        self.conv = nn.Conv2d(3,256, (3,3))
     def forward(self, input_data):
         """forward pass"""
         return self.conv(input_data)
@@ -29,9 +29,13 @@ net = Conv()
 
 # setting the size of the input
 # minibatch_size x nChannels x Height x Width
-input_size = 1, 3, 128, 128
+input_size = 32, 3, 128, 128
 # generating some fake data
 data = torch.randn(input_size)
+# using gpu if available
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+net.to(DEVICE)
+data = data.to(DEVICE)
 
 # this parser will be in charge to write the results to a json file
 driver = parsers.JsonParser(args.output_folder)
@@ -41,10 +45,6 @@ exp = experiment.Experiment(driver, model=net, input_size=input_size)
 # starting the record, and wait two seconds between each energy consumption measurement
 # Note that it takes the model and the input as a parameter in order to give a model summary
 p, q = exp.measure_yourself(period=2)
-# using gpu if available
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-net.to(DEVICE)
-data = data.to(DEVICE)
 
 ## starting the experiment
 N_ITER = 200000
@@ -62,4 +62,6 @@ q.put(experiment.STOP_MESSAGE)
 # it shows how to read results from a past experiment
 driver = parsers.JsonParser(args.output_folder)
 exp_result = experiment.ExpResults(driver)
+data = torch.randn(input_size)
+data = torch.randn(input_size)
 exp_result.print()

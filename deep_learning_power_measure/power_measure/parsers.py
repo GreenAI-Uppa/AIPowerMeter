@@ -7,6 +7,7 @@ import pandas as pd
 import subprocess
 import logging
 
+SEGMENT_END = "END OF RECORDING SEGMENT"
 class JsonParser():
     """write and parse the measurement recording from and to json files"""
     def __init__(self, location : str):
@@ -45,6 +46,11 @@ class JsonParser():
         json_str = json.dumps(data)
         power_metric_fileout.write(json_str+'\n')
 
+    def close_driver(self):
+        power_metric_fileout = open(self.power_metric_filename,'a')
+        json_str = json.dumps(SEGMENT_END)
+        power_metric_fileout.write(json_str+'\n')
+
     def save_wattmeter_metrics(self):
         """save the model card as a json file"""
         if not os.path.isdir(self.folder):
@@ -70,14 +76,29 @@ class JsonParser():
         if os.path.isfile(self.model_card_file):
             return json.load(open(self.model_card_file))
 
+    def get_segments(self):
+        """
+        get time stamps where recordings have been stopped AND re-initiated later
+        """
+        segments = []
+        if os.path.isfile(self.power_metric_filename):
+            for line in open(self.power_metric_filename):
+                result = json.loads(line)
+                if 'date' in result:
+                    last_date = datetime.datetime.fromisoformat(result['date'])
+                elif result==SEGMENT_END:
+                    segments.append(last_date)
+            segments.pop() # the last one is just the last line in the file
+        return segments
+
     def load_cpu_metrics(self):
         """load the metrics related to the cpu usage and energy consumption"""
         if os.path.isfile(self.power_metric_filename):
             metrics = {}
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
-                date = datetime.datetime.fromisoformat(result['date'])
-                if 'cpu' in result['metrics']:
+                if isinstance(result,dict) and 'cpu' in result['metrics']:
+                    date = datetime.datetime.fromisoformat(result['date'])
                     for k, v in result['metrics']['cpu'].items():
                         if isinstance(v, dict):
                             v = sum(v.values())
@@ -96,7 +117,7 @@ class JsonParser():
             metrics = {} #Streaming Processor / Shared Processor sm
             for line in open(self.power_metric_filename):
                 result = json.loads(line)
-                if 'gpu' in result['metrics']:
+                if  isinstance(result,dict) and 'gpu' in result['metrics']:
                     date = datetime.datetime.fromisoformat(result['date'])
 
                     v = result['metrics']['gpu']['nvidia_draw_absolute']
@@ -104,9 +125,7 @@ class JsonParser():
                         metrics['nvidia_draw_absolute'] = {'dates':[], 'values':[]}
                     metrics['nvidia_draw_absolute']['dates'].append(date)
                     metrics['nvidia_draw_absolute']['values'].append(v)
-
-
-
+                    
                     v = result['metrics']['gpu']['per_gpu_attributable_power']['all']
                     if 'nvidia_attributable_power' not in metrics:
                         metrics['nvidia_attributable_power'] = {'dates':[], 'values':[]}
@@ -162,9 +181,6 @@ class JsonParser():
                             metrics['per_gpu_estimated_attributable_utilization'][gpu] = {'dates':[], 'values':[]}
                         metrics['per_gpu_estimated_attributable_utilization'][gpu]['dates'].append(date)
                         metrics['per_gpu_estimated_attributable_utilization'][gpu]['values'].append(sm_use)
-
-
-
             if len(metrics) == 0:
                 return None
             return metrics
@@ -174,7 +190,6 @@ class JsonParser():
         """load the experiment (accuracy, latency,...) related metrics"""
         if os.path.isfile(self.exp_metric_filename):
             results = json.load(open(self.exp_metric_filename))
-            
             metrics = {}
             for result in results:
                 if isinstance(results, dict):
