@@ -358,6 +358,7 @@ class Experiment():
         pid_args : list of pid : will monitor exclusively these pids. If set to None, will update the list of pid starting from current_pid
         current_pid : root process from which we collect subprocesses to be monitored. Used only if pid_args is set to None
         """
+        session_id = time.time()
         time_at_last_measure = 0
         if self.wattmeter_available:
             ## launch power meter recording
@@ -391,15 +392,15 @@ class Experiment():
                 # The STOP message which is a string, and the metrics dictionnary that this function is sending
                 if message == STOP_MESSAGE:
                     print("Done with measuring")
+                    self.db_driver.close_driver()
                     if self.wattmeter_available  and proc:
                         os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     # os.system("kill -10 `cat /tmp/pid`")
-                    queue.put(EXP_DONE)
+                    #queue.put(EXP_DONE)
                     return
             except EmptyQueueException:
                 pass
         
-
 class ExpResults():
     """
     Process the power recording from an experiment.
@@ -408,6 +409,7 @@ class ExpResults():
     def __init__(self, db_driver):
         self.db_driver = db_driver
         self.cpu_metrics, self.gpu_metrics, self.exp_metrics, self.wattmeter_metrics = self.db_driver.load_metrics()
+        self.segments = self.db_driver.get_segments()
         if self.cpu_metrics is None and self.gpu_metrics is None and self.exp_metrics is None:
             raise Exception('I could not load any recordings from folder: "' +
             self.db_driver.folder +
@@ -415,6 +417,9 @@ class ExpResults():
         self.model_card = self.db_driver.get_model_card()
 
     def list_metrics(self):
+        """
+        Return a list of the available metrics, clustered into four groups 'CPU', 'GPU', 'Experiment', 'wattmeter
+        """
         metrics = {'CPU':[],'GPU':[],'Experiment':[],'wattmeter':[]}
         if self.cpu_metrics is not None:
             for k in self.cpu_metrics:
@@ -438,6 +443,18 @@ class ExpResults():
                 print('      NOT AVAILABLE')
             else:
                 print(mets)
+
+    def split_into_segments(self,curve):
+        curve_segmented = []
+        prev_idx = 0
+        for s in self.segments:
+            t = time_to_sec(s)
+            for idx,d in enumerate(curve):
+                if d['date'] == t:
+                    curve_segmented.append(curve[prev_idx:idx+1])
+                    prev_idx = idx
+        curve_segmented.append(curve[prev_idx+1:])
+        return curve_segmented
 
     def get_curve(self, name):
         """
@@ -469,68 +486,81 @@ class ExpResults():
 
         if curve is not None and len(curve) == 0:
             curve = None
-        return curve
+
+        if isinstance(curve, dict):
+            for k, c in curve.items():
+                curve[k] = self.split_into_segments(c)
+            return curve
+        else:
+            return self.split_into_segments(curve)
+ 
+    def get_duration_metric(self, metric_name):
+        """
+        get the duration of the time when the metric metric_name has been recorded
+        """
+        segments = self.get_curve(metric_name)
+        duration = 0
+        for curve in segments:
+            curve = sorted([c['date'] for c in curve])
+            duration += curve[-1] - curve[0]
+            print(duration)
+        return duration
+        #times = sorted([time_to_sec(date)  for date in recordings['dates']])
+        #return times[-1] - times[0]
 
     def get_exp_duration(self):
+        """
+        return experiment duration : this the duration of time when one of the metrics have been recorded.
+        See get_duration_metric if you want the recording time of a specific metric
+        """
         if self.cpu_metrics is not None:
-            for name, recordings in self.cpu_metrics.items():
-                times = sorted([time_to_sec(date)  for date in recordings['dates']])
-                return times[-1] - times[0]
+            for name in self.cpu_metrics:
+                return self.get_duration_metric(name)
 
         if self.gpu_metrics is not None:
-            for name, recordings in self.gpu_metrics.items():
-                times = sorted([time_to_sec(date)  for date in recordings['dates']])
-                return times[-1] - times[0]
+            for name in self.gpu_metrics:
+                return self.get_duration_metric(name)    
 
         if self.exp_metrics is not None:
-            for name, recordings in self.exp_metrics.items():
-                times = sorted([time_to_sec(date)  for date in recordings['dates']])
-                return times[-1] - times[0]
+            for name in self.exp_metrics:
+                return self.get_duration_metric(name)    
         return -1
 
     def total_(self, metric_name: str):
         """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
         the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
-        if metric is None:
-            return None
-        elif isinstance(metric, list):
-            r =integrate(metric)
-            if r is None:
-                return r
-            return r[-1]
-        else:
+        if isinstance(metric, list):
+            rs = [ integrate(segment) for segment in metric  ]
+            if rs[0] is not None:
+                return sum([ r[-1] for r in rs])
+        elif isinstance(metric, dict):
             totals = {}
-            for device_id, mtrc in metric.items():
-                r = integrate(mtrc)
-                if r is not None:
-                    r = r[-1]
-                totals[device_id] = r
+            for device_id, segments in metric.items():
+                rs = [ integrate(segment) for segment in metric  ]
+                if rs is not None:
+                    r = sum([ r[-1] for r in rs])
+                    totals[device_id] = r
+                else:
+                    totals[device_id] = None
             return totals
 
     def average_(self, metric_name: str):
         """take the average of a metric"""
-        metric = self.get_curve(metric_name)
-        if metric is None:
-            return None
-        elif isinstance(metric, list):
-            r = integrate(metric)
-            if r is None:
-                return r
-            r = r[-1]
-            if len(metric) == 1:
-                return r
-            return r /( metric[-1]['date'] - metric[0]['date'])
-        else:# compute the average for each device
-            averages = {}
-            for device_id, mtrc in metric.items():
-                r = integrate(mtrc)
-                if r is not None:
-                    r = r[-1]
-                    if len(mtrc) > 1:
-                        r = r /( mtrc[-1]['date'] - mtrc[0]['date'])
-                averages[device_id] = r
-            return averages
+        total = self.total_(metric_name)
+        duration = self.get_exp_duration()
+        if isinstance(total, dict):
+            totals = {}
+            for (device_id, tot) in total.items():
+                if tot is not None:
+                    totals[device_id] = tot/duration
+                else:
+                    totals[device_id] = None
+            return dict([ (device_id, tot/duration) ] )
+        else:            
+            if total is None:
+                return None
+            return total / duration
 
     def max_(self, metric_name: str):
         """return the max of a metric"""
@@ -538,14 +568,14 @@ class ExpResults():
         if metric is None:
             return None
         elif isinstance(metric, list):
-            return max([m["value"] for m in metric])
+            return max([m["value"] for segment in metric for m in segment])
         else:
             maxs = {}
             for device_id, mtrc in metric.items():
                 if mtrc is None or len(mtrc)==0:
                     maxs[device_id] = None
                 else:
-                    maxs[device_id] = max([m["value"] for m in mtrc])
+                    maxs[device_id] = max([m["value"] for segment in mtrc for m in segment])
             return maxs
 
     def total_power_draw(self):
@@ -557,8 +587,8 @@ class ExpResults():
     def display_curves(self, metric_names):
         """
         Input:
-          metric_names [metric_name1, metric_name2,...]
-          see print_metrics() function for what's available 
+          metric_names : list of metric names :  [metric_name1, metric_name2,...]
+          run print_metrics() function for what's available 
         """
         fig, ax = plt.subplots()
         for metric_name in metric_names:

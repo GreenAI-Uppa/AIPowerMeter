@@ -96,7 +96,7 @@ for epoch in range(n_epochs):
                 running_loss = 0.0
 
     q.put(experiment.STOP_MESSAGE)
-    q.get(block=True) # blocking to ensure the experiment is stopped before proceeding
+    #q.get(block=True) # blocking to ensure the experiment is stopped before proceeding
 
     #### test phase
     p, q = test_exp.measure_yourself(period=0.1)
@@ -113,4 +113,11 @@ for epoch in range(n_epochs):
     print(f'Accuracy of the network on the 10000 test images: {100 * correct // total} %')
 
     q.put(experiment.STOP_MESSAGE)
-    q.get(block=True)
+    #q.get(block=True)
+
+
+print('TRAINING PHASE CONSUMPTION')
+experiment.ExpResults(train_driver).print()
+
+print('TESTING PHASE CONSUMPTION')
+experiment.ExpResults(test_driver).print()
