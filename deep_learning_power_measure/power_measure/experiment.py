@@ -489,7 +489,8 @@ class ExpResults():
 
         if isinstance(curve, dict):
             for k, c in curve.items():
-                curve[k] = self.split_into_segments(c)
+                if c is not None:
+                    curve[k] = self.split_into_segments(c)
             return curve
         else:
             return self.split_into_segments(curve)
