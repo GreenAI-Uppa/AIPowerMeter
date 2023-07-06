@@ -100,8 +100,14 @@ and the console output should looks like:
   on the gpu
   nvidia total consumption: 543.126 joules, your consumption:  543.126, average memory used: 1.6GiB
 
-You can also measure the consumption of a script, for example, if you want to evaluate script.py
+
+**Two TIPS and use cases**
+
+- You can also measure the consumption of a script, for example, if you want to evaluate script.py
 
 .. code-block:: console
 
   python -m deep_learning_power_measure python script.py
+
+
+- Record separetely the consumption of your training, and test phases of your deep learning experiments from `this example <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py>`_

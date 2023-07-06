@@ -40,19 +40,45 @@
 <p>See also the <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">example scripts</a> to test the different metrics provided by the library.</p>
 <div class="section" id="recorded-fields">
 <span id="json"></span><h2>Recorded fields<a class="headerlink" href="#recorded-fields" title="Permalink to this heading">¶</a></h2>
-<p>Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, the monitoring of multiple programs on the same device should be done with care (see <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>).</p>
-<p>Unless specified otherwise, the power is logged in watts.</p>
+<p>Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: <cite>per_process_metric_name : {… pid_i: v_i, ….}</cite>. However, the monitoring of multiple programs on the same device should be done with care (see <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>). In the following, we details the different metrics recorded. Unless specified otherwise, the power is logged in watts.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">parsers</span>
+<span class="n">driver</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">JsonParser</span><span class="p">(</span><span class="s1">&#39;your_output_folder&#39;</span><span class="p">)</span>
+<span class="n">exp_result</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">ExpResults</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">exp_result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>should print the list of available metrics (might depend on your setup):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Available metrics :</span>
+<span class="go">CPU</span>
+<span class="go">  per_process_mem_use_abs,per_process_cpu_uses,per_process_mem_use_percent,intel_power,psys_power,uncore_power,per_process_cpu_power,total_cpu_power,per_process_mem_use_uss</span>
+<span class="go">GPU</span>
+<span class="go">  nvidia_draw_absolute,nvidia_attributable_power,nvidia_mem_use,nvidia_sm_use,per_gpu_power_draw,per_gpu_attributable_power,per_gpu_estimated_attributable_utilization</span>
+<span class="go">Experiments</span>
+<span class="go">  nvidia_draw_absolute,nvidia_attributable_power,nvidia_mem_use,nvidia_sm_use,per_gpu_power_draw,per_gpu_attributable_power,per_gpu_estimated_attributable_utilization</span>
+</pre></div>
+</div>
+<p>Below are the definitions of these metrics:</p>
 <p><strong>CPU use</strong></p>
 <ul class="simple">
+<li><p><cite>per_process_mem_use_abs</cite> : RAM Memory usage for each recorded process in bytes</p></li>
+<li><p><cite>per_process_mem_use_percent</cite> : RAM PSS Memory usage for each recorded process in percentage of the overall memory usage</p></li>
+<li><p><cite>per_process_mem_use_uss</cite> : RAM  USS Memory usage for each recorded process</p></li>
+<li><p><cite>per_process_cpu_uses</cite> : Percentage of CPU usage for each process, relatively to the general CPU usage.</p></li>
 <li><p><cite>cpu_uses</cite>: percentage of cpu clock used by this pid during the recording.</p></li>
 <li><p><cite>mem_use_abs</cite>: Number of bytes used in the CPU RAM. The recording uses psutil in the background, check: <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a> for more details.</p></li>
-<li><p><cite>mem_use_percent</cite>: Relative number of bytes used in the CPU RAM.</p></li>
+<li><p><cite>mem_use_percent</cite>: Relative number of bytes used in the CPU RAM PSS.</p></li>
 </ul>
-<p><strong>CPU power</strong></p>
-<p><cite>Intel_power</cite>: total consumption measured by RAPL</p>
-<p><cite>psys_power</cite>: System on chip consumption</p>
-<p><cite>uncore_power</cite>: other hardware present on the cpu board, for instance, an integrated graphic card. This is NOT the nvidia gpu which is on another board.</p>
-<p><cite>total_cpu_power</cite>: core power consumption.</p>
+<p>For details on the USS and PSS memory, check <a class="reference internal" href="modules.html#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses"><code class="xref py py-func docutils literal notranslate"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.get_mem_uses()</span></code></a></p>
+<p><strong>Non GPU Energy consumption</strong></p>
+<ul class="simple">
+<li><p><cite>intel_power</cite> : total consumptino measured by RAPL</p></li>
+<li><p><cite>total_cpu_power</cite>: total consumption measured by RAPL for the CPU</p></li>
+<li><p><cite>psys_power</cite>: System on chip consumption</p></li>
+<li><p><cite>uncore_power</cite>: other hardware present on the cpu board, for instance, an integrated graphic card. This is NOT the nvidia gpu which is on another board.</p></li>
+<li><p><cite>total_cpu_power</cite>: core power consumption.</p></li>
+<li><p><cite>per_process_cpu_power</cite> : Essentially :  * intel_power. Should be used with caution (see <a class="reference internal" href="../background/background.html#multiple"><span class="std std-ref">Measuring multiple programs</span></a>)</p></li>
+<li><p><cite>per_process_mem_use_uss</cite> : USS memory per CPU in RAM.</p></li>
+</ul>
 <p>In other words, you have the following relation:</p>
 <div class="math notranslate nohighlight">
 \[Intel\_power = psys + uncore + total\_cpu\]</div>
@@ -67,8 +93,12 @@
 </ul>
 <p><strong>GPU power</strong></p>
 <p>This is done by the nvidia-smi tool supported by the NVML library of nvidia.</p>
-<p><cite>nvidia_draw_absolute</cite> : total nvidia power draw for all the gpus per_gpu_power_draw : nvidia power draw per gpu
-<cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card.</p>
+<ul class="simple">
+<li><p><cite>nvidia_draw_absolute</cite>: the amount of power used by the whole nvidia card and all GPUs.</p></li>
+<li><p><cite>per_gpu_power_draw</cite>: the amount of power used by the whole nvidia card for each GPUs</p></li>
+<li><p><cite>nvidia_attributable_power</cite> : Total nvidia power consumption attributatble to the processes you recorded. It corresponds to</p></li>
+<li><p><cite>per_gpu_attributable_power</cite> : same as <cite>nvidia_attributable_power</cite> but for each gpu</p></li>
+</ul>
 </div>
 <div class="section" id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this heading">¶</a></h2>
