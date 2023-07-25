@@ -142,7 +142,10 @@ Currently, the following metrics are supported
 
 .. code-block:: console
 
-   ['power_draw_cpu', 'intel_power', 'mem_used_cpu', 'mem_used_gpu', 'power_draw_gpu']
+   ['power_draw_cpu', 'intel_power', 
+   'mem_used_cpu', 'mem_used_gpu', 
+   'power_draw_gpu']
+
 
 model complexity
 ----------------
