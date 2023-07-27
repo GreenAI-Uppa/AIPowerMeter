@@ -22,6 +22,8 @@ class JsonParser():
         self.power_metric_filename = self.folder + '/power_metrics.json'
         self.exp_metric_filename = self.folder + '/results_exp.json'
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
+        if not os.path.isdir(self.folder):
+            os.makedirs(self.folder)
 
 
     def erase(self):
@@ -32,8 +34,6 @@ class JsonParser():
 
     def save_model_card(self, model_card):
         """save the model card as a json file"""
-        if not os.path.isdir(self.folder):
-            os.makedirs(self.folder)
         json.dump(model_card, open(self.model_card_file, 'w'))
 
     def save_power_metrics(self, metrics):

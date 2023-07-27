@@ -381,10 +381,13 @@ class Experiment():
                 metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
             if time.time() - time_at_last_measure > period:
                 time_at_last_measure = time.time()
+                print("IS NVIDIA AVAILABLE",self.nvidia_available)
+                print(metrics['gpu'])
                 if self.nvidia_available:
                     per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                     metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
                     metrics['gpu'] = metrics_gpu
+                print(metrics['gpu'])
                 self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
