@@ -88,7 +88,8 @@ class JsonParser():
                     last_date = datetime.datetime.fromisoformat(result['date'])
                 elif result==SEGMENT_END:
                     segments.append(last_date)
-            segments.pop() # the last one is just the last line in the file
+            if len(segments) != 0: # there are actually segments in this file 
+                segments.pop() # We don't need the last one, we know the file is over
         return segments
 
     def load_cpu_metrics(self):
@@ -140,7 +141,7 @@ class JsonParser():
                             metrics['nvidia_mem_use'][gpu] = {'dates':[], 'values':[]}
                         v = [v for pid, v in mem_uses.items() if v is not None ]
                         if len(v) == 0:
-                            v = None
+                            v = 0
                         else:
                             v = sum(v)
                         metrics['nvidia_mem_use'][gpu]['dates'].append(date)

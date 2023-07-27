@@ -478,7 +478,8 @@ class ExpResults():
                 else:
                     curve = {}
                     for device_id, metric in self.gpu_metrics[name].items():
-                        curve[device_id] = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name][device_id]['dates'], self.gpu_metrics[name][device_id]['values']) if v is not None]
+                        c = [{'date':time_to_sec(x), 'value':v} for (x,v) in zip(self.gpu_metrics[name][device_id]['dates'], self.gpu_metrics[name][device_id]['values']) if v is not None]
+                        curve[device_id] = c
 
         if self.exp_metrics is not None:
             if name in self.exp_metrics:
@@ -487,8 +488,8 @@ class ExpResults():
             if name in self.wattmeter_metrics:
                 curve = [{'date':x, 'value':v} for (x,v) in zip(self.wattmeter_metrics[name]['dates'], self.wattmeter_metrics[name]['values']) if v is not None]
 
-        if curve is not None and len(curve) == 0:
-            curve = None
+        if curve == None or len(curve) == 0:
+            return None
 
         if isinstance(curve, dict):
             for k, c in curve.items():
@@ -583,7 +584,7 @@ class ExpResults():
             return maxs
 
     def total_power_draw(self):
-        """extracting cpu and GPU power draw"""
+        """extracting cpu and GPU power draw for the whole machine"""
         total_intel_power = self.total_('intel_power')
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
