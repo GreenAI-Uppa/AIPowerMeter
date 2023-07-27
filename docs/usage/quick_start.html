@@ -113,7 +113,7 @@ You can then get a summary of the recordings</p>
 <span class="go">nvidia total consumption: 543.126 joules, your consumption:  543.126, average memory used: 1.6GiB</span>
 </pre></div>
 </div>
-<p><strong>Two TIPS and use cases</strong></p>
+<p><strong>TIPS and use cases</strong></p>
 <ul class="simple">
 <li><p>You can also measure the consumption of a script, for example, if you want to evaluate script.py</p></li>
 </ul>
@@ -122,7 +122,13 @@ You can then get a summary of the recordings</p>
 </div>
 <ul class="simple">
 <li><p>Record separetely the consumption of your training, and test phases of your deep learning experiments from <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py">this example</a></p></li>
+<li><p>Set permanently the access to the RAPL files</p></li>
 </ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt install sysfsutils</span>
+<span class="go">echo &quot;mode class/powercap/intel-rapl:0/energy_uj = 0444&quot; &gt;&gt; /etc/sysfs.conf</span>
+</pre></div>
+</div>
+<p>then reboot</p>
 </div>
 </div>
 

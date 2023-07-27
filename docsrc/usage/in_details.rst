@@ -98,6 +98,55 @@ This is done by the nvidia-smi tool supported by the NVML library of nvidia.
 
 - `per_gpu_attributable_power` : same as `nvidia_attributable_power` but for each gpu
 
+Monitoring whole machine with Prometheus
+----------------------------------------
+
+The following code will launch the monitoring and a flask app on the port 5001
+
+.. code-block:: python
+
+  from deep_learning_power_measure.power_measure import experiment, prometheus_client
+
+  driver = prometheus_client.PrometheusClient()
+  exp = experiment.Experiment(driver)
+  exp.monitor_machine(period=5)
+
+
+Then, you can launch a prometheus instance
+
+.. code-block:: console
+
+   ./prometheus --config.file=prometheus.yml
+
+
+with a config file which look like the following
+
+.. code-block:: console
+
+  global:
+  scrape_interval: 3s
+
+  external_labels:
+    monitor: "example-app"
+
+  rule_files:
+
+  scrape_configs:
+    - job_name: "flask_test"
+      static_configs:
+        - targets: ["localhost:5001"]
+
+Then visit the following url : `http://localhost:9090/graph`
+
+Currently, the following metrics are supported 
+
+.. code-block:: console
+
+   ['power_draw_cpu', 'intel_power', 
+   'mem_used_cpu', 'mem_used_gpu', 
+   'power_draw_gpu']
+
+
 model complexity
 ----------------
 
@@ -112,7 +161,7 @@ To obtain them, add additional parameters:
 
 
 You can log the number of parameters and the number of multiply and add (mac) operations of your model. 
-Currently, only pytorch is supported, and tensorflow should be supported shortly
+Currently, only pytorch is supported.
 
 .. _docker:
 

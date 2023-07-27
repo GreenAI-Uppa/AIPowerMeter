@@ -100,6 +100,43 @@
 <li><p><cite>per_gpu_attributable_power</cite> : same as <cite>nvidia_attributable_power</cite> but for each gpu</p></li>
 </ul>
 </div>
+<div class="section" id="monitoring-whole-machine-with-prometheus">
+<h2>Monitoring whole machine with Prometheus<a class="headerlink" href="#monitoring-whole-machine-with-prometheus" title="Permalink to this heading">¶</a></h2>
+<p>The following code will launch the monitoring and a flask app on the port 5001</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">deep_learning_power_measure.power_measure</span> <span class="kn">import</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">prometheus_client</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">prometheus_client</span><span class="o">.</span><span class="n">PrometheusClient</span><span class="p">()</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Experiment</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+<span class="n">exp</span><span class="o">.</span><span class="n">monitor_machine</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, you can launch a prometheus instance</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">./prometheus --config.file=prometheus.yml</span>
+</pre></div>
+</div>
+<p>with a config file which look like the following</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">global:</span>
+<span class="go">scrape_interval: 3s</span>
+
+<span class="go">external_labels:</span>
+<span class="go">  monitor: &quot;example-app&quot;</span>
+
+<span class="go">rule_files:</span>
+
+<span class="go">scrape_configs:</span>
+<span class="go">  - job_name: &quot;flask_test&quot;</span>
+<span class="go">    static_configs:</span>
+<span class="go">      - targets: [&quot;localhost:5001&quot;]</span>
+</pre></div>
+</div>
+<p>Then visit the following url : <cite>http://localhost:9090/graph</cite></p>
+<p>Currently, the following metrics are supported</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[&#39;power_draw_cpu&#39;, &#39;intel_power&#39;,</span>
+<span class="go">&#39;mem_used_cpu&#39;, &#39;mem_used_gpu&#39;,</span>
+<span class="go">&#39;power_draw_gpu&#39;]</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="model-complexity">
 <h2>model complexity<a class="headerlink" href="#model-complexity" title="Permalink to this heading">¶</a></h2>
 <p>We use a wrapper for <a class="reference external" href="https://pypi.org/project/torchinfo/">torchinfo</a> to extract statistics about your model, essentially number of parameters and mac operation counts.
@@ -110,7 +147,7 @@ To obtain them, add additional parameters:</p>
 </pre></div>
 </div>
 <p>You can log the number of parameters and the number of multiply and add (mac) operations of your model.
-Currently, only pytorch is supported, and tensorflow should be supported shortly</p>
+Currently, only pytorch is supported.</p>
 </div>
 <div class="section" id="docker-integration">
 <span id="docker"></span><h2>Docker integration<a class="headerlink" href="#docker-integration" title="Permalink to this heading">¶</a></h2>
@@ -145,6 +182,7 @@ Currently, only pytorch is supported, and tensorflow should be supported shortly
 <li class="toctree-l1"><a class="reference internal" href="../background/background.html">Background on power measure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#recorded-fields">Recorded fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-whole-machine-with-prometheus">Monitoring whole machine with Prometheus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model-complexity">model complexity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#docker-integration">Docker integration</a></li>
 </ul>

@@ -101,7 +101,7 @@ and the console output should looks like:
   nvidia total consumption: 543.126 joules, your consumption:  543.126, average memory used: 1.6GiB
 
 
-**Two TIPS and use cases**
+**TIPS and use cases**
 
 - You can also measure the consumption of a script, for example, if you want to evaluate script.py
 
@@ -111,3 +111,12 @@ and the console output should looks like:
 
 
 - Record separetely the consumption of your training, and test phases of your deep learning experiments from `this example <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py>`_
+
+- Set permanently the access to the RAPL files
+
+.. code-block:: console
+
+    sudo apt install sysfsutils
+    echo "mode class/powercap/intel-rapl:0/energy_uj = 0444" >> /etc/sysfs.conf 
+
+then reboot
