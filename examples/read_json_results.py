@@ -2,8 +2,6 @@
 Recording of a simple experiment where a random image is fed multiple times to a convolutional layer
 """
 import argparse
-import torch
-import torch.nn as nn
 from deep_learning_power_measure.power_measure import experiment, parsers
 
 parser = argparse.ArgumentParser(
