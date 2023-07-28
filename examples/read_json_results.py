@@ -22,8 +22,10 @@ args = parser.parse_args()
 
 driver = parsers.JsonParser(args.output_folder)
 exp_result = experiment.ExpResults(driver)
+exp_result.print()
 if args.metric_name is None:
-    print('metric_name argument empty please provide a value')
+    print()
+    print('metric_name argument empty please provide a value to also plot graphs')
     print()
     print(exp_result)
 else:
