@@ -13,7 +13,6 @@ from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
@@ -508,7 +507,6 @@ class ExpResults():
         for curve in segments:
             curve = sorted([c['date'] for c in curve])
             duration += curve[-1] - curve[0]
-            print(duration)
         return duration
         #times = sorted([time_to_sec(date)  for date in recordings['dates']])
         #return times[-1] - times[0]
@@ -542,7 +540,7 @@ class ExpResults():
         elif isinstance(metric, dict):
             totals = {}
             for device_id, segments in metric.items():
-                rs = [ integrate(segment) for segment in metric  ]
+                rs = [ integrate(segment) for segment in segments  ]
                 if rs is not None:
                     r = sum([ r[-1] for r in rs])
                     totals[device_id] = r
