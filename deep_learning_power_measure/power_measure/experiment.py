@@ -32,13 +32,21 @@ def joules_to_wh(n):
     return n*3600/1000
 
 def integrate(metric, start=None, end=None, allow_None=False):
-    """integral of the metric values over time"""
+    """integral of the metric values over time
+    start, end : timestamp from which we should start computing the integral"""
     r = [0]
-    if start is None:
-        start = 0
-    if end is None:
-        end = len(metric)-1
-    for i in range(start, end):
+    start_idx = 0
+    if start != None:
+        start_idx = 0
+        while metric[start_idx]['date'] < start:
+            start_idx += 1
+        
+    end_idx = len(metric)-1
+    if end != None:
+        while end < metric[end_idx]['date']:
+            end_idx -= 1
+        
+    for i in range(start_idx, end_idx):
         x1 = metric[i]['date']
         x2 = metric[i+1]['date']
         y1 = metric[i]['value']
@@ -73,21 +81,6 @@ def get_pid_list(current_pid, parent_pid=None):
         if queue_pid in pid_list:
             pid_list.remove(queue_pid)
     return pid_list
-
-def average(metric, start=None, end=None):
-    """average of the metric values over time"""
-    if start is None:
-        start = 0
-    if end is None:
-        end = len(metric)-1
-    r = integrate(metric, start=start, end=end)
-    if len(metric) == 1:
-        return r[0]
-    return r[-1]/(metric[end]['date'] - metric[start]['date'])
-
-def total(metric, start=None, end=None):
-    r = integrate(metric, start=start, end=end)
-    return r[-1]
 
 def interpolate(metric1, metric2):
     """
@@ -498,49 +491,53 @@ class ExpResults():
         else:
             return self.split_into_segments(curve)
  
-    def get_duration_metric(self, metric_name):
+    def get_duration_metric(self, metric_name, start=None, end=None):
         """
         get the duration of the time when the metric metric_name has been recorded
         """
         segments = self.get_curve(metric_name)
+        sts = sorted([c['date'] for c in segments[0]])[0]
+        ets = sorted([c['date'] for c in segments[-1]])[-1]
+        start = max(start,sts) if start!=None else sts
+        end = min(end,ets) if end!=None else ets        
         duration = 0
         for curve in segments:
-            curve = sorted([c['date'] for c in curve])
-            duration += curve[-1] - curve[0]
-        return duration
-        #times = sorted([time_to_sec(date)  for date in recordings['dates']])
-        #return times[-1] - times[0]
+            curve = sorted([c['date'] for c in curve if (start <= c['date'] and c['date'] <= end)])
+            if len(curve) > 1:
+                duration += curve[-1] - curve[0]
+        return duration, start, end
 
-    def get_exp_duration(self):
+
+
+    def get_exp_duration(self, start=None, end=None):
         """
-        return experiment duration : this the duration of time when one of the metrics have been recorded.
+        return experiment duration in sec: this the duration of time when one of the metrics have been recorded.
         See get_duration_metric if you want the recording time of a specific metric
         """
         if self.cpu_metrics is not None:
             for name in self.cpu_metrics:
-                return self.get_duration_metric(name)
+                return self.get_duration_metric(name, start=start, end=end)
 
         if self.gpu_metrics is not None:
             for name in self.gpu_metrics:
-                return self.get_duration_metric(name)    
+                return self.get_duration_metric(name, start=start, end=end)    
 
         if self.exp_metrics is not None:
             for name in self.exp_metrics:
-                return self.get_duration_metric(name)    
-        return -1
+                return self.get_duration_metric(name, start=start, end=end)    
 
-    def total_(self, metric_name: str):
+    def total_(self, metric_name: str, start=None, end=None):
         """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
         the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
         if isinstance(metric, list):
-            rs = [ integrate(segment) for segment in metric  ]
+            rs = [ integrate(segment,start=start,end=end) for segment in metric  ]
             if rs[0] is not None:
                 return sum([ r[-1] for r in rs])
         elif isinstance(metric, dict):
             totals = {}
             for device_id, segments in metric.items():
-                rs = [ integrate(segment) for segment in segments  ]
+                rs = [ integrate(segment, start=start, end=end) for segment in segments  ]
                 if rs is not None:
                     r = sum([ r[-1] for r in rs])
                     totals[device_id] = r
@@ -548,10 +545,10 @@ class ExpResults():
                     totals[device_id] = None
             return totals
 
-    def average_(self, metric_name: str):
+    def average_(self, metric_name: str, start = None, end = None):
         """take the average of a metric"""
-        total = self.total_(metric_name)
-        duration = self.get_exp_duration()
+        total = self.total_(metric_name, start=start, end=end)
+        duration, _, _ = self.get_exp_duration(start=start, end=end)
         if isinstance(total, dict):
             totals = {}
             for (device_id, tot) in total.items():
@@ -565,20 +562,29 @@ class ExpResults():
                 return None
             return total / duration
 
-    def max_(self, metric_name: str):
+    def max_(self, metric_name: str, start=None, end=None):
         """return the max of a metric"""
         metric = self.get_curve(metric_name)
         if metric is None:
             return None
         elif isinstance(metric, list):
-            return max([m["value"] for segment in metric for m in segment])
+            return max([m["value"] for segment in metric for m in segment 
+                        if (start == None or start < m['date']) 
+                        and
+                        (end == None or m['date'] < end) 
+                        ])
         else:
             maxs = {}
             for device_id, mtrc in metric.items():
                 if mtrc is None or len(mtrc)==0:
                     maxs[device_id] = None
                 else:
-                    maxs[device_id] = max([m["value"] for segment in mtrc for m in segment])
+                    maxs[device_id] = max([m["value"] for segment in mtrc for m in segment 
+                        if (start == None or start < m['date']) 
+                        and
+                        (end == None or m['date'] < end) 
+                        ])
+                    #max([m["value"] for segment in mtrc for m in segment])
             return maxs
 
     def total_power_draw(self):
@@ -676,6 +682,35 @@ class ExpResults():
         r.append('\n\ncall print() method to display power consumption')
         return '\n'.join(r)
     
+    def get_summary(self, start=None, end=None):
+        """
+        return the experiment summary as a dictionnary
+        """
+        summary = {}
+        d, start, end = self.get_exp_duration(start=start, end=end)
+        summary['duration'] = d
+        summary['start'] = datetime.datetime.fromtimestamp(start).__str__()
+        summary['end'] = datetime.datetime.fromtimestamp(end).__str__()
+        if self.cpu_metrics is not None:
+            summary['cpu'] = {}
+            summary['cpu']['total_psys_power'] = self.total_('psys_power',start=start, end=end)
+            summary['cpu']['total_intel_power'] = self.total_('intel_power',start=start, end=end)
+            summary['cpu']['total_dram_power'] = self.total_('total_dram_power',start=start, end=end)
+            summary['cpu']['total_cpu_power'] = self.total_('total_cpu_power',start=start, end=end)
+            summary['cpu']['rel_dram_power'] = self.total_('per_process_dram_power',start=start, end=end)
+            summary['cpu']['rel_cpu_power'] = self.total_('per_process_cpu_power',start=start, end=end)
+            summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
+            summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
+        if self.gpu_metrics is not None:
+            summary['gpu'] = {}
+            summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
+            summary['gpu']['rel_nvidia_power'] = self.total_('nvidia_attributable_power',start=start, end=end)
+            summary['gpu']['nvidia_mem_use_abs'] = self.max_("nvidia_mem_use",start=start, end=end)
+            summary['gpu']['nvidia_average_sm'] = self.average_("nvidia_sm_use",start=start, end=end)
+            summary['gpu']['per_gpu_attributable_power'] = self.total_('per_gpu_attributable_power',start=start, end=end)
+        return summary
+            
+    
     def print(self):
         """
         simple print of the experiment summary
@@ -685,8 +720,8 @@ class ExpResults():
             print(self.model_card)
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
-
-        print('Experiment duration: ', self.get_exp_duration(), 'seconds')
+        d, s, e = self.get_exp_duration()
+        print('Experiment duration: ', d, 'seconds', 'start',s, 'end',e)
         if self.cpu_metrics is not None:
             print("ENERGY CONSUMPTION: ")
             print("on the cpu")
@@ -706,7 +741,7 @@ class ExpResults():
             else:
                 print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
             if total_cpu_power is None:
-                print("CPU consumption not available")
+                print("detailed CPU consumption not available")
             else:
                 print("Total CPU consumption:", total_cpu_power, "joules, your experiment consumption: ", rel_cpu_power, "joules")
             print("total intel power: ", total_intel_power, "joules")
