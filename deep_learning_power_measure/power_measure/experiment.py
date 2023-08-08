@@ -62,6 +62,13 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
+def average(metric, start=None, end=None):
+    """average of the metric values over time"""
+    r = integrate(metric, start=start, end=end)
+    if len(metric) == 1:
+        return r[0]
+    return r[-1]/(metric[end]['date'] - metric[start]['date'])
+
 def get_pid_list(current_pid, parent_pid=None):
     """
     get pid list of the experiment, or the processes spawned from parent_pid
