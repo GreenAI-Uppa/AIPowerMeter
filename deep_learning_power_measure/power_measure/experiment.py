@@ -62,12 +62,24 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
-def average(metric, start=None, end=None):
-    """average of the metric values over time"""
-    r = integrate(metric, start=start, end=end)
-    if len(metric) == 1:
-        return r[0]
-    return r[-1]/(metric[end]['date'] - metric[start]['date'])
+def total(metric: list, start=None, end=None):
+    """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
+    the return value is the energy consumed in Joules"""
+    if isinstance(metric, list):
+        rs = [ integrate(segment,start=start,end=end) for segment in metric  ]
+        if rs[0] is not None:
+            return sum([ r[-1] for r in rs])
+    elif isinstance(metric, dict):
+        totals = {}
+        for device_id, segments in metric.items():
+            rs = [ integrate(segment, start=start, end=end) for segment in segments  ]
+            if rs is not None:
+                r = sum([ r[-1] for r in rs])
+                totals[device_id] = r
+            else:
+                totals[device_id] = None
+        return totals
+
 
 def get_pid_list(current_pid, parent_pid=None):
     """
@@ -268,7 +280,9 @@ class Experiment():
         for gpu_id in self.pid_per_gpu:
             this_gpu_power_draw = per_gpu_power_draw[gpu_id]
             use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
-            this_gpu_relative_use = average(use_curve) # average use of the gpu over the time window
+            total = total(use_curve)
+            duration = use_curve[-1]['date'] - use_curve[0]['date']
+            this_gpu_relative_use = total / duration # average use of the gpu over the time window
             per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
             all_pids_on_this_gpu = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
             if all_pids_on_this_gpu == 0:
@@ -537,20 +551,7 @@ class ExpResults():
         """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
         the return value is the energy consumed in Joules"""
         metric = self.get_curve(metric_name)
-        if isinstance(metric, list):
-            rs = [ integrate(segment,start=start,end=end) for segment in metric  ]
-            if rs[0] is not None:
-                return sum([ r[-1] for r in rs])
-        elif isinstance(metric, dict):
-            totals = {}
-            for device_id, segments in metric.items():
-                rs = [ integrate(segment, start=start, end=end) for segment in segments  ]
-                if rs is not None:
-                    r = sum([ r[-1] for r in rs])
-                    totals[device_id] = r
-                else:
-                    totals[device_id] = None
-            return totals
+        return total(metric,start=start, end=end)
 
     def average_(self, metric_name: str, start = None, end = None):
         """take the average of a metric"""
