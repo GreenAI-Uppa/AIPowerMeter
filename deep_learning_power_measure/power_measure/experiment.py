@@ -465,8 +465,8 @@ class ExpResults():
             for idx,d in enumerate(curve):
                 if d['date'] == t:
                     curve_segmented.append(curve[prev_idx:idx+1])
-                    prev_idx = idx
-        curve_segmented.append(curve[prev_idx+1:])
+                    prev_idx = idx+1
+        curve_segmented.append(curve[prev_idx:])
         return curve_segmented
 
     def get_curve(self, name):
@@ -524,8 +524,6 @@ class ExpResults():
             if len(curve) > 1:
                 duration += curve[-1] - curve[0]
         return duration, start, end
-
-
 
     def get_exp_duration(self, start=None, end=None):
         """
