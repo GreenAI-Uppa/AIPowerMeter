@@ -81,6 +81,8 @@ def get_gpu_use_pmon(nsample=1):
     out_str_final = re.sub(r"\s+\n", "\n", out_str_final)  # else pd will mis-align
     out_str_final = out_str_final.strip()
     df = pd.read_csv(StringIO(out_str_final), engine="python", delimiter="\t")
+    df = df.drop('type', axis=1)
+    df = df.drop('command', axis=1)
     process_percentage_used_gpu = df.groupby(["gpu", "pid"]).mean().reset_index()
     per_gpu_per_pid_utilization_absolute = {}
     for _, row in process_percentage_used_gpu.iterrows():
