@@ -559,14 +559,14 @@ class ExpResults():
             totals = {}
             for (device_id, tot) in total.items():
                 if tot is not None:
-                    totals[device_id] = tot/duration if s==e else tot
+                    totals[device_id] = tot/duration if s!=e else tot
                 else:
                     totals[device_id] = None
-            return dict([ (device_id, tot/duration if s==e else tot) ] )
+            return dict([ (device_id, tot/duration if s!=e else tot) ] )
         else:            
             if total is None:
                 return None
-            return total / duration
+            return total/duration if s!=e else total
 
     def max_(self, metric_name: str, start=None, end=None):
         """return the max of a metric"""
@@ -575,9 +575,9 @@ class ExpResults():
             return None
         elif isinstance(metric, list):
             return max([m["value"] for segment in metric for m in segment 
-                        if (start == None or start < m['date']) 
+                        if (start == None or start <= m['date']) 
                         and
-                        (end == None or m['date'] < end) 
+                        (end == None or m['date'] <= end) 
                         ])
         else:
             maxs = {}
@@ -586,9 +586,9 @@ class ExpResults():
                     maxs[device_id] = None
                 else:
                     maxs[device_id] = max([m["value"] for segment in mtrc for m in segment 
-                        if (start == None or start < m['date']) 
+                        if (start == None or start <= m['date']) 
                         and
-                        (end == None or m['date'] < end) 
+                        (end == None or m['date'] <= end) 
                         ])
                     #max([m["value"] for segment in mtrc for m in segment])
             return maxs
