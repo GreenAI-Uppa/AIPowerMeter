@@ -401,7 +401,6 @@ class Experiment():
                     per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                     metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
                     metrics['gpu'] = metrics_gpu
-                print(metrics['gpu'])
                 self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
@@ -728,7 +727,7 @@ class ExpResults():
             print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
             print()
         d, s, e = self.get_exp_duration()
-        print('Experiment duration: ', d, 'seconds', 'start',s, 'end',e)
+        print('Experiment duration: ', d, 'seconds.', ' Start:',datetime.datetime.fromtimestamp(s), ' end',datetime.datetime.fromtimestamp(e))
         if self.cpu_metrics is not None:
             print("ENERGY CONSUMPTION: ")
             print("on the cpu")
@@ -741,12 +740,15 @@ class ExpResults():
             rel_cpu_power = self.total_('per_process_cpu_power')
             mem_use_abs = self.average_('per_process_mem_use_abs')
             mem_use_uss = self.average_('per_process_mem_use_uss')
+            cpu_total_time = self.total_('absolute_cpu_time_per_pid')
+            if cpu_total_time is not None:
+                print('CPU time usage of your experiment:', cpu_total_time,'seconds')
             if total_dram_power is None and mem_use_abs is None:
                 print("RAM consumption not available. RAM usage not available")
             elif total_dram_power is None:
-                print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+                print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'among which',humanize_bytes(mem_use_uss),'is unique to your experiment (ie. USS memory)')
             else:
-                print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'with an overhead of',humanize_bytes(mem_use_uss))
+                print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'among which',humanize_bytes(mem_use_uss),'is unique to your experiment (ie. USS memory)')
             if total_cpu_power is None:
                 print("detailed CPU consumption not available")
             else:
@@ -792,6 +794,3 @@ class ExpResults():
             pow_machine2 = self.total_('#activepow2')
             pow_machine3 = self.total_('#activepow3')
             print(f"consumption from machine 1: {pow_machine1} joules, consumption from machine 2: {pow_machine2} joules, consumption from machine 3: {pow_machine3} joules")
-        else:
-            print()
-            print("PowerMeter recordings not available")
