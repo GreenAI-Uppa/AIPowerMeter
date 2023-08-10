@@ -394,8 +394,6 @@ class Experiment():
                 metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
             if time.time() - time_at_last_measure > period:
                 time_at_last_measure = time.time()
-                print("IS NVIDIA AVAILABLE",self.nvidia_available)
-                print(metrics['gpu'])
                 if self.nvidia_available:
                     per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                     metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
@@ -554,15 +552,15 @@ class ExpResults():
     def average_(self, metric_name: str, start = None, end = None):
         """take the average of a metric"""
         total = self.total_(metric_name, start=start, end=end)
-        duration, _, _ = self.get_exp_duration(start=start, end=end)
+        duration, s, e = self.get_exp_duration(start=start, end=end)
         if isinstance(total, dict):
             totals = {}
             for (device_id, tot) in total.items():
                 if tot is not None:
-                    totals[device_id] = tot/duration
+                    totals[device_id] = tot/duration if s==e else tot
                 else:
                     totals[device_id] = None
-            return dict([ (device_id, tot/duration) ] )
+            return dict([ (device_id, tot/duration if s==e else tot) ] )
         else:            
             if total is None:
                 return None
