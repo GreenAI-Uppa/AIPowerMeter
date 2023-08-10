@@ -364,7 +364,7 @@ class Experiment():
                 metrics['gpu'] = metrics_gpu
             self.db_driver.save_power_metrics(metrics)
 
-    def measure(self, queue, pid_args, current_pid = None, period=1):
+    def measure(self, queue, pid_args, current_pid = None, period=1, measurement_period=2):
         """
         performs power use recording
 
@@ -394,8 +394,8 @@ class Experiment():
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
-            if time.time() - time_at_last_measure > period:
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=period)
+            if time.time() - time_at_last_measure > measurement_period:
                 time_at_last_measure = time.time()
                 if self.nvidia_available:
                     per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
@@ -701,6 +701,7 @@ class ExpResults():
             summary['cpu'] = {}
             summary['cpu']['total_psys_power'] = self.total_('psys_power',start=start, end=end)
             summary['cpu']['total_intel_power'] = self.total_('intel_power',start=start, end=end)
+            summary['cpu']['rel_intel_power'] = self.total_('rel_intel_power',start=start, end=end)
             summary['cpu']['total_dram_power'] = self.total_('total_dram_power',start=start, end=end)
             summary['cpu']['total_cpu_power'] = self.total_('total_cpu_power',start=start, end=end)
             summary['cpu']['rel_dram_power'] = self.total_('per_process_dram_power',start=start, end=end)
