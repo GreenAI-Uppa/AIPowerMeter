@@ -20,7 +20,7 @@ class Conv(nn.Module):
     """one conv layer model"""
     def __init__(self):
         super().__init__()
-        self.conv = nn.Conv2d(3,256, (3,3))
+        self.conv = nn.Conv2d(3,3, (3,3))
     def forward(self, input_data):
         """forward pass"""
         return self.conv(input_data)
@@ -29,7 +29,7 @@ net = Conv()
 
 # setting the size of the input
 # minibatch_size x nChannels x Height x Width
-input_size = 32, 3, 128, 128
+input_size = 1, 3, 128, 128
 # generating some fake data
 data = torch.randn(input_size)
 # using gpu if available

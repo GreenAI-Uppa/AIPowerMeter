@@ -7,8 +7,8 @@ from deep_learning_power_measure.power_measure import rapl_power
 
 def f(q, process_list):
     """get the cpu uses and place them in the queue"""
-    cpu_use = rapl_power.get_cpu_uses(process_list, pause=10.0)
-    q.put(cpu_use)
+    cpu_use, absolute_cpu_time_per_pid = rapl_power.get_cpu_uses(process_list, period=5.0)
+    q.put((cpu_use,absolute_cpu_time_per_pid))
 
 current_process = psutil.Process(os.getppid())
 pid_list = [current_process.pid] + [
@@ -27,9 +27,11 @@ p.start()
 while True:
     np.matmul(a,b)
     try:
-        msg = q.get(block=False)
-        total_percent = sum(msg.values())
+        cpu_use,absolute_cpu_time_per_pid = q.get(block=False)
+        total_percent = sum(cpu_use.values())
+        total_time = sum(absolute_cpu_time_per_pid.values())
         print("our programm used ", total_percent, "of the cpu times when we were measuring")
+        print("our programm used ", total_time, "of cpu time")
         break
     except EmptyQueueException:
         pass

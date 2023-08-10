@@ -152,6 +152,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
     infos1 and infos2 : cpu times gathered at two different times and both system and process wised.
     """
     cpu_percent = {}
+    absolute_cpu_time_per_pid = {}
     for p in process_list:
         if p.pid in zombies:
             continue
@@ -172,9 +173,9 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
             attributable_compute = 0
         else:
             attributable_compute = cpu_util_process / cpu_util_system
-
+        absolute_cpu_time_per_pid[p.pid] = cpu_util_process
         cpu_percent[p.pid] = attributable_compute
-    return cpu_percent # should be for multiple softwares
+    return cpu_percent, absolute_cpu_time_per_pid # should be for multiple softwares
 
 def get_cpu_uses(process_list, period=2.0):
     """Extracts the relative number of cpu clock attributed to each process
@@ -195,8 +196,8 @@ def get_cpu_uses(process_list, period=2.0):
     time.sleep(period)
     # get the cpu time used
     infos2, zombies = get_info_time(process_list, zombies)
-    cpu_uses = get_percent_uses(infos1, infos2, zombies, process_list)
-    return cpu_uses
+    cpu_uses, absolute_cpu_time_per_pid = get_percent_uses(infos1, infos2, zombies, process_list)
+    return cpu_uses, absolute_cpu_time_per_pid
 
 def get_rel_power(rel_uses, power):
     """
@@ -233,8 +234,8 @@ def get_mem_uses(process_list):
     some info from psutil documentation:
 
     USS : (Linux, macOS, Windows): aka “Unique Set Size”, this is the memory
-    was terminated right now which is unique to a process and which would be
-    freed if the process
+    which is unique to a process and which would be freed 
+    if the process was terminated right now 
 
     PSS :  (Linux): aka “Proportional Set Size”, is the amount of memory
     shared with other processes, accounted in a way that the amount is
@@ -282,7 +283,7 @@ def get_metrics(pid_list, period = 2.0):
     sample = rapl.RAPLSample()
     s1 = sample.take_sample()
     process_list = get_processes(pid_list)
-    cpu_uses = get_cpu_uses(process_list, period = period)
+    cpu_uses, absolute_cpu_time_per_pid = get_cpu_uses(process_list, period = period)
     mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
@@ -290,6 +291,7 @@ def get_metrics(pid_list, period = 2.0):
     metrics = {
         'per_process_mem_use_abs':mem_pss_per_process,
         'per_process_cpu_uses': cpu_uses,
+        'absolute_cpu_time_per_pid': absolute_cpu_time_per_pid,
         'per_process_mem_use_percent': mem_uses,
         'intel_power' :power_metrics['intel_power'],
         'psys_power':power_metrics['psys_power']
