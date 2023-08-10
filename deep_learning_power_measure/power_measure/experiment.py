@@ -707,6 +707,7 @@ class ExpResults():
             summary['cpu']['rel_cpu_power'] = self.total_('per_process_cpu_power',start=start, end=end)
             summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
+            summary['cpu']['mem_use_uss'] = self.average_('absolute_cpu_time_per_pid',start=start, end=end)
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
             summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
