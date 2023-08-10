@@ -61,13 +61,13 @@ def get_info_time(process_list, zombies=None):
     if zombies is None:
         zombies = []
     for p in process_list:
-        st11 = _timer()
         # units in terms of cpu-time, so we need the cpu in the last time period that are for the process only
-        system_wide_pt1 = psutil.cpu_times()
-        st12 = _timer()
+
+        # very CPU time represents the seconds the CPU has spent in the given mode
         try:
             pt1 = p.cpu_times()
-            infos[p.pid] = (st11, st12, system_wide_pt1, pt1)
+            system_wide_pt1 = psutil.cpu_times() 
+            infos[p.pid] = (system_wide_pt1, pt1)
         except (psutil.NoSuchProcess, psutil.ZombieProcess):
             zombies.append(p.pid)
     return infos, zombies
@@ -81,9 +81,11 @@ def get_processes(pid_list):
             p = psutil.Process(process)
             process_list.append(p)
         except psutil.NoSuchProcess:
-            pass # Actually this can happens, for instance there are some quick calls to nvidia-smi when running pytorch
+            pass 
             #s = "Process with pid {} used to be part of this process chain, but was shut down. Skipping.".format(process)
             #warnings.warn(s)
+            # Actually this can happens, for instance there are some quick calls to nvidia-smi when running pytorch, 
+            # so maybe rising a warning is not a good option
     return process_list
 
 def get_power(diff):
@@ -156,15 +158,18 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
     for p in process_list:
         if p.pid in zombies:
             continue
-        st1, st12, system_wide_pt1, pt1 = infos1[p.pid]
-        st2, st22, system_wide_pt2, pt2 = infos2[p.pid]
+        #st11, st12, st13, system_wide_pt1, pt1 = infos1[p.pid]
+        #st21, st22, st23, system_wide_pt2, pt2 = infos2[p.pid]
+
+        system_wide_pt1, pt1 = infos1[p.pid]
+        system_wide_pt2, pt2 = infos2[p.pid]
 
         #  time used by this process
-        delta_proc = (pt2.user - pt1.user) + (pt2.system - pt1.system)
-        cpu_util_process = delta_proc / float(st2 - st1)
+        cpu_util_process = (pt2.user - pt1.user) + (pt2.system - pt1.system)
+        
         # time used system wide
-        delta_proc2 = (system_wide_pt2.user - system_wide_pt1.user) + (system_wide_pt2.system - system_wide_pt1.system)
-        cpu_util_system = delta_proc2 / float(st22 - st12)
+        cpu_util_system = (system_wide_pt2.user - system_wide_pt1.user) + (system_wide_pt2.system - system_wide_pt1.system)
+
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
             print("WARNING cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
@@ -175,7 +180,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
             attributable_compute = cpu_util_process / cpu_util_system
         absolute_cpu_time_per_pid[p.pid] = cpu_util_process
         cpu_percent[p.pid] = attributable_compute
-    return cpu_percent, absolute_cpu_time_per_pid # should be for multiple softwares
+    return cpu_percent, absolute_cpu_time_per_pid 
 
 def get_cpu_uses(process_list, period=2.0):
     """Extracts the relative number of cpu clock attributed to each process
@@ -288,12 +293,14 @@ def get_metrics(pid_list, period = 2.0):
     mem_uses = get_relative_mem_use(mem_pss_per_process)
     s2 = sample.take_sample()
     power_metrics = get_power(s2 - s1)
+    intel_power_use = get_rel_power(cpu_uses, power_metrics['intel_power'])
     metrics = {
         'per_process_mem_use_abs':mem_pss_per_process,
         'per_process_cpu_uses': cpu_uses,
         'absolute_cpu_time_per_pid': absolute_cpu_time_per_pid,
         'per_process_mem_use_percent': mem_uses,
         'intel_power' :power_metrics['intel_power'],
+        'rel_intel_power':intel_power_use,
         'psys_power':power_metrics['psys_power']
     }
     if 'uncore_power' in power_metrics:
