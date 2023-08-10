@@ -40,11 +40,15 @@ def integrate(metric, start=None, end=None, allow_None=False):
         start_idx = 0
         while metric[start_idx]['date'] < start:
             start_idx += 1
+            if start_idx == len(metric):
+                raise Exception('period start time given in parameter is : '  + str(start) + ' and the metric starts at: ' +str(metric[0]['date']))
         
     end_idx = len(metric)-1
     if end != None:
         while end < metric[end_idx]['date']:
             end_idx -= 1
+            if end_idx < 0:
+                raise Exception('period end time given in parameter is : '  + str(end) + ' and the metric stops at: ' +str(metric[-1]['date']))
         
     for i in range(start_idx, end_idx):
         x1 = metric[i]['date']
