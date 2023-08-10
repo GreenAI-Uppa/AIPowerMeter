@@ -279,10 +279,13 @@ class Experiment():
             return {'all': 0}, {}
         for gpu_id in self.pid_per_gpu:
             this_gpu_power_draw = per_gpu_power_draw[gpu_id]
-            use_curve =  [ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]
-            total = total(use_curve)
-            duration = use_curve[-1]['date'] - use_curve[0]['date']
-            this_gpu_relative_use = total / duration # average use of the gpu over the time window
+            use_curve =  [[ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]]
+            tot = total(use_curve)
+            duration = use_curve[0][-1]['date'] - use_curve[0][0]['date']
+            if duration != 0:
+                this_gpu_relative_use = tot / duration # average use of the gpu over the time window
+            else:
+                this_gpu_relative_use = 0
             per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
             all_pids_on_this_gpu = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
             if all_pids_on_this_gpu == 0:
