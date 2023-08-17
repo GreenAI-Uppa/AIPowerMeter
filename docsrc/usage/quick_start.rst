@@ -106,8 +106,8 @@ and the console output should looks like:
 - You can also measure the consumption of a script, for example, if you want to evaluate script.py
 
 .. code-block:: console
-
-  python -m deep_learning_power_measure python script.py
+  
+  python -m deep_learning_power_measure --output_folder "/home/paul/test" --cmd  "python examples/exp_deep_learning.py"
 
 
 - Record separetely the consumption of your training, and test phases of your deep learning experiments from `this example <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py>`_
