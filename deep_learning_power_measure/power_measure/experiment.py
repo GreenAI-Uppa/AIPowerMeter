@@ -66,6 +66,9 @@ def integrate(metric, start=None, end=None, allow_None=False):
         r.append(v)
     return r
 
+def get_usage_duration(curve):
+    pass
+
 def total(metric: list, start=None, end=None):
     """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
     the return value is the energy consumed in Joules"""
@@ -532,6 +535,11 @@ class ExpResults():
                 duration += curve[-1] - curve[0]
         return duration, start, end
 
+    def get_gpu_usage_duration(self):
+        curve = self.get_curve('per_gpu_absolute_percent_usage')
+        return get_usage_duration(curve)
+        
+
     def get_exp_duration(self, start=None, end=None):
         """
         return experiment duration in sec: this the duration of time when one of the metrics have been recorded.
@@ -712,6 +720,7 @@ class ExpResults():
             summary['cpu']['rel_cpu_power'] = self.total_('per_process_cpu_power',start=start, end=end)
             summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
+            summary['cpu']['absolute_cpu_time_per_pid'] = self.total_('absolute_cpu_time_per_pid',start=start, end=end)
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
             summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
