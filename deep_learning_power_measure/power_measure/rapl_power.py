@@ -158,8 +158,6 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
     for p in process_list:
         if p.pid in zombies:
             continue
-        #st11, st12, st13, system_wide_pt1, pt1 = infos1[p.pid]
-        #st21, st22, st23, system_wide_pt2, pt2 = infos2[p.pid]
 
         system_wide_pt1, pt1 = infos1[p.pid]
         system_wide_pt2, pt2 = infos2[p.pid]
@@ -172,7 +170,7 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
 
         # percent of cpu-hours in time frame attributable to this process (e.g., attributable compute)
         if cpu_util_system == 0:
-            print("WARNING cpu_util_system is 0", p.pid, delta_proc2, cpu_util_system, cpu_util_process)
+            print("WARNING cpu_util_system is 0", p.pid, cpu_util_system, cpu_util_process)
             print("I cannot attribute cpu time to the different pids.")
             print("consider to set a larger period value when calling measurement function")
             attributable_compute = 0
