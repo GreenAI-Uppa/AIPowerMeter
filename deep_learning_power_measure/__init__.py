@@ -9,6 +9,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cmd", help="the running command you want to monitor",type=str)
     parser.add_argument("--output_folder", help="directory to save the energy consumption records",type=str, default="power_measure")
+    parser.add_argument("--period", help="time interval used to compute the cpu usage", type=float, default=0.1)
+    parser.add_argument("--measurement_period", help="time interval between two recordings for all the metrics (energy, cpu usage, etc). Increase this parameter to reduce the size of the generated jsons", type=float, default=2)
     args = parser.parse_args()
     """TODO parse arguments and make a system call"""
     # parse sys argv to obtain the output folder, and the period
@@ -17,7 +19,7 @@ def main():
     period = 2
     driver = parsers.JsonParser(output_folder)
     exp = experiment.Experiment(driver)
-    p, q = exp.measure_yourself(period=period)
+    p, q = exp.measure_yourself(period=args.period, measurement_period=args.measurement_period)
     ## calling the experiment script
     subprocess.run(cmd, shell=True, check=True)
     q.put(experiment.STOP_MESSAGE)

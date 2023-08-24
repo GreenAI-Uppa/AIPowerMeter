@@ -13,8 +13,10 @@ from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
 import numpy as np
+import warnings
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import pandas as pd
 import datetime
 import psutil
 from . import rapl_power
@@ -206,12 +208,6 @@ class Experiment():
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible() 
         self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec) if (self.db_driver.wattemeter_exec is not None) else False
-        if not self.rapl_available and not self.nvidia_available:
-            raise Exception(
-            "\n\n Neither rapl and nvidia are available, I can't measure anything.\n\n "
-            + msg_rapl + "\n\n"
-            + msg_nvidia
-            )
         if not self.rapl_available:
             print("RAPL not available: " + msg_rapl)
         else:
@@ -229,7 +225,9 @@ class Experiment():
             self.gpu_logs = []
             self.min_gpu_powers = gpu_power.get_min_power()
             self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
-
+        if not self.rapl_available and not self.nvidia_available:
+            msg = "\n\n Neither rapl and nvidia are available, I can't measure anything related to Energy consumption.\n\n "
+            warnings.warn(msg)
 
     def log_usage(self, metric_gpu, pid_list, time_window=3, waiting_phase=20):
         """
@@ -326,14 +324,14 @@ class Experiment():
         self.measure(queue, pid_list, period=period)
 
     @processify
-    def measure_yourself(self, queue, period=1):
+    def measure_yourself(self, queue, period=1,measurement_period=2):
         """
         record power use for the process which calls this method
         """
         current_pid = queue.get()
-        self.measure(queue, None, current_pid=current_pid, period=period)
+        self.measure(queue, None, current_pid=current_pid, period=period, measurement_period=measurement_period)
 
-    def monitor_machine(self, pid_args=None, parent_pid = 1, period=1):
+    def monitor_machine(self, pid_args=None, parent_pid = 1, period=1, measurement_period=2):
         """
         performs power use recording
 
@@ -346,7 +344,7 @@ class Experiment():
         time_at_last_measure = 0
         monitoring_process_pid = os.getppid()
         while True:
-            time.sleep(period)
+            time.sleep(measurement_period)
             #if time.time() - time_at_last_measure < period:
             #    continue
             time_at_last_measure = time.time()
@@ -364,7 +362,9 @@ class Experiment():
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=0.1)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=True, cpu_usage=True, period=period)
+            else:
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=False, cpu_usage=True, period=period)
             if self.nvidia_available:
                 per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                 metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
@@ -401,7 +401,9 @@ class Experiment():
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, period=period)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=True, cpu_usage=True, period=period)
+            else:
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=False, cpu_usage=True, period=period)
             if time.time() - time_at_last_measure > measurement_period:
                 time_at_last_measure = time.time()
                 if self.nvidia_available:
@@ -623,7 +625,7 @@ class ExpResults():
             if curve is None:
                 continue
             if isinstance(curve,list):
-                df = pd.DataFrame(curve)
+                df = pd.DataFrame([c for segment in curve for c in segment])
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax.plot(df['date_datetime'], df['value'], label=metric_name)

@@ -275,7 +275,7 @@ def get_mem_uses(process_list):
             mem_uss_per_process[k] = info['uss']
     return mem_pss_per_process, mem_uss_per_process
 
-def get_metrics(pid_list, period = 2.0):
+def get_metrics(pid_list, period = 2.0, memory_usage=True, rapl=True, cpu_usage=True):
     """
     main function which will return power, memory and cpu usages
     Args: pid_list :
@@ -283,36 +283,50 @@ def get_metrics(pid_list, period = 2.0):
         period : indicates how many seconds to wait to compute the delta
             of power draw and cpu uses
     """
-    sample = rapl.RAPLSample()
-    s1 = sample.take_sample()
-    process_list = get_processes(pid_list)
-    cpu_uses, absolute_cpu_time_per_pid = get_cpu_uses(process_list, period = period)
-    mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
-    mem_uses = get_relative_mem_use(mem_pss_per_process)
-    s2 = sample.take_sample()
-    power_metrics = get_power(s2 - s1)
-    intel_power_use = get_rel_power(cpu_uses, power_metrics['intel_power'])
-    metrics = {
-        'per_process_mem_use_abs':mem_pss_per_process,
-        'per_process_cpu_uses': cpu_uses,
-        'absolute_cpu_time_per_pid': absolute_cpu_time_per_pid,
-        'per_process_mem_use_percent': mem_uses,
-        'intel_power' :power_metrics['intel_power'],
-        'rel_intel_power':intel_power_use,
-        'psys_power':power_metrics['psys_power']
-    }
-    if 'uncore_power' in power_metrics:
-        metrics['uncore_power'] = power_metrics['uncore_power'],
-    if 'cpu_power' in power_metrics:
-        cpu_power = power_metrics['cpu_power']
-        cpu_power_use = get_rel_power(cpu_uses, cpu_power)
-        metrics['per_process_cpu_power'] = cpu_power_use
-        metrics['total_cpu_power'] = cpu_power
-    if 'dram_power' in power_metrics:
-        dram_power = power_metrics['dram_power']
-        dram_power_use = get_rel_power(mem_uses, dram_power)
-        metrics['per_process_dram_power'] = dram_power_use
-        metrics['total_dram_power'] = dram_power
-    if len(mem_uss_per_process) > 0:
-        metrics['per_process_mem_use_uss'] = mem_uss_per_process
+    metrics = {}
+
+    # collecting the metrics
+    if rapl:
+        sample = rapl.RAPLSample()
+        s1 = sample.take_sample()
+    if cpu_usage or memory_usage:
+        process_list = get_processes(pid_list)
+    if cpu_usage:
+        cpu_uses, absolute_cpu_time_per_pid = get_cpu_uses(process_list, period = period)
+    if memory_usage:
+        mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
+        mem_uses = get_relative_mem_use(mem_pss_per_process)
+    if rapl:
+        s2 = sample.take_sample()
+        power_metrics = get_power(s2 - s1)
+    if rapl and cpu_usage:
+        intel_power_use = get_rel_power(cpu_uses, power_metrics['intel_power'])
+        metrics['rel_intel_power'] = intel_power_use
+
+    # storing the results into the dictionnary
+    if cpu_usage:
+        metrics['per_process_cpu_uses'] = cpu_uses
+        metrics['absolute_cpu_time_per_pid'] = absolute_cpu_time_per_pid
+    if memory_usage:
+        metrics['per_process_mem_use_abs'] = mem_pss_per_process
+        metrics['per_process_mem_use_percent'] = mem_uses
+        if len(mem_uss_per_process) > 0:
+            metrics['per_process_mem_use_uss'] = mem_uss_per_process
+    if rapl:
+        metrics['intel_power']  = power_metrics['intel_power']
+        metrics['psys_power'] = power_metrics['psys_power']
+        if 'uncore_power' in power_metrics:
+            metrics['uncore_power'] = power_metrics['uncore_power'],
+        if 'cpu_power' in power_metrics:
+            cpu_power = power_metrics['cpu_power']
+            metrics['total_cpu_power'] = cpu_power        
+            if cpu_usage:
+                cpu_power_use = get_rel_power(cpu_uses, cpu_power)
+                metrics['per_process_cpu_power'] = cpu_power_use
+        if 'dram_power' in power_metrics:
+            dram_power = power_metrics['dram_power']
+            metrics['total_dram_power'] = dram_power
+            if memory_usage:
+                dram_power_use = get_rel_power(mem_uses, dram_power)
+                metrics['per_process_dram_power'] = dram_power_use
     return metrics
