@@ -275,7 +275,7 @@ def get_mem_uses(process_list):
             mem_uss_per_process[k] = info['uss']
     return mem_pss_per_process, mem_uss_per_process
 
-def get_metrics(pid_list, period = 2.0, memory_usage=True, rapl=True, cpu_usage=True):
+def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, measure_cpu_usage=True):
     """
     main function which will return power, memory and cpu usages
     Args: pid_list :
@@ -286,25 +286,25 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, rapl=True, cpu_usage=
     metrics = {}
 
     # collecting the metrics
-    if rapl:
+    if measure_rapl:
         sample = rapl.RAPLSample()
         s1 = sample.take_sample()
-    if cpu_usage or memory_usage:
+    if measure_cpu_usage or memory_usage:
         process_list = get_processes(pid_list)
-    if cpu_usage:
+    if measure_cpu_usage:
         cpu_uses, absolute_cpu_time_per_pid = get_cpu_uses(process_list, period = period)
     if memory_usage:
         mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
         mem_uses = get_relative_mem_use(mem_pss_per_process)
-    if rapl:
+    if measure_rapl:
         s2 = sample.take_sample()
         power_metrics = get_power(s2 - s1)
-    if rapl and cpu_usage:
+    if measure_rapl and measure_cpu_usage:
         intel_power_use = get_rel_power(cpu_uses, power_metrics['intel_power'])
         metrics['rel_intel_power'] = intel_power_use
 
     # storing the results into the dictionnary
-    if cpu_usage:
+    if measure_cpu_usage:
         metrics['per_process_cpu_uses'] = cpu_uses
         metrics['absolute_cpu_time_per_pid'] = absolute_cpu_time_per_pid
     if memory_usage:
@@ -312,7 +312,7 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, rapl=True, cpu_usage=
         metrics['per_process_mem_use_percent'] = mem_uses
         if len(mem_uss_per_process) > 0:
             metrics['per_process_mem_use_uss'] = mem_uss_per_process
-    if rapl:
+    if measure_rapl:
         metrics['intel_power']  = power_metrics['intel_power']
         metrics['psys_power'] = power_metrics['psys_power']
         if 'uncore_power' in power_metrics:
