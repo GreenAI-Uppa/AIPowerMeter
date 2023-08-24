@@ -401,9 +401,9 @@ class Experiment():
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=True, cpu_usage=True, period=period)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=True, measure_cpu_usage=True, period=period)
             else:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=False, cpu_usage=True, period=period)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=False, measure_cpu_usage=True, period=period)
             if time.time() - time_at_last_measure > measurement_period:
                 time_at_last_measure = time.time()
                 if self.nvidia_available:
