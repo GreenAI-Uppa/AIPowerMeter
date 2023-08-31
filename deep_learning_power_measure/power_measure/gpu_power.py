@@ -153,10 +153,10 @@ def get_gpu_data(gpu):
     """
     gpu_data = {}
     name = gpu.findall("product_name")[0].text
+    gpu_data["power_readings"] = get_gpu_power(gpu)
     gpu_data["name"] = name
     gpu_data["memory"] = get_gpu_mem(gpu)
     gpu_data["utilization"] = get_gpu_use(gpu)
-    gpu_data["power_readings"] = get_gpu_power(gpu)
     return gpu_data
 
 def get_nvidia_xml():
