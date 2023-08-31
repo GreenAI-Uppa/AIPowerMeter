@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="476.52997mm"
+   width="430.78497mm"
    height="255.8401mm"
-   viewBox="0 0 476.52996 255.84009"
+   viewBox="0 0 430.78497 255.84009"
    version="1.1"
    id="svg7420"
-   inkscape:export-filename="/home/paul/Documents/uppa/coca4ai/insa_toulouse/pic/computer2.png"
+   inkscape:export-filename="/home/paul/programmation/uppa/deep_learning_power_measure/docsrc/background/computer.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
@@ -32,9 +32,9 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:zoom="0.47641697"
-     inkscape:cx="840.65016"
+     inkscape:cx="686.37354"
      inkscape:cy="387.2658"
-     inkscape:window-width="1846"
+     inkscape:window-width="1850"
      inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -42,63 +42,12 @@
      inkscape:current-layer="layer1"
      showguides="false" />
   <defs
-     id="defs7417">
-    <filter
-       inkscape:collect="always"
-       style="color-interpolation-filters:sRGB"
-       id="filter5537"
-       x="-0.043175671"
-       y="-0.11440744"
-       width="1.0863513"
-       height="1.2288149">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.5175968"
-         id="feGaussianBlur5539" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       style="color-interpolation-filters:sRGB"
-       id="filter5537-0"
-       x="-0.043175671"
-       y="-0.11440744"
-       width="1.0863513"
-       height="1.2288149">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.5175968"
-         id="feGaussianBlur5539-8" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       style="color-interpolation-filters:sRGB"
-       id="filter5537-0-1"
-       x="-0.043175671"
-       y="-0.11440744"
-       width="1.0863513"
-       height="1.2288149">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.5175968"
-         id="feGaussianBlur5539-8-2" />
-    </filter>
-  </defs>
+     id="defs7417" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(170.97613,11.149219)">
-    <rect
-       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       id="rect4168"
-       width="376.03143"
-       height="213.36208"
-       x="-124.23111"
-       y="-10.149219"
-       ry="26.984058"
-       inkscape:export-filename="/home/paul/path5896-0.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+     transform="translate(125.23111,11.149219)">
     <rect
        style="fill:#a0f698;fill-opacity:1;stroke:#000000;stroke-width:0.557105;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect846-1-9-8-8-8-8-0-6"
@@ -175,28 +124,12 @@
        x="-106.82769"
        y="117.68773" />
     <rect
-       style="mix-blend-mode:normal;fill:#ffffff;stroke-width:1.265;filter:url(#filter5537)"
-       id="rect5371"
-       width="84.358444"
-       height="31.835627"
-       x="-167.09578"
-       y="132.11218"
-       transform="matrix(1.1154612,0,0,0.98853988,19.475494,9.6339413)" />
-    <rect
        style="fill:#a0f698;fill-opacity:1;stroke:#000000;stroke-width:0.557105;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect846-1-9-8-8-8-8-0"
        width="175.28009"
        height="97.432724"
        x="33.622639"
        y="8.1837263" />
-    <rect
-       style="mix-blend-mode:normal;fill:#ffffff;stroke-width:1.265;filter:url(#filter5537-0)"
-       id="rect5371-1"
-       width="84.358444"
-       height="31.835627"
-       x="-167.09578"
-       y="132.11218"
-       transform="matrix(1.1154612,0,0,0.98853988,376.0432,-86.613524)" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:8.84129px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.221033"
@@ -352,6 +285,17 @@
          style="stroke-width:0.221033"
          x="53.360046"
          y="33.385693">Control unit</tspan></text>
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect4168"
+       width="376.03143"
+       height="213.36208"
+       x="-124.23111"
+       y="-10.149219"
+       ry="26.984058"
+       inkscape:export-filename="/home/paul/path5896-0.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <g
        id="g8692"
        transform="matrix(1.0049197,0,0,0.74951421,2.3663947,47.283212)">
@@ -383,54 +327,14 @@
        id="path8826" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#cb0000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="204.35603"
-       y="56.721951"
-       id="text3067"><tspan
+       style="font-size:12.1661px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.760383"
+       x="-117.6554"
+       y="165.42346"
+       id="text1659"><tspan
          sodipodi:role="line"
-         id="tspan3065"
-         style="fill:#cb0000;fill-opacity:1;stroke-width:0.264583"
-         x="204.35603"
-         y="56.721951">Measured With </tspan><tspan
-         sodipodi:role="line"
-         style="fill:#cb0000;fill-opacity:1;stroke-width:0.264583"
-         x="204.35603"
-         y="69.951073"
-         id="tspan3069">RAPL (INTEL)</tspan></text>
-    <rect
-       style="mix-blend-mode:normal;fill:#ffffff;stroke-width:1.265;filter:url(#filter5537-0-1)"
-       id="rect5371-1-0"
-       width="84.358444"
-       height="31.835627"
-       x="-167.09578"
-       y="132.11218"
-       transform="matrix(0.9921364,0,0,0.63378907,359.13042,119.30352)" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#cb0000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="197.64682"
-       y="215.77209"
-       id="text3067-7"><tspan
-         sodipodi:role="line"
-         style="fill:#cb0000;fill-opacity:1;stroke-width:0.264583"
-         x="197.64682"
-         y="215.77209"
-         id="tspan3069-1">PowerMeter</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b80000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="-154.49385"
-       y="154.9814"
-       id="text5265"><tspan
-         sodipodi:role="line"
-         id="tspan5263"
-         style="fill:#b80000;fill-opacity:1;stroke-width:0.264583"
-         x="-154.49385"
-         y="154.9814">Measured with</tspan><tspan
-         sodipodi:role="line"
-         style="fill:#b80000;fill-opacity:1;stroke-width:0.264583"
-         x="-154.49385"
-         y="168.21053"
-         id="tspan5267">nvidia-smi</tspan></text>
+         id="tspan1657"
+         style="stroke-width:0.760383"
+         x="-117.6554"
+         y="165.42346">MEASURED</tspan></text>
   </g>
 </svg>

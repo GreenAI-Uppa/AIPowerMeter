@@ -8,16 +8,31 @@ See also the `example scripts <https://github.com/GreenAI-Uppa/AIPowerMeter/tree
 Recorded fields
 ---------------------
 
-Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`. However, the monitoring of multiple programs on the same device should be done with care (see :ref:`multiple`). In the following, we details the different metrics recorded. Unless specified otherwise, the power is logged in watts.
+Recordings are logged in a json file and include the power draw and the use of the CPU and GPU for the pids related to your experiment. Some of the recordings are done for each pid related to your experiments: `per_process_metric_name : {... pid_i: v_i, ....}`. However, the monitoring of multiple programs on the same device should be done with care (see :ref:`multiple`). In the following, we details the different metrics recorded. Unless specified otherwise, the power is logged in Watt.
 
+First you can load the data of an experiment contained in "your_output_folder"
 .. code-block:: python
   
   from deep_learning_power_measure.power_measure import experiment, parsers
   driver = parsers.JsonParser('your_output_folder')
   exp_result = experiment.ExpResults(driver)
+
+From then, you can compute some statistics 
+
+.. code-block:: python
+  
+  # power consummed by the CPU measured by RAPL of your experiment
+  print(exp_result.total_("rel_intel_power"))
+  # duration of your experiments
+  d, start, end = print(exp_result.get_duration())
+  
+
+To check the list of available metrics (might depend on your setup):
+
+.. code-block:: python 
+
   print(exp_result)
 
-should print the list of available metrics (might depend on your setup):
 
 .. code-block:: console
 
@@ -34,11 +49,11 @@ Below are the definitions of these metrics:
 
 **CPU use**
 
-- `per_process_mem_use_abs` : RAM Memory usage for each recorded process in bytes
+- `per_process_mem_use_abs` : RAM PSS Memory usage for each recorded process in bytes*
 
-- `per_process_mem_use_percent` : RAM PSS Memory usage for each recorded process in percentage of the overall memory usage
+- `per_process_mem_use_percent` : RAM PSS Memory usage for each recorded process in percentage of the overall memory usage*
 
-- `per_process_mem_use_uss` : RAM  USS Memory usage for each recorded process
+- `per_process_mem_use_uss` : RAM  USS Memory usage for each recorded process*
 
 - `per_process_cpu_uses` : Percentage of CPU usage for each process, relatively to the general CPU usage.
 
@@ -48,7 +63,7 @@ Below are the definitions of these metrics:
 
 - `mem_use_percent`: Relative number of bytes used in the CPU RAM PSS.
 
-For details on the USS and PSS memory, check :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses`
+* For details on the USS and PSS memory, check :py:func:`deep_learning_power_measure.power_measure.rapl_power.get_mem_uses`
 
 **Non GPU Energy consumption**
 

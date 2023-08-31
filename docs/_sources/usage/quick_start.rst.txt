@@ -103,7 +103,7 @@ and the console output should looks like:
 
 **TIPS and use cases**
 
-- You can also measure the consumption of a script, for example, if you want to evaluate script.py
+- You can measure the consumption of a console command, for example, to evaluate "exp_deep_learning.py"
 
 .. code-block:: console
   
