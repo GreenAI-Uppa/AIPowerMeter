@@ -68,7 +68,7 @@ GPU are good for single instruction multiple data situations where they can para
 Regarding power measurements, things are simple with nvidia-smi, unfortunately, part of the reason for this is because we have much less information than RAPL.
 from the man page of `nvidia-smi <https://man.archlinux.org/man/nvidia-utils/nvidia-smi.1.en>`_ : *The last measured power draw for the entire board, in watts. Only available if power management is supported. Please note that for boards without INA sensors, this refers to the power draw for the GPU and not for the entire board.*
 
-Still, nvidia provides us with the percentage of core memory used by each program for each GPU.
+Still, nvidia provides us with the percentage of core memory used by each program for each GPU (% Streaming Multiprcessor). We use this information to assign the total power of the GPUs to the different programs running on it. Now see below for considerations about measuring multiple programs. Fortunately for analysts (but is it good for efficiency?), most of the IA experiments are conducted such that one GPU is exclusively allocated to one experiment.
 
 .. _multiple:
 
