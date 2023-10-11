@@ -95,12 +95,14 @@ previous example, the result would be 20Mbs instead of 15Mbs</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses">
 <span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_cpu_uses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts the relative number of cpu clock attributed to each process</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>process_list : list of process [pid1, pid2,…] for which the cpu use
+<dd><p>Extracts the relative number of cpu clock attributed to each process
+Args:</p>
+<blockquote>
+<div><p>process_list : list of process [pid1, pid2,…] for which the cpu use
 will be measured
 pause : sleeping time during which the cpu use will be recorded.</p>
-</dd>
+</div></blockquote>
+<dl class="simple">
 <dt>Returns:</dt><dd><p>cpu_uses = {pid1 : cpu_use, }  where cpu_use is the percentage of use
 of this cpu with the respect to the total use of the cpu on this period</p>
 </dd>
