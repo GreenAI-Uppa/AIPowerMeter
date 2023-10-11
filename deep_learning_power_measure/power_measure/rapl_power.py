@@ -151,7 +151,13 @@ def get_power(diff):
 
 def get_percent_uses(infos1, infos2, zombies, process_list):
     """
-    infos1 and infos2 : cpu times gathered at two different times and both system and process wised.
+    Args:
+        infos1 and infos2 : cpu times gathered at two different times and both system and process wised.
+        zombies : the pids in this list will ignored
+        process_list : list of ids which should be monitored
+    Returns:
+        cpu_percent : dictionnary where each key is a pid and value a percentage of cpu usage
+        absolute_cpu_time_per_pid : dictionnary where each key is a pid and value the absolute cpu time used by this process
     """
     cpu_percent = {}
     absolute_cpu_time_per_pid = {}
@@ -182,7 +188,6 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
 
 def get_cpu_uses(process_list, period=2.0):
     """Extracts the relative number of cpu clock attributed to each process
-
     Args:
         process_list : list of process [pid1, pid2,...] for which the cpu use
         will be measured
@@ -204,7 +209,7 @@ def get_cpu_uses(process_list, period=2.0):
 
 def get_rel_power(rel_uses, power):
     """
-    input:
+    Args:
         dictionnary : pid : relative use in percentages
         power : total power used in watts
     return
@@ -278,8 +283,8 @@ def get_mem_uses(process_list):
 def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, measure_cpu_usage=True):
     """
     main function which will return power, memory and cpu usages
-    Args: pid_list :
-        list of process pids on which the metrics will be measure
+    Args: 
+        pid_list : list of process pids on which the metrics will be measure
         period : indicates how many seconds to wait to compute the delta
             of power draw and cpu uses
     """
@@ -320,7 +325,7 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, me
         if 'cpu_power' in power_metrics:
             cpu_power = power_metrics['cpu_power']
             metrics['total_cpu_power'] = cpu_power        
-            if cpu_usage:
+            if measure_cpu_usage:
                 cpu_power_use = get_rel_power(cpu_uses, cpu_power)
                 metrics['per_process_cpu_power'] = cpu_power_use
         if 'dram_power' in power_metrics:
