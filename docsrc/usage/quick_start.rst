@@ -101,7 +101,10 @@ and the console output should looks like:
   nvidia total consumption: 543.126 joules, your consumption:  543.126, average memory used: 1.6GiB
 
 
+
 **TIPS and use cases**
+
+- We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . `exp_deep_learning.py` is a good one to start with. 
 
 - You can measure the consumption of a console command, for example, to evaluate "exp_deep_learning.py"
 
