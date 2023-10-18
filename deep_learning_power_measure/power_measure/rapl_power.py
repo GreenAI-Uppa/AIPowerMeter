@@ -7,9 +7,8 @@ import psutil
 from . import rapl
 
 def is_rapl_compatible():
-    """
-    Check if rapl logs are available on this machine.
-    """
+    """Check if rapl logs are available on this machine."""
+    
     if not os.path.isdir(rapl.rapl_dir):
         return (False, "cannot find rapl directory in "+rapl.rapl_dir)
     if not (os.path.isfile('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj') and os.access('/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj', os.R_OK)):
@@ -188,6 +187,11 @@ def get_percent_uses(infos1, infos2, zombies, process_list):
 
 def get_cpu_uses(process_list, period=2.0):
     """Extracts the relative number of cpu clock attributed to each process
+
+    Compute for each process p in process_list t over the period
+        - relative cpu usage : ( cpu time of p ) / (cpu time of the whole system) 
+        - absolute cpu usage : cpu time of p
+
     Args:
         process_list : list of process [pid1, pid2,...] for which the cpu use
         will be measured

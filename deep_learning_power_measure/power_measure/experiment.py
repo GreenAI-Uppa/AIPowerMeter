@@ -110,6 +110,19 @@ def get_pid_list(current_pid, parent_pid=None):
             pid_list.remove(queue_pid)
     return pid_list
 
+def collect_all(p,d):
+  for c in p.children():
+      name = c.username()+"_"+c.name()
+      if name not in d:
+          d[name]= []
+      d[name].append(c.pid)
+      collect_all(c,d)
+
+def get_pid_list_all():
+    p = psutil.Process(1)
+    collect_all(p,d)
+    return d
+
 def interpolate(metric1, metric2):
     """
     return two new metrics so that metric1 and metric2 have the same range of dates
@@ -362,13 +375,14 @@ class Experiment():
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=True, cpu_usage=True, period=period)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=True, measure_cpu_usage=True, period=period)
             else:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, rapl=False, cpu_usage=True, period=period)
+                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=False, measure_cpu_usage=True, period=period)
             if self.nvidia_available:
                 per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
                 metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
                 metrics['gpu'] = metrics_gpu
+            summarize_metrics()
             self.db_driver.save_power_metrics(metrics)
 
     def measure(self, queue, pid_args, current_pid = None, period=1, measurement_period=2):
@@ -400,6 +414,7 @@ class Experiment():
                 # launch in separate threads because they won't have the same frequency
                 metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
                 self.log_usage(metrics_gpu, pid_list)
+            metrics['temperature'] = psutil.sensors_temperatures()
             if self.rapl_available:
                 metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=True, measure_cpu_usage=True, period=period)
             else:
@@ -613,7 +628,7 @@ class ExpResults():
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
 
-    def display_curves(self, metric_names):
+    def display_curves(self, metric_names, saveto=None):
         """
         Input:
           metric_names : list of metric names :  [metric_name1, metric_name2,...]
@@ -638,8 +653,10 @@ class ExpResults():
         ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
         plt.xticks(rotation=45)
         plt.legend()
-        plt.show()
-
+        if saveto:
+            plt.savefig(saveto)
+        else:
+            plt.show()
 
     def display_2_curves(self, metric_name1, metric_name2):
         """
@@ -649,14 +666,14 @@ class ExpResults():
         #if curve is None:
         #    raise Exception('invalide metric name')
         if isinstance(curve,list):
-            df = pd.DataFrame(curve)
+            df = pd.DataFrame( [item for sublist in curve for item in sublist] )
             df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
             df['date_datetime'] = pd.to_datetime(df['date_datetime'])
             ax.plot(df['date_datetime'], df['value'], label=metric_name1)
             ax.set_ylabel(metric_name1, color="blue",fontsize=14)
         else:
             for device_id, metric in curve.items():
-                df = pd.DataFrame(metric)
+                df = pd.DataFrame( [item for sublist in metric for item in sublist] )
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax.plot(df['date_datetime'], df['value'],label=metric_name1+":"+device_id)
@@ -666,14 +683,14 @@ class ExpResults():
         ax2 = ax.twinx()
         curve = self.get_curve(metric_name2)
         if isinstance(curve,list):
-            df = pd.DataFrame(curve)
+            df = pd.DataFrame( [item for sublist in curve for item in sublist] )
             df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
             df['date_datetime'] = pd.to_datetime(df['date_datetime'])
             ax2.plot(df['date_datetime'], df['value'], label=metric_name2, color="red")
             ax2.set_ylabel(metric_name2, color="red",fontsize=14)
         else:
             for device_id, metric in curve.items():
-                df = pd.DataFrame(metric)
+                df =  pd.DataFrame( [item for sublist in metric for item in sublist] )
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax2.plot(df['date_datetime'], df['value'],label=metric_name2+":"+device_id, color='red')
@@ -723,6 +740,7 @@ class ExpResults():
             summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
             summary['cpu']['absolute_cpu_time_per_pid'] = self.total_('absolute_cpu_time_per_pid',start=start, end=end)
+            summary['cpu']['average_cpu_use'] = self.average_('per_process_cpu_uses',start=start, end=end)
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
             summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
