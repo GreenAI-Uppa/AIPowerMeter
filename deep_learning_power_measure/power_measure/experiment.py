@@ -27,11 +27,9 @@ import signal
 STOP_MESSAGE = "Stop"
 EXP_DONE = "Done"
 
-def joules_to_wh(n):
+def joules_to_kwh(n):
     """conversion function"""
-    if hasattr(n, '__iter__'):
-        return [i*3600/1000 for i in n]
-    return n*3600/1000
+    return n/3600/1000
 
 def integrate(metric, start=None, end=None, allow_None=False):
     """integral of the metric values over time
