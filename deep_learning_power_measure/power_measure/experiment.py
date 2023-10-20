@@ -71,7 +71,10 @@ def get_usage_duration(curve):
 
 def total(metric: list, start=None, end=None):
     """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
-    the return value is the energy consumed in Joules"""
+    the return value is the energy consumed in Joules
+    Input:
+        - list a list containing different segments, each segment is a list where one item is a dictionnary with keys 'date' and 'value'f_____
+    """
     if isinstance(metric, list):
         rs = [ integrate(segment,start=start,end=end) for segment in metric  ]
         if rs[0] is not None:
@@ -620,10 +623,10 @@ class ExpResults():
                     #max([m["value"] for segment in mtrc for m in segment])
             return maxs
 
-    def total_power_draw(self):
+    def total_power_draw(self,start=None, end=None):
         """extracting cpu and GPU power draw for the whole machine"""
-        total_intel_power = self.total_('intel_power')
-        abs_nvidia_power = self.total_('nvidia_draw_absolute')
+        total_intel_power = self.total_('intel_power',start=start, end=end)
+        abs_nvidia_power = self.total_('nvidia_draw_absolute',start=start, end=end)
         return total_intel_power + abs_nvidia_power
 
     def display_curves(self, metric_names, saveto=None):
@@ -701,17 +704,17 @@ class ExpResults():
         r = ['Available metrics : ']
         r.append('CPU')
         if self.cpu_metrics is not None:
-            r.append('  '+','.join([k for k in self.cpu_metrics.keys()]))
+            r.append('  '+', '.join([k for k in self.cpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('GPU')
         if self.gpu_metrics is not None:
-            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
+            r.append('  '+', '.join([k for k in self.gpu_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('Experiments')
-        if self.gpu_metrics is not None:
-            r.append('  '+','.join([k for k in self.gpu_metrics.keys()]))
+        if self.exp_metrics is not None:
+            r.append('  '+', '.join([k for k in self.exp_metrics.keys()]))
         else:
             r.append('NOT AVAILABLE')
         r.append('\n\ncall print() method to display power consumption')
@@ -738,7 +741,8 @@ class ExpResults():
             summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
             summary['cpu']['absolute_cpu_time_per_pid'] = self.total_('absolute_cpu_time_per_pid',start=start, end=end)
-            summary['cpu']['average_cpu_use'] = self.average_('per_process_cpu_uses',start=start, end=end)
+            summary['cpu']['relative_cpu_use'] = self.average_('per_process_cpu_uses',start=start, end=end)
+
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
             summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
