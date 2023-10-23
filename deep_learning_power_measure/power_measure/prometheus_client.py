@@ -11,8 +11,12 @@ class PrometheusClient():
       it serves the data with a flask app on the /metrics route
     Experiment will call this class
     """
-    def __init__(self):
+    def __init__(self, port=None):
         #self.app = Flask(__name__)
+        if port == None:
+            self.port = 5001 
+        else:
+            self.port = port
         self.wattemeter_exec = None
         self.gauges = {}
         for metric, description in metric_metadata.items():
@@ -60,4 +64,4 @@ class PrometheusClient():
         logging.warning('You are trying to log wattmeter metric to prometheus, but this has not been implemented. Skipping.')
 
     def run(self):
-        self.app.run(host = 'localhost', port=5001)
+        self.app.run(host = 'localhost', port=self.port)
