@@ -613,7 +613,7 @@ class ExpResults():
         abs_nvidia_power = self.total_('nvidia_draw_absolute')
         return total_intel_power + abs_nvidia_power
 
-    def display_curves(self, metric_names):
+    def display_curves(self, metric_names, saveto=None):
         """
         Input:
           metric_names : list of metric names :  [metric_name1, metric_name2,...]
@@ -638,7 +638,10 @@ class ExpResults():
         ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
         plt.xticks(rotation=45)
         plt.legend()
-        plt.show()
+        if saveto:
+            plt.savefig(saveto)
+        else:
+            plt.show()
 
 
     def display_2_curves(self, metric_name1, metric_name2):
