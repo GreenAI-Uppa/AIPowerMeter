@@ -16,7 +16,6 @@ def main():
     # parse sys argv to obtain the output folder, and the period
     output_folder = args.output_folder 
     cmd = args.cmd
-    period = 2
     driver = parsers.JsonParser(output_folder)
     exp = experiment.Experiment(driver)
     p, q = exp.measure_yourself(period=args.period, measurement_period=args.measurement_period)
