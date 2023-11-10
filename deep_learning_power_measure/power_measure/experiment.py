@@ -27,31 +27,32 @@ import signal
 STOP_MESSAGE = "Stop"
 EXP_DONE = "Done"
 
-def joules_to_wh(n):
+def joules_to_kwh(n):
     """conversion function"""
-    if hasattr(n, '__iter__'):
-        return [i*3600/1000 for i in n]
-    return n*3600/1000
+    return n/3600/1000
 
 def integrate(metric, start=None, end=None, allow_None=False):
     """integral of the metric values over time
     start, end : timestamp from which we should start computing the integral"""
-    r = [0]
+    # first, find the indices corresponding to the [start, end] temporal segment
     start_idx = 0
     if start != None:
         start_idx = 0
         while metric[start_idx]['date'] < start:
             start_idx += 1
             if start_idx == len(metric):
-                raise Exception('period start time given in parameter is : '  + str(start) + ' and the metric starts at: ' +str(metric[0]['date']))
+                raise Exception('period start time given in parameter is : '  + str(start) + ' and the metric ends at: ' +str(metric[-1]['date']))
         
     end_idx = len(metric)-1
     if end != None:
         while end < metric[end_idx]['date']:
             end_idx -= 1
             if end_idx < 0:
-                raise Exception('period end time given in parameter is : '  + str(end) + ' and the metric stops at: ' +str(metric[-1]['date']))
+                raise Exception('period end time given in parameter is : '  + str(end) + ' and the metric starts at: ' +str(metric[0]['date']))
         
+    print(start_idx, end_idx)
+    # now computing the integral on the given segments
+    r = [0]
     for i in range(start_idx, end_idx):
         x1 = metric[i]['date']
         x2 = metric[i+1]['date']
@@ -71,24 +72,55 @@ def integrate(metric, start=None, end=None, allow_None=False):
 def get_usage_duration(curve):
     pass
 
+def is_iou(s1,e1,s2,e2):
+    return s2 < e1 and s1 < e2
+
 def total(metric: list, start=None, end=None):
     """Return the integration over time for the metric. For instance if the metric is in watt and the time in seconds,
-    the return value is the energy consumed in Joules
+    the return value would be the total consumed energy in joules
     Input:
         - list a list containing different segments, each segment is a list where one item is a dictionnary with keys 'date' and 'value'f_____
     """
+    # case one, metric is directly a list of temporal segments
     if isinstance(metric, list):
-        rs = [ integrate(segment,start=start,end=end) for segment in metric  ]
-        if rs[0] is not None:
-            return sum([ r[-1] for r in rs])
+        rs = [] # store the total for all the temporal segments
+        for segment in metric:
+            # check if this temporal segment intersect the given start and end parameter
+            if start != None and end != None:
+                if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
+                    # if so, compute the integral
+                    integral = integrate(segment,start=start,end=end)[-1]
+                else:
+                    integral = 0
+            else:
+                # if there is no intersect, say the metric value is 0
+                integral = integrate(segment,start=start,end=end)[-1]
+            if integral is not None:
+                rs.append(integral)
+        if len(rs)>0: 
+            # get the sum for all the segments
+            return sum(rs)
+    # case two, metric is a dictionnary where key is a device and value is a list of segments
     elif isinstance(metric, dict):
         totals = {}
         for device_id, segments in metric.items():
-            rs = [ integrate(segment, start=start, end=end) for segment in segments  ]
-            if rs is not None:
-                r = sum([ r[-1] for r in rs])
-                totals[device_id] = r
+            # and then, same as case one
+            rs = []
+            for segment in segments:
+                if start != None and end != None:
+                    if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
+                        # if so, compute the integral
+                        integral = integrate(segment,start=start,end=end)[-1]
+                    else:
+                        integral = 0
+                else:
+                    integral = integrate(segment,start=start,end=end)[-1]
+                if integral is not None:
+                        rs.append(integral)
+            if len(rs)>0: 
+                totals[device_id] = sum(rs)
             else:
+                # if no segments for this device, set None value
                 totals[device_id] = None
         return totals
 
