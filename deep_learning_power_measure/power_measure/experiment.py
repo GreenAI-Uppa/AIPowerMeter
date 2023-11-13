@@ -85,9 +85,12 @@ def total(metric: list, start=None, end=None):
         rs = [] # store the total for all the temporal segments
         for segment in metric:
             # check if this temporal segment intersect the given start and end parameter
-            if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
-                # if so, compute the integral
-                integral = integrate(segment,start=start,end=end)[-1]
+            if start != None and end != None:
+                if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
+                    # if so, compute the integral
+                    integral = integrate(segment,start=start,end=end)[-1]
+                else:
+                    integral = 0
             else:
                 # if there is no intersect, say the metric value is 0
                 integral = 0
