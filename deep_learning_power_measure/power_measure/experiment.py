@@ -27,16 +27,14 @@ import signal
 STOP_MESSAGE = "Stop"
 EXP_DONE = "Done"
 
-def joules_to_wh(n):
+def joules_to_kwh(n):
     """conversion function"""
-    if hasattr(n, '__iter__'):
-        return [i*3600/1000 for i in n]
-    return n*3600/1000
+    return n/3600/1000
 
 def integrate(metric, start=None, end=None, allow_None=False):
     """integral of the metric values over time
     start, end : timestamp from which we should start computing the integral"""
-    r = [0]
+    # first, find the indices corresponding to the [start, end] temporal segment
     start_idx = 0
     if start != None:
         start_idx = 0
@@ -52,6 +50,9 @@ def integrate(metric, start=None, end=None, allow_None=False):
             if end_idx < 0:
                 raise Exception('period end time given in parameter is : '  + str(end) + ' and the metric starts at: ' +str(metric[0]['date']))
         
+    print(start_idx, end_idx)
+    # now computing the integral on the given segments
+    r = [0]
     for i in range(start_idx, end_idx):
         x1 = metric[i]['date']
         x2 = metric[i+1]['date']
@@ -93,7 +94,7 @@ def total(metric: list, start=None, end=None):
                     integral = 0
             else:
                 # if there is no intersect, say the metric value is 0
-                integral = 0
+                integral = integrate(segment,start=start,end=end)[-1]
             if integral is not None:
                 rs.append(integral)
         if len(rs)>0: 
@@ -106,10 +107,14 @@ def total(metric: list, start=None, end=None):
             # and then, same as case one
             rs = []
             for segment in segments:
-                if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
-                    integral = integrate(segment,start=start,end=end)[-1]
+                if start != None and end != None:
+                    if is_iou(segment[0]['date'],segment[-1]['date'], start, end):
+                        # if so, compute the integral
+                        integral = integrate(segment,start=start,end=end)[-1]
+                    else:
+                        integral = 0
                 else:
-                    integral = 0
+                    integral = integrate(segment,start=start,end=end)[-1]
                 if integral is not None:
                         rs.append(integral)
             if len(rs)>0: 
