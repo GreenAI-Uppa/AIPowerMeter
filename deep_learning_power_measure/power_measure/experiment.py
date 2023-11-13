@@ -50,7 +50,6 @@ def integrate(metric, start=None, end=None, allow_None=False):
             if end_idx < 0:
                 raise Exception('period end time given in parameter is : '  + str(end) + ' and the metric starts at: ' +str(metric[0]['date']))
         
-    print(start_idx, end_idx)
     # now computing the integral on the given segments
     r = [0]
     for i in range(start_idx, end_idx):
