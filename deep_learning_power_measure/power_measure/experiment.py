@@ -21,7 +21,6 @@ import datetime
 import psutil
 from . import rapl_power
 from . import gpu_power
-from . import model_complexity
 import signal
 
 STOP_MESSAGE = "Stop"
@@ -246,11 +245,6 @@ class Experiment():
         self.db_driver = driver
         if not cont:
             driver.erase()
-        if model is not None:
-            # attempting to guess the device on the model.
-            device = next(model.parameters()).device
-            model.to(device)
-            self.save_model_card(model, input_size, device=device)
         #self.power_meter_available = is_omegawatt_available CHECK IF BINARY PRESENT
         self.rapl_available, msg_rapl = rapl_power.is_rapl_compatible()
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible() 
@@ -349,21 +343,6 @@ class Experiment():
             per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
         per_gpu_attributable_power['all'] = sum(per_gpu_attributable_power.values())
         return per_gpu_attributable_power, per_gpu_attributable_sm_use
-
-    def save_model_card(self, model, input_size, device='cpu'):
-        """
-        get a model summary and save it
-
-        model : pytorch model
-        input_size : input_size for this model (batch_size, *input_data_size)
-        """
-        if model is None:
-            raise Exception('You tried to compute the model card with the parameter model set to None')
-
-        if model is not None and input_size is None:
-            raise Exception('a model was given as parameter, but the input_size argument must also be supplied to estimate the model card')
-        summary = model_complexity.get_summary(model, input_size, device=device)
-        self.db_driver.save_model_card(summary)
 
     @processify
     def measure_from_pid_list(self, queue, pid_list, period=1):
@@ -488,7 +467,6 @@ class ExpResults():
             raise Exception('I could not load any recordings from folder: "' +
             self.db_driver.folder +
             '".\n Please check that the folder contains valid recordings')
-        self.model_card = self.db_driver.get_model_card()
 
     def list_metrics(self):
         """
@@ -791,10 +769,6 @@ class ExpResults():
         simple print of the experiment summary
         """
         print("============================================ EXPERIMENT SUMMARY ============================================")
-        if self.model_card is not None and 'total_params' in self.model_card and 'total_mult_adds' in self.model_card:
-            print(self.model_card)
-            print("MODEL SUMMARY: ", self.model_card['total_params'],"parameters and ",self.model_card['total_mult_adds'], "mac operations during the forward pass of your model")
-            print()
         d, s, e = self.get_exp_duration()
         print('Experiment duration: ', d, 'seconds.', ' Start:',datetime.datetime.fromtimestamp(s), ' end',datetime.datetime.fromtimestamp(e))
         if self.cpu_metrics is not None:
