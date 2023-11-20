@@ -10,6 +10,9 @@ from deep_learning_power_measure.power_measure import experiment, parsers
 from config import *
 
 def get_user_job_folders(user, start=0, end=math.inf):
+    """
+    return the 
+    """
     folders = []
     for dirpath, dirnames, filenames in os.walk(RECORDING_RAPL_NVIDI_DIR):
         if user in dirpath.replace(RECORDING_RAPL_NVIDI_DIR,''):
@@ -22,6 +25,7 @@ def get_user_job_folders(user, start=0, end=math.inf):
     return folders
 
 def get_list_user(start=0, end=math.inf):
+    """return the list of users for which RAPL recording are present"""
     users = []
     for dirpath in os.listdir(RECORDING_RAPL_NVIDI_DIR):
         if os.path.isdir(os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath)):
@@ -132,11 +136,7 @@ def get_stats_per_job_status(all_user_stats):
 def aiPowerMeterInfo(user, start=0, end=math.inf):
     job_folders = get_user_job_folders(user, start=start, end=end)
     metrics = {}
-    nodes = {} # collect the node names and when experiences has been run for this user 
     for job_folder in tqdm(job_folders):
-        #mtrcs = get_aiPowerMeterInfo_1job(job_folder)
-        #job_id = mtrcs["job_id"]
-        #metrics[job_id] = mtrcs
         driver = parsers.JsonParser(job_folder)
         try:
             exp_result = experiment.ExpResults(driver)
@@ -146,7 +146,7 @@ def aiPowerMeterInfo(user, start=0, end=math.inf):
         _, se, ee = exp_result.get_exp_duration()
         if start  < ee and se < end: # there is overlap
             mtrcs = exp_result.get_summary(max(start,se), min(end,ee))
-            meta_data = load_meta_date(job_folder) #json.load(open(os.path.join(job_folder,'meta_data.json')))
+            meta_data = load_meta_data(job_folder) #json.load(open(os.path.join(job_folder,'meta_data.json')))
             node_name = meta_data["node_id"] 
             job_id = meta_data["jobid"]
             metrics[job_id] = {}
