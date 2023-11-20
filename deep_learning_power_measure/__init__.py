@@ -6,6 +6,9 @@ import argparse
 
 
 def main():
+    """small function mainly used to record power consumption of a command by calling directly the module deep_learning_power_measure
+    for an example, please see the end section in the quickstart documentation : "TIPS and use cases"
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--cmd", help="the running command you want to monitor",type=str)
     parser.add_argument("--output_folder", help="directory to save the energy consumption records",type=str, default="power_measure")
