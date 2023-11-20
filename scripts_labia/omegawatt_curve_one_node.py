@@ -15,13 +15,15 @@ t1 = datetime.datetime.fromisoformat(args.start).timestamp()
 t2 = datetime.datetime.fromisoformat(args.end).timestamp()
 
 fake_job_id = '0'
-zip_files = labia.get_zip_files([(t1, t2, node_name, fake_job_id)])
+segments = [(t1, t2, node_name, fake_job_id)]
+zip_files = labia.get_zip_files(segments)
 all_curves = {fake_job_id : {node_name : []}}
 for zip_file, segments in tqdm(zip_files.items()):
   curves = labia.read_zip_file(zip_file, segments)
   all_curves[fake_job_id][node_name] += curves[fake_job_id][node_name]
 
 values = [v['value'] for v in all_curves[fake_job_id][node_name]]
+
 print('Read ',len(values), 'values recorded by omegawatt')
 print('Median :', statistics.median(values))
 print('Max :', max(values))
