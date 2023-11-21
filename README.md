@@ -76,3 +76,5 @@ For each script, run `python script.py --help` for more information on the param
 ## CRON jobs 
 
 `append_summary_last_jobs.py` : used to collect statistics from last jobs and append them to csv files, one for each user. This script is meant to be used in a cron. 
+
+`cron_script.sh` : main cron script which every day, store the omegawatt logs in zip files and updates csv files containing the statistics for each jobs.
