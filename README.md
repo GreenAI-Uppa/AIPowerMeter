@@ -3,8 +3,9 @@
 The solution developed by the company [Omegawat](mv.omegawatt.fr/) makes it possible to replace the power cables of each machine with extensions which include an intensity sensor connected to measurement boxes. The measuring boxes are connected to each other and to a _master_ box which collects all the data, before transmitting it by USB to a server corresponding to one of the Lab-IA machines. It is important that each phase powering a sensor is also used to power the master box, thus providing a reference to precisely measure the voltage. For this reason, the master box has 3 power cables which must be distributed over the phases used by the machines that we wish to measure. Once connected, the device must be configured manually via a web interface by specifying which phase the sensors measure.
 
 
-.center[<img  style="text-align: center;" src="omegawatt.png" alt="isolated" width="400"/>]
-
+<p align="center">
+<img src="omegawatt.png" alt="isolated" width="400"/>
+</p>
 _Illustration of the power measurement of all the machines. The slave box receives the measurements via its sensors which are connected to the power cables. In order to calculate the correct value for a machine, the system uses as a reference the phase on which this machine is via the power supply of the master box. So for example, you must manually indicate in the configuration that channel 1 which measures node n2 is on phase 2._
 
 
@@ -21,7 +22,7 @@ In practice, the measurements are accessible via a _/dev/ttyUSB0_ port correspon
 
 The collection of data makes it possible to know for each task the use of GPUs, CPUs in terms of memory and use of calculation capacities, as well as the electrical power consumed as measured by Nvidia-smi and RAPL.
 
-.center[<img style="text-align: center;" src="measurement_system.png" alt="isolated" width="400"/>]
+<img style="text-align: center;" src="measurement_system.png" alt="isolated" width="400"/>
 _Arrangement of the different software and hardware components with their exchange of information._
 
 
