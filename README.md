@@ -3,7 +3,7 @@
 The solution developed by the company [Omegawat](mv.omegawatt.fr/) makes it possible to replace the power cables of each machine with extensions which include an intensity sensor connected to measurement boxes. The measuring boxes are connected to each other and to a _master_ box which collects all the data, before transmitting it by USB to a server corresponding to one of the Lab-IA machines. It is important that each phase powering a sensor is also used to power the master box, thus providing a reference to precisely measure the voltage. For this reason, the master box has 3 power cables which must be distributed over the phases used by the machines that we wish to measure. Once connected, the device must be configured manually via a web interface by specifying which phase the sensors measure.
 
 
-<img src="omegawatt.png" alt="isolated" width="400"/>
+.center[<img src="omegawatt.png" alt="isolated" width="400"/>]
 
 
 
