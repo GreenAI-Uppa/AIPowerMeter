@@ -27,9 +27,9 @@ The collection of data makes it possible to know for each task the use of GPUs, 
 </p>
 <em>Arrangement of the different software and hardware components with their exchange of information.</em>
 
+</br></br>
 
-
-    For each _T_ task launched on SLURM, a prolog program starts the AIPowerMeter software and saves the information allowing the data from the different sources to be cross-referenced. An instance of AIPowerMeter is launched on each compute node used by task _T_. The SLURM _scontrol_ command allows you to know which processes belong to the task on the different nodes. AIPowerMeter uses this information to assign CPU and GPU usage to each task and terminate the program when the task is completed. The _delta_ period between each record is a parameter and is set to 2 seconds. In practice this parameter presents several limitations, from RAPL, from nvidia-smi, as well as from the precision of psutil. The system also supports the task sequence mechanism (SLURM job array) by creating measuring each task in the sequence independently.
+For each _T_ task launched on SLURM, a prolog program starts the AIPowerMeter software and saves the information allowing the data from the different sources to be cross-referenced. An instance of AIPowerMeter is launched on each compute node used by task _T_. The SLURM _scontrol_ command allows you to know which processes belong to the task on the different nodes. AIPowerMeter uses this information to assign CPU and GPU usage to each task and terminate the program when the task is completed. The _delta_ period between each record is a parameter and is set to 2 seconds. In practice this parameter presents several limitations, from RAPL, from nvidia-smi, as well as from the precision of psutil. The system also supports the task sequence mechanism (SLURM job array) by creating measuring each task in the sequence independently.
 
 # Consumption measurement with AIPowerMeter
 
