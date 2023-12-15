@@ -6,7 +6,7 @@ The solution developed by the company [Omegawat](mv.omegawatt.fr/) makes it poss
 <p align="center">
 <img src="omegawatt.png" alt="isolated" width="400"/>
 </p>
-_Illustration of the power measurement of all the machines. The slave box receives the measurements via its sensors which are connected to the power cables. In order to calculate the correct value for a machine, the system uses as a reference the phase on which this machine is via the power supply of the master box. So for example, you must manually indicate in the configuration that channel 1 which measures node n2 is on phase 2._
+*Illustration of the power measurement of all the machines. The slave box receives the measurements via its sensors which are connected to the power cables. In order to calculate the correct value for a machine, the system uses as a reference the phase on which this machine is via the power supply of the master box. So for example, you must manually indicate in the configuration that channel 1 which measures node n2 is on phase 2.*
 
 
 
@@ -22,9 +22,10 @@ In practice, the measurements are accessible via a _/dev/ttyUSB0_ port correspon
 
 The collection of data makes it possible to know for each task the use of GPUs, CPUs in terms of memory and use of calculation capacities, as well as the electrical power consumed as measured by Nvidia-smi and RAPL.
 
+<p align="center">
 <img style="text-align: center;" src="measurement_system.png" alt="isolated" width="400"/>
 _Arrangement of the different software and hardware components with their exchange of information._
-
+</p>
 
 
 For each _T_ task launched on SLURM, a prolog program starts the AIPowerMeter software and saves the information allowing the data from the different sources to be cross-referenced. An instance of AIPowerMeter is launched on each compute node used by task _T_. The SLURM _scontrol_ command allows you to know which processes belong to the task on the different nodes. AIPowerMeter uses this information to assign CPU and GPU usage to each task and terminate the program when the task is completed. The _delta_ period between each record is a parameter and is set to 2 seconds. In practice this parameter presents several limitations, from RAPL, from nvidia-smi, as well as from the precision of psutil. The system also supports the task sequence mechanism (SLURM job array) by creating measuring each task in the sequence independently.
