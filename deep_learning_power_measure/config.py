@@ -1,3 +1,5 @@
+
+# node name to csv column in the zip files
 node_name_to_csv_column = {'n51': [30, 42],
  'n52': [32, 46],
  'n53': [34, 44],
@@ -19,6 +21,9 @@ node_name_to_csv_column = {'n51': [30, 42],
  'bee1': [30, 34],
  'bee2': [32, 36]}
 
+# use to print a definition for the different fields
+# keys of this dictionnary are keys used in the labia modules
+# for instance, to write a summary of a job
 mapping = {'number_of_jobs':'#jobs', 
     'date':'start date',
     'job_id':'job_id',
@@ -59,32 +64,7 @@ node_to_column_usb1 = {'n3': {'slaves': ['slave1', 'slave2'],
   'columns': [14, 16],
   'alims': ['D', 'G']}}
 
-baie_droite = [{'slave': 'slave1', 'column': 13, 'node': 'n51', 'alim': 'G'},
- {'slave': 'slave1', 'column': 14, 'node': 'n52', 'alim': 'G'},
- {'slave': 'slave1', 'column': 15, 'node': 'n53', 'alim': 'G'},
- {'slave': 'slave1', 'column': 16, 'node': 'n54', 'alim': 'G'},
- {'slave': 'slave1', 'column': 17, 'node': 'n55', 'alim': 'G'},
- {'slave': 'slave1', 'column': 18, 'node': 'n101', 'alim': 'G'},
- {'slave': 'slave2', 'column': 19, 'node': 'n51', 'alim': 'D'},
- {'slave': 'slave2', 'column': 21, 'node': 'n52', 'alim': 'D'},
- {'slave': 'slave2', 'column': 20, 'node': 'n53', 'alim': 'D'},
- {'slave': 'slave2', 'column': 22, 'node': 'n54', 'alim': 'D'},
- {'slave': 'slave2', 'column': 23, 'node': 'n55', 'alim': 'D'},
- {'slave': 'slave2', 'column': 24, 'node': 'n101', 'alim': 'D'},
- {'slave': 'slave3', 'column': 1, 'node': 'MD1400', 'alim': 'D'},
- {'slave': 'slave3', 'column': 2, 'node': 'backup', 'alim': 'D'},
- {'slave': 'slave3', 'column': 3, 'node': 'slurm', 'alim': 'D'},
- {'slave': 'slave3', 'column': 4, 'node': 'service', 'alim': 'D'},
- {'slave': 'slave3', 'column': 5, 'node': 'SWB1', 'alim': 'D'},
- {'slave': 'slave3', 'column': 6, 'node': 'SWB1', 'alim': 'G'},
- {'slave': 'slave4', 'column': 7, 'node': 'MD1400', 'alim': 'G'},
- {'slave': 'slave4', 'column': 8, 'node': 'backup', 'alim': 'D'},
- {'slave': 'slave4', 'column': 10, 'node': 'slurm', 'alim': 'G'},
- {'slave': 'slave4', 'column': 9, 'node': 'service', 'alim': 'D'},
- {'slave': 'slave4', 'column': 11, 'node': 'n102', 'alim': 'D'},
- {'slave': 'slave4', 'column': 12, 'node': 'n102', 'alim': 'G'}]
-
-
+#baie droite
 node_to_column_usb0 = {'n51': {'slaves': ['slave1', 'slave2'],
   'columns': [13, 19],
   'alims': ['G', 'D']},
@@ -120,10 +100,11 @@ node_to_column_usb0 = {'n51': {'slaves': ['slave1', 'slave2'],
   'columns': [11, 12],
   'alims': ['D', 'G']}}
 
-RECORDING_RAPL_NVIDI_DIR="/mnt/beegfs/power_monitor/prolog_log" 
-#"/mnt/beegfs/home/gay/coca4ai/recordings/rapl_nvidia/"
+RECORDING_RAPL_NVIDIA_DIR="/mnt/beegfs/power_monitor/prolog_log" 
 RECORDING_OMEGA_WATT_DIR="/mnt/beegfs/home/gay/coca4ai/recordings/omegawatt_subsample/"
 
+# voieNumber are the id used by omegawatt for example with number 3 (#current3,#activepow3)
+# these numbers also correspond (almost always) to the tags written in the cables. 
 voieNumber_to_csv_column = {1: 6,
  2: 8,
  3: 10,
@@ -183,3 +164,26 @@ voieNumber_to_csv_column = {1: 6,
  57: 118,
  58: 120,
  59: 122}
+
+
+# node name to csv column in the zip files
+node_name_to_gpu_memory = {'n51': 32,
+ 'n52': 32,
+ 'n53': 32,
+ 'n54': 32,
+ 'n55': 32,
+ 'n101': 32,
+ 'MD1400': None,
+ 'backup': None,
+ 'service': None,
+ 'SWB1': None,
+ 'slurm': None,
+ 'n102': 32,
+ 'n3': 48,
+ 'n4': 48,
+ 'n1': 48,
+ 'switch 10Gpbs': None,
+ 'n5': 48,
+ 'n2': 48,
+ 'bee1': None,
+ 'bee2': None}

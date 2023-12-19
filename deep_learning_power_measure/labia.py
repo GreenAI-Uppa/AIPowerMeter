@@ -6,34 +6,25 @@ import math
 from tqdm import tqdm
 import datetime
 from deep_learning_power_measure.power_measure import experiment, parsers
+from dateutil.relativedelta import relativedelta
+from .config import *
 
-from config import *
-
-def get_user_job_folders(user, start=0, end=math.inf):
-    """
-    return the 
-    """
-    folders = []
-    for dirpath, dirnames, filenames in os.walk(RECORDING_RAPL_NVIDI_DIR):
-        if user in dirpath.replace(RECORDING_RAPL_NVIDI_DIR,''):
-            for dirname in dirnames:
-                year, month = dirpath.split('/')[-2].split('_')
-                start_folder = datetime.datetime(int(year),int(month),1).timestamp()
-                end_folder = (datetime.datetime(int(year),int(month)+1,1) - datetime.timedelta(days=1)).timestamp()
-                if min(end_folder, end) - max(start_folder, start) > 0:
-                    folders.append(os.path.join(dirpath, dirname))
-    return folders
+def get_jobfolder_from_id(jobid):
+    """return the folder of the rapl nvidia recording from its jobid"""
+    for root, dirs, _ in os.walk(RECORDING_RAPL_NVIDIA_DIR):
+        if jobid in dirs:
+            return os.path.join(root, jobid)    
 
 def get_list_user(start=0, end=math.inf):
     """return the list of users for which RAPL recording are present"""
     users = []
-    for dirpath in os.listdir(RECORDING_RAPL_NVIDI_DIR):
-        if os.path.isdir(os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath)):
+    for dirpath in os.listdir(RECORDING_RAPL_NVIDIA_DIR):
+        if os.path.isdir(os.path.join(RECORDING_RAPL_NVIDIA_DIR,dirpath)):
             year, month = dirpath.split('_')
             start_folder = datetime.datetime(int(year),int(month),1).timestamp()
-            end_folder = (datetime.datetime(int(year),int(month)+1,1) - datetime.timedelta(days=1)).timestamp()
+            end_folder = (datetime.datetime(int(year),int(month),1) + relativedelta(months=+1) - datetime.timedelta(days=1)).timestamp()
             if min(end_folder, end) - max(start_folder, start) > 0:
-                users += os.listdir(os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath))
+                users += os.listdir(os.path.join(RECORDING_RAPL_NVIDIA_DIR,dirpath))
     return users
 
 def get_list_job(start=0, end=math.inf, users=[], nodes=[]):
@@ -44,16 +35,16 @@ def get_list_job(start=0, end=math.inf, users=[], nodes=[]):
     nodes : if not empty, contain a list of compute nodes. The returned jobs have be run only on these nodes
     """
     jobs = {}
-    for dirpath in os.listdir(RECORDING_RAPL_NVIDI_DIR):
-        if os.path.isdir(os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath)):
+    for dirpath in os.listdir(RECORDING_RAPL_NVIDIA_DIR):
+        if os.path.isdir(os.path.join(RECORDING_RAPL_NVIDIA_DIR,dirpath)):
             year, month = dirpath.split('_')
             start_folder = datetime.datetime(int(year),int(month),1).timestamp()
-            end_folder = (datetime.datetime(int(year),int(month)+1,1) - datetime.timedelta(days=1)).timestamp()
+            end_folder = (datetime.datetime(int(year),int(month),1) + relativedelta(months=+1) - datetime.timedelta(days=1)).timestamp()
             if min(end_folder, end) - max(start_folder, start) > 0:
-                for user in os.listdir(os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath)):
+                for user in os.listdir(os.path.join(RECORDING_RAPL_NVIDIA_DIR,dirpath)):
                     if len(users)!=0 and user not in users:
                         continue
-                    user_folder = os.path.join(RECORDING_RAPL_NVIDI_DIR,dirpath,user)
+                    user_folder = os.path.join(RECORDING_RAPL_NVIDIA_DIR,dirpath,user)
                     job_ids = os.listdir(user_folder)
                     for job_id in job_ids:
                         job_folder = os.path.join(user_folder,job_id)
@@ -64,7 +55,6 @@ def get_list_job(start=0, end=math.inf, users=[], nodes=[]):
                             end_job = datetime.datetime.today().timestamp()
                         else:
                             end_job = datetime.datetime.fromisoformat(meta_data['end_date']).timestamp()
-                        #end = datetime.datetime.fromisoformat(meta_data['end_date']).timestamp()
                         if not experiment.is_iou(start, end, start_job, end_job):
                             continue
                         if len(nodes) > 0 and node_name not in nodes:
@@ -74,6 +64,7 @@ def get_list_job(start=0, end=math.inf, users=[], nodes=[]):
 
 
 def summarize(user_stats):
+    """compute minimal given user recordings"""
     summary = {}
     summary['number_of_jobs'] = len(user_stats)
     summary['gpu_consumption'] = sum([ v['rapl_nvidia']['gpu']['per_gpu_attributable_power']['all']  for (jobid, v) in user_stats.items()])
@@ -81,12 +72,6 @@ def summarize(user_stats):
     summary['cpu_consumption'] = sum([ v['rapl_nvidia']['cpu']['rel_intel_power']  for (jobid, v) in user_stats.items()])
     summary['total_duration'] = sum([ v['rapl_nvidia']['duration']  for (jobid, v) in user_stats.items()])
     return summary 
-     
-def get_summaries(all_users_stats):
-    summaries = {}
-    for user, user_stats in all_users_stats.items():
-        summaries[user] = summarize(user_stats) 
-    return summaries
 
 def extract_value_for_each_job(user_stats, metrics):
     per_job_metrics = {}
@@ -133,8 +118,9 @@ def get_stats_per_job_status(all_user_stats):
             per_status[status][jobid] = stats
     return per_status
 
-def aiPowerMeterInfo(user, start=0, end=math.inf):
-    job_folders = get_user_job_folders(user, start=start, end=end)
+def aiPowerMeterInfo1User(user, start=0, end=math.inf):
+    jobs = get_list_job(users=[user])
+    job_folders = [v['folder'] for (j,v) in jobs.items() ]
     metrics = {}
     for job_folder in tqdm(job_folders):
         driver = parsers.JsonParser(job_folder)
@@ -155,7 +141,64 @@ def aiPowerMeterInfo(user, start=0, end=math.inf):
             metrics[job_id]['rapl_nvidia'] = mtrcs
     return metrics
 
-def rapl_nvidia_omegawatt_per_node(nodes, period=3600, meas_delta = 10, start=0, end=math.inf):
+def all_feature_per_t(nodes, period=3600, meas_delta = 10, start=0, end=math.inf, outlier_upper_bound=3000):
+    """
+    return the energy consumption measured by RAPL, Nvidia and powermeter and different resource utilisation metrics for the given nodes on the given period
+    Args: 
+        - nodes : list of node names 
+        - period : in seconds, intervall between two measurements
+        - meas_delta : in seconds, value of the curve will be averaged on this delta
+        - start, end : time stamps of the considered period
+    Output: 
+        per_node_measure : dictionnary where each key is a node name
+                      each value is a dictionnary : 
+                       where k is a timestamp
+                       values are intel_power (rapl power), nvidia_draw_absolute and omegawatt_power_draw
+    """
+    # initialise the structure to store the results
+    points = list(range(int(start),int(end),period))
+    per_node_measure = {} 
+    for n in nodes:
+        per_node_measure[n] = {}
+        for point in points:
+            per_node_measure[n][point] = {}
+
+    # for each job, collect rapl and nvidia
+    jobs = get_list_job()
+    for job_id, v in tqdm(jobs.items()):
+        job_folder = v['folder']
+        meta_data = load_meta_data(job_folder)
+        node_name = meta_data['node_id']
+        start_ts = datetime.datetime.fromisoformat(meta_data['start_date']).timestamp()
+        end_ts = datetime.datetime.fromisoformat(meta_data['end_date']).timestamp()
+        points_on_this_job = [t for t in points if start_ts < t - meas_delta/2 and t + meas_delta/2 < end_ts ]
+        if len(points_on_this_job) == 0:
+            continue 
+        if node_name not in per_node_measure:
+            continue
+        measures = per_node_measure[node_name]
+        driver = parsers.JsonParser(job_folder)
+        try:
+          exp_result = experiment.ExpResults(driver)
+        except Exception as e:
+            traceback.print_exc(limit=2, file=sys.stdout)
+            continue
+        for t in points_on_this_job:
+            if job_id not in measures[t]:
+                measures[t][job_id] = exp_result.get_summary(start=t-meas_delta/2,end=t+meas_delta/2)
+    # now collect omegawatt recordings
+    segments = []
+    for node_name in nodes:
+        segments += [(point - meas_delta/2, point + meas_delta/2, node_name, (point,node_name)) for point in points ]
+        
+    metrics = omegaWattInfo(segments)
+    for node_name in nodes:
+        for (point,node_name), v in metrics.items():
+            per_node_measure[node_name][point]['omegawatt_power_draw'] = v['omegawatt_power_draw'] / meas_delta
+    return per_node_measure
+
+
+def rapl_nvidia_omegawatt_per_node(nodes, period=3600, meas_delta = 10, start=0, end=math.inf, outlier_upper_bound=3000):
     """
     return the energy consumption measured by RAPL, Nvidia and powermeter for the given nodes on the given period
     Args: 
@@ -177,6 +220,7 @@ def rapl_nvidia_omegawatt_per_node(nodes, period=3600, meas_delta = 10, start=0,
         for point in points:
             per_node_measure[n][point] = {}
 
+    # for each job, collect rapl and nvidia
     jobs = get_list_job()
     for job_id, v in tqdm(jobs.items()):
         job_folder = v['folder']
@@ -202,6 +246,8 @@ def rapl_nvidia_omegawatt_per_node(nodes, period=3600, meas_delta = 10, start=0,
                 nvidia_power_draw = exp_result.total_('nvidia_draw_absolute', start=t-meas_delta/2,end=t+meas_delta/2) #total_('intel_power', start=t-meas_delta/2,end=t+meas_delta/2)
                 measures[t]['rapl'] = rapl_power_draw /meas_delta
                 measures[t]['nvidia'] = nvidia_power_draw / meas_delta
+
+    # now collect omegawatt recordings
     segments = []
     for node_name in nodes:
         segments += [(point - meas_delta/2, point + meas_delta/2, node_name, (point,node_name)) for point in points ]
@@ -223,7 +269,7 @@ def load_meta_data(job_folder):
                 print('end date missing for folder',job_folder)
                 traceback.print_exc(limit=2, file=sys.stdout)
                 return meta_data
-        _, se, ee = exp_result.get_exp_duration()
+        _, _, ee = exp_result.get_exp_duration()
         meta_data['end_date'] = datetime.datetime.fromtimestamp(ee).isoformat()
     return meta_data
 
@@ -249,6 +295,7 @@ def get_aiPowerMeterInfo_1job(job_folder):
     return metrics
 
 def omegaWattInfo(segments, start=0, end=math.inf):
+    """return the total of energy consumption as recorded by omegaWatt on the corresponding temporal segments"""
     metrics = {}
     zip_files = get_zip_files(segments)
     for zip_file, segments in tqdm(zip_files.items()):
@@ -264,10 +311,10 @@ def omegaWattInfo(segments, start=0, end=math.inf):
 
 def get_user_stats(user, start=0, end=math.inf):
     """
-    return a metric for each job for the given period
+    return a recording summary for each job for the the given user and the given period
     """
     #recordings from AIPowerMeter
-    metrics = aiPowerMeterInfo(user, start, end)
+    metrics = aiPowerMeterInfo1User(user, start, end)
     # recordings from OmegaWatt
     # removing jobs which did not finish before the last omegawatt measures were recorded
     today = datetime.datetime.today()
@@ -346,12 +393,16 @@ def get_zip_files(segments):
     return zip_files
 
 def head_zip_file(zip_file):
+    """print the first ten lines of the given zip file """
     myzip = zipfile.ZipFile(zip_file)
     f = myzip.open('log_omegawatt_of_the_day')
     for i in range(10):
         print(f.readline())
 
 def extract_header(zip_file,usbport=0):
+    """read the header which provided the mapping between the csv column
+      and the omegawatt tracks (voies) number. This function was used to
+        construct the dictionnaries in the config.py files"""
     myzip = zipfile.ZipFile(zip_file)
     f = myzip.open('log_omegawatt_of_the_day')
     f.readline()

@@ -22,9 +22,11 @@ To parse the measurement, you have to obtain the mapping between the clusters no
 > It is a good practice to check if these tags are correct.
 
 
-For the labia, the result is store in the file _deep_learning_power_measure/config.py_
+An example of such configuration is for the labia in the file _deep_learning_power_measure/config.py_
 
-- _node_name_to_csv_column_ : dictionnary where the key is the node id and the value the csv columns (record that each node has two alimentation cable)
+The most important variable is this one : 
+
+- _node_name_to_csv_column_ : dictionnary where the key is the node id and the value the csv columns (remember that each node has two alimentation cables)
 
 
 ## Data collection with RAPL and Nvidia
@@ -40,11 +42,12 @@ The collection of data makes it possible to know for each task the use of GPUs, 
 
 For each _T_ task launched on SLURM, a prolog program starts the AIPowerMeter software and saves the information allowing the data from the different sources to be cross-referenced. An instance of AIPowerMeter is launched on each compute node used by task _T_. The SLURM _scontrol_ command allows you to know which processes belong to the task on the different nodes. AIPowerMeter uses this information to assign CPU and GPU usage to each task and terminate the program when the task is completed. The _delta_ period between each record is a parameter and is set to 2 seconds. In practice this parameter presents several limitations, from RAPL, from nvidia-smi, as well as from the precision of psutil. The system also supports the task sequence mechanism (SLURM job array) by creating measuring each task in the sequence independently. The next section is from the main documentation of AIPowerMeter which is used to collect RAPL and Nvidia data.
 
+The different recorded fields related to CPU and GPU usages are listed in [this page](https://greenai-uppa.github.io/AIPowerMeter/usage/modules.html) 
+
+
 # Consumption measurement with AIPowerMeter
 
-Record the energy consumption of your cpu and gpu. Check [our documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
-
-This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
+Record the energy consumption of your cpu and gpu. Check [the documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
 
 ## Requirements
 
@@ -73,34 +76,6 @@ sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 
 
 > some examples requires pytorch or tensorflow.
-## Usage
-
-See `examples/example_exp_deep_learning.py`.
-
-Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.
-
-```
-from deep_learning_power_measure.power_measure import experiment, parsers
-
-driver = parsers.JsonParser("output_folder")
-exp = experiment.Experiment(driver)
-
-p, q = exp.measure_yourself(period=2)
-###################
-#  place here the code that you want to profile
-################
-q.put(experiment.STOP_MESSAGE)
-
-``` 
-
-This will save the recordings as json file in the `output_folder`. You can display them with: 
-
-```
-from deep_learning_power_measure.power_measure import experiment, parsers
-driver = parsers.JsonParser(output_folder)
-exp_result = experiment.ExpResults(driver)
-exp_result.print()
-``` 
 
 ## Lab IA scripts
 
