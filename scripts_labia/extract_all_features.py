@@ -26,5 +26,5 @@ output_file = args.output_file
 meas_delta = args.meas_delta #10 # in seconds, average the energy over this value
 period = args.period #3600 # in seconds, take a measurement every this period
 
-per_node_measure = labia.rapl_nvidia_omegawatt_per_node(nodes, start=start, end=end)
+per_node_measure = labia.all_feature_per_t(nodes, start=start, end=end)
 json.dump(per_node_measure, open(output_file,'w'))
