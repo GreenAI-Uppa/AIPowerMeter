@@ -22,8 +22,11 @@ def main():
     driver = parsers.JsonParser(output_folder)
     exp = experiment.Experiment(driver)
     p, q = exp.measure_yourself(period=args.period, measurement_period=args.measurement_period)
-    ## calling the experiment script
-    subprocess.run(cmd, shell=True, check=True)
+    # calling the experiment script
+    try:
+        r = subprocess.run(cmd, shell=True, check=True)
+    except:
+        print("ERROR IN THE MONITORED PROGRAMM")
     q.put(experiment.STOP_MESSAGE)
     driver = parsers.JsonParser(output_folder)
     exp_result = experiment.ExpResults(driver)
