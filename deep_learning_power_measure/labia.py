@@ -93,9 +93,9 @@ def print_summaries(summaries):
     summaries['all'] = global_stats
     df = pd.DataFrame(summaries).transpose()
     df = df.rename(columns=mapping)
-    df[mapping['omegawatt_power_draw']] = df[mapping['omegawatt_power_draw']].map(experiment.joules_to_kwh)
-    df[mapping['cpu_consumption']] = df[mapping['cpu_consumption']].map(experiment.joules_to_kwh)
-    df[mapping['gpu_consumption']] = df[mapping['gpu_consumption']].map(experiment.joules_to_kwh)
+    df[mapping['omegawatt_power_draw']] = df[mapping['omegawatt_power_draw']].map(experiment.joules_to_wh)
+    df[mapping['cpu_consumption']] = df[mapping['cpu_consumption']].map(experiment.joules_to_wh)
+    df[mapping['gpu_consumption']] = df[mapping['gpu_consumption']].map(experiment.joules_to_wh)
     print(df.round(2))
 
 
