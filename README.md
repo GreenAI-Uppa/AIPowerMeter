@@ -59,12 +59,4 @@ driver = parsers.JsonParser(output_folder)
 exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
-### model card
-We use a wrapper for [torchinfo](https://pypi.org/project/torchinfo/) to extract statistics about your model. 
-To obtain them, add additional parameters:
-```
-net = ... the model you are using for your experiment 
-input_size = ... (batch_size, *data_point_shape)
-exp = experiment.Experiment(driver, model=net, input_size=input_size)
 
-```
