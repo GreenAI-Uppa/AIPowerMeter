@@ -30,6 +30,41 @@ def joules_to_kwh(n):
     """conversion function"""
     return n/3600/1000
 
+def joules_to_wh(n):
+    """conversion function"""
+    return n/3600
+
+def flatten_list(l):
+    """Flatten a nested list of lists into a single list of dictionaries"""
+    flat_list = []
+    for key, sublist in l.items():
+        for subsublist in sublist:
+            for item in subsublist:
+                flat_list.append(item)
+    return flat_list
+
+def integrate_dictionnary(metrics):
+    """integral of the metric values over time
+    list : a list of dictionnaries with keys 'date' and 'value'
+    same thing as integrate but returns a list of integrated values instead of total
+    """
+    newdict = {}
+    for i in range(len(metrics) - 1):
+        x1 = metrics[i]['date']
+        x2 = metrics[i+1]['date']
+        y1 = metrics[i]['value']
+        y2 = metrics[i + 1]['value']
+        
+        # Integration with trapeze method
+        integrated_value = (x2 - x1) * (y2 + y1) / 2
+        
+        # add value to the dictionnary
+        if x1 not in newdict:
+            newdict[x1] = 0
+        newdict[x1] += integrated_value
+    
+    return newdict
+
 def integrate(metric, start=None, end=None, allow_None=False):
     """integral of the metric values over time
     start, end : timestamp from which we should start computing the integral"""
@@ -753,7 +788,11 @@ class ExpResults():
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
             summary['cpu']['absolute_cpu_time_per_pid'] = self.total_('absolute_cpu_time_per_pid',start=start, end=end)
             summary['cpu']['relative_cpu_use'] = self.average_('per_process_cpu_uses',start=start, end=end)
+            summary['cpu']['intel_power'] = self.cpu_metrics['intel_power']['values']
 
+            tmp_cpu = self.get_curve('rel_intel_power')[0]
+            summary['cpu']['joules_list'] = integrate_dictionnary(tmp_cpu)
+            
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
             summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
@@ -761,6 +800,14 @@ class ExpResults():
             summary['gpu']['nvidia_mem_use_abs'] = self.max_("nvidia_mem_use",start=start, end=end)
             summary['gpu']['nvidia_average_sm'] = self.average_("nvidia_sm_use",start=start, end=end)
             summary['gpu']['per_gpu_attributable_power'] = self.total_('per_gpu_attributable_power',start=start, end=end)
+            summary['gpu']['per_gpu_absolute_percent_usage'] = self.gpu_metrics['per_gpu_attributable_power']
+            summary['gpu']['nvidia_sm_list'] = self.gpu_metrics  
+            
+
+            
+            tmp_gpu = self.get_curve('per_gpu_attributable_power')
+            summary['gpu']['joules_list'] = integrate_dictionnary(flatten_list(tmp_gpu))
+
         return summary
             
     

@@ -9,8 +9,10 @@ from deep_learning_power_measure import labia
 
 parser = argparse.ArgumentParser("Example usage with default options : python scripts_labia/compare_raplNvidia_omegawatt.py")
 parser.add_argument('--node_names', default='n4,n102,n54,n55,n5')
-parser.add_argument('--start',help='start date in isoformat',default='2023-10-23')
-parser.add_argument('--end',help='end date in isoformat',default='2023-11-19')
+# parser.add_argument('--start',help='start date in isoformat',default='2023-12-23')
+parser.add_argument('--start',help='start date in isoformat',default='2024-01-01')
+# parser.add_argument('--end',help='end date in isoformat',default='2023-11-19')
+parser.add_argument('--end',help='end date in isoformat',default='2024-06-15')
 parser.add_argument('--meas_delta',help='time delta on which to average a point recording value in secs.', type=int, default=10)
 parser.add_argument('--period',help='interval between two point recording, in secs', type=int, default=3600)
 parser.add_argument('--output_file',help='json file where to save the results',default='results_omegawatt_raplnvidia.json')
