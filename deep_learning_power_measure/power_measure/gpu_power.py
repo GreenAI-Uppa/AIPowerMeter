@@ -131,7 +131,10 @@ def get_gpu_use(gpu):
 
 def get_gpu_power(gpu):
     """get the power draw for this gpu"""
-    power_readings = gpu.findall("power_readings")[0]
+    power_readings = gpu.findall("power_readings")
+    if len(power_readings) == 0:
+        power_readings = gpu.findall("gpu_power_readings")
+    power_readings = power_readings[0]
     power_draw = power_readings.findall("power_draw")[0].text
     if power_draw  == 'N/A':
         raise RuntimeError("nvidia-smi could not retrieve power draw from the nvidia card. Check that it is supported on your hardware ?")
@@ -170,7 +173,10 @@ def get_min_power():
     min_powers = {}
     xml = get_nvidia_xml()
     for gpu_id, gpu in enumerate(xml.findall("gpu")):
-        power_readings = gpu.findall("power_readings")[0]
+        power_readings = gpu.findall("power_readings")
+        if len(power_readings) == 0:
+            power_readings = gpu.findall("gpu_power_readings")
+        power_readings = power_readings[0]
         power_min = power_readings.findall("min_power_limit")[0].text
         min_powers[gpu_id] = float(power_min.replace('W',''))
     return min_powers
