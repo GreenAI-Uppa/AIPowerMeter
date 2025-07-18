@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Dev Documentation &#8212; AI Power Meter  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=cb25574f" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Deep learning benchmark" href="../experiments/experiments.html" />
@@ -34,11 +31,11 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="dev-documentation">
-<h1>Dev Documentation<a class="headerlink" href="#dev-documentation" title="Permalink to this heading">¶</a></h1>
+  <section id="dev-documentation">
+<h1>Dev Documentation<a class="headerlink" href="#dev-documentation" title="Link to this heading">¶</a></h1>
 <p>This part is a brief description of some key functions</p>
-<div class="section" id="module-deep_learning_power_measure.power_measure.experiment">
-<span id="experiment-module"></span><h2>Experiment module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.experiment" title="Permalink to this heading">¶</a></h2>
+<section id="module-deep_learning_power_measure.power_measure.experiment">
+<span id="experiment-module"></span><h2>Experiment module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.experiment" title="Link to this heading">¶</a></h2>
 <dl class="simple">
 <dt>this module contains mainly two classes</dt><dd><ul class="simple">
 <li><p>Experiment is an entry point to start and end the recording of the power consumption of your Experiment</p></li>
@@ -49,7 +46,7 @@
 <p>Both classes uses a driver attribute to communicate with a database, or read and write in json files</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.experiment.Experiment">
-<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.experiment.</span></span><span class="sig-name descname"><span class="pre">Experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.experiment.</span></span><span class="sig-name descname"><span class="pre">Experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.experiment.Experiment" title="Link to this definition">¶</a></dt>
 <dd><p>This class provides the method to start an experiment
 by launching a thread which will record the power draw.
 The recording can be ended by sending a stop message
@@ -57,18 +54,20 @@ to this thread</p>
 </dd></dl>
 
 <p>In practice, a thread is launched to record the energy of your program.</p>
-<div class="figure align-default" id="id1">
+<figure class="align-default" id="id1">
 <img alt="../_images/multi_threading.png" src="../_images/multi_threading.png" />
-<p class="caption"><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Interaction between the experiment and the recording threads</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
 <p>If you want to record also the time, accuracy and other valuable metrics, the simplest way is to do it in the main thread and then, to interpolate with the timestamps of the energy recordings if an alignement is needed.</p>
-</div>
-<div class="section" id="module-deep_learning_power_measure.power_measure.rapl_power">
-<span id="rapl-power-module"></span><h2>rapl_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.rapl_power" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-deep_learning_power_measure.power_measure.rapl_power">
+<span id="rapl-power-module"></span><h2>rapl_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.rapl_power" title="Link to this heading">¶</a></h2>
 <p>Handling of the CPU use and CPU consumption with RAPL</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.rapl_power.get_mem_uses">
-<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_mem_uses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_mem_uses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_mem_uses" title="Link to this definition">¶</a></dt>
 <dd><p>Get memory usage.
 psutil will be used to collect pss and uss values. rss is collected if pss
 is not available
@@ -94,15 +93,18 @@ previous example, the result would be 20Mbs instead of 15Mbs</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses">
-<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_cpu_uses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts the relative number of cpu clock attributed to each process
-Args:</p>
-<blockquote>
-<div><p>process_list : list of process [pid1, pid2,…] for which the cpu use
+<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_cpu_uses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_cpu_uses" title="Link to this definition">¶</a></dt>
+<dd><p>Extracts the relative number of cpu clock attributed to each process</p>
+<dl class="simple">
+<dt>Compute for each process p in process_list t over the period</dt><dd><ul class="simple">
+<li><p>relative cpu usage : ( cpu time of p ) / (cpu time of the whole system)</p></li>
+<li><p>absolute cpu usage : cpu time of p</p></li>
+</ul>
+</dd>
+<dt>Args:</dt><dd><p>process_list : list of process [pid1, pid2,…] for which the cpu use
 will be measured
 pause : sleeping time during which the cpu use will be recorded.</p>
-</div></blockquote>
-<dl class="simple">
+</dd>
 <dt>Returns:</dt><dd><p>cpu_uses = {pid1 : cpu_use, }  where cpu_use is the percentage of use
 of this cpu with the respect to the total use of the cpu on this period</p>
 </dd>
@@ -111,7 +113,7 @@ of this cpu with the respect to the total use of the cpu on this period</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.rapl_power.get_power">
-<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.rapl_power.</span></span><span class="sig-name descname"><span class="pre">get_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.rapl_power.get_power" title="Link to this definition">¶</a></dt>
 <dd><p>return the power accumulation of the provided pair of rapl samples for
 the different RAPL domains</p>
 <dl class="simple">
@@ -124,13 +126,13 @@ domain and the value is the accumulated energy consumption in Joules
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-deep_learning_power_measure.power_measure.gpu_power">
-<span id="gpu-power-module"></span><h2>gpu_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.gpu_power" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-deep_learning_power_measure.power_measure.gpu_power">
+<span id="gpu-power-module"></span><h2>gpu_power module<a class="headerlink" href="#module-deep_learning_power_measure.power_measure.gpu_power" title="Link to this heading">¶</a></h2>
 <p>This module parses the xml provided by nvidia-smi to obtain the consumption, memory and SM used for each gpu and each pid.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power">
-<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.gpu_power.</span></span><span class="sig-name descname"><span class="pre">get_nvidia_gpu_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">deep_learning_power_measure.power_measure.gpu_power.</span></span><span class="sig-name descname"><span class="pre">get_nvidia_gpu_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#deep_learning_power_measure.power_measure.gpu_power.get_nvidia_gpu_power" title="Link to this definition">¶</a></dt>
 <dd><p>Get the power and use of each GPU.
 first, get gpu usage per process
 second get the power use of nvidia for each GPU
@@ -169,8 +171,8 @@ power</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -239,7 +241,7 @@ power</p>
       &copy;2022, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
