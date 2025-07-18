@@ -1,4 +1,3 @@
-matplotlib
 psutil
 numpy
 pandas
