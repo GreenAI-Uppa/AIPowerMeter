@@ -103,7 +103,7 @@ and the console output should looks like:
 
 
 TIPS and use cases
-__________________
+------------------
 
 - We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . The script `exp_deep_learning.py` is a simple one to start with with torch. The script `exp_matmul.py` only requires numpy.
 
