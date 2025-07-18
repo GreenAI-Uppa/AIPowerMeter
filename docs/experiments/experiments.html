@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Deep learning benchmark &#8212; AI Power Meter  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=cb25574f" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Machine and Deep Learning Benchmarks with wattmeters" href="schneiderbox.html" />
@@ -34,8 +31,8 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="deep-learning-benchmark">
-<h1>Deep learning benchmark<a class="headerlink" href="#deep-learning-benchmark" title="Permalink to this heading">¶</a></h1>
+  <section id="deep-learning-benchmark">
+<h1>Deep learning benchmark<a class="headerlink" href="#deep-learning-benchmark" title="Link to this heading">¶</a></h1>
 <p>This section describes energy measurements for classic deep learning models. For each model, the experiment is as follows:</p>
 <p>To measure the energy consumption of classical deep learning pretrained model at inference, our protocol acts as follows:</p>
 <ul class="simple">
@@ -45,16 +42,9 @@
 <li><p>we repeat the experiment 10 times to have more robustness.</p></li>
 </ul>
 <p>Experiments were run with a NVIDIA GeForce RTX 3090 with 24Gb of ram.</p>
-<div class="section" id="summary-one-inference-with-classic-deep-learning-models">
-<h2>Summary : One inference with classic deep learning models<a class="headerlink" href="#summary-one-inference-with-classic-deep-learning-models" title="Permalink to this heading">¶</a></h2>
+<section id="summary-one-inference-with-classic-deep-learning-models">
+<h2>Summary : One inference with classic deep learning models<a class="headerlink" href="#summary-one-inference-with-classic-deep-learning-models" title="Link to this heading">¶</a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 18%" />
-<col style="width: 18%" />
-<col style="width: 20%" />
-<col style="width: 23%" />
-<col style="width: 21%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Model Type</p></th>
 <th class="head"><p>CNN Object Detection</p></th>
@@ -96,9 +86,9 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="experimental-protocol">
-<h2>Experimental protocol<a class="headerlink" href="#experimental-protocol" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="experimental-protocol">
+<h2>Experimental protocol<a class="headerlink" href="#experimental-protocol" title="Link to this heading">¶</a></h2>
 <p>For each set of experiments, power measurements and lattencies are written into several power_metrics.json  and latency.csv files: one by tuple (format,x) where format is the chosen input size an integer and x =0, … 9 following this architecture:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>input_format
 ├── run_x
@@ -107,9 +97,9 @@
 </pre></div>
 </div>
 <p>We then compile  <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/deep_learning_benchmark/concat_power_measure.py">here</a> an estimate of different power draws of one inference and compile the median of the over the 10 runs. For each pretrained model, results are generated into a csv file where each row corresponds to one input size and each column represents the median of one power draw.</p>
-</div>
-<div class="section" id="alexnet-study">
-<h2>Alexnet study<a class="headerlink" href="#alexnet-study" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="alexnet-study">
+<h2>Alexnet study<a class="headerlink" href="#alexnet-study" title="Link to this heading">¶</a></h2>
 <p>As a gentle start, we measure the consumption at inference of a vanilla <a class="reference external" href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">Alexnet</a> on a GeForce RTX 3090 GPU, and 16 i9 Intel cores CPU.</p>
 <p>We first import necessary modules for power draws and torch models downloads.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">os</span>
@@ -179,9 +169,9 @@
 <p>We also plot the behaviours of latency and total consumption as a function of the input size. We highlight a smoother evolution for the latency as the input size increases but with a still very high Pearson coefficient (0.98).</p>
 <a class="reference internal image-reference" href="../_images/alexnet_gpu_latency.png"><img alt="../_images/alexnet_gpu_latency.png" class="align-center" src="../_images/alexnet_gpu_latency.png" style="width: 400pt;" /></a>
 <p>As a result, for this particular experiment protocol, we can conclude that <em>the latency is a reasonable statistic to describe the energy consumption of an Alexnet at inference as a function of the input size</em>. In the next study, we will propose the same kind of analyses varying the size of the architecture (number of layers, number of filters, size of the filters).</p>
-</div>
-<div class="section" id="resnet-study">
-<h2>Resnet study<a class="headerlink" href="#resnet-study" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="resnet-study">
+<h2>Resnet study<a class="headerlink" href="#resnet-study" title="Link to this heading">¶</a></h2>
 <p>Following the same steps as for Alexnet study, we have done the measurements with a pretrained Resnet50, using the following parameters:</p>
 <ul class="simple">
 <li><p>we define random colored images with an width/height of 8, 32, 64, 128, 256, 512, 1024, 2048 and 4096,</p></li>
@@ -193,9 +183,9 @@
 <a class="reference internal image-reference" href="../_images/resnet_sm_nvi.png"><img alt="../_images/resnet_sm_nvi.png" class="align-center" src="../_images/resnet_sm_nvi.png" style="width: 300pt;" /></a>
 <p>We also compute the matrix of Spearman correlation :</p>
 <a class="reference internal image-reference" href="../_images/resnet_spearman.png"><img alt="../_images/resnet_spearman.png" src="../_images/resnet_spearman.png" style="width: 400pt;" /></a>
-</div>
-<div class="section" id="bert-transformer">
-<h2>Bert Transformer<a class="headerlink" href="#bert-transformer" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="bert-transformer">
+<h2>Bert Transformer<a class="headerlink" href="#bert-transformer" title="Link to this heading">¶</a></h2>
 <p>As a similar study than the previous Alexnet and Resnet one, we measure consumption of a famous NLP transformer: <a class="reference external" href="https://arxiv.org/abs/1810.04805">Bert</a>.</p>
 <p>In this case we use torch with a sequence classifier version of Bert, as provided by the <a class="reference external" href="https://huggingface.co/transformers/model_doc/bert.html">hugging face</a> library.</p>
 <p>The process follows previous experiments. The inputs are sequences of <strong>“yes”</strong> tokens of different sizes.</p>
@@ -219,9 +209,9 @@
 <a class="reference internal image-reference" href="../_images/GPU_CPU.png"><img alt="../_images/GPU_CPU.png" class="align-center" src="../_images/GPU_CPU.png" style="width: 400pt;" /></a>
 <p>On the next figure, we can see the evolution of latency in seconds compared to the input size. The measure is clearly not linear as a gap appears at a size of 300-350 tokens. On this plot, the link between the latency and the energy consumption is not trivial.</p>
 <a class="reference internal image-reference" href="../_images/latency.png"><img alt="../_images/latency.png" class="align-center" src="../_images/latency.png" style="width: 400pt;" /></a>
-</div>
-<div class="section" id="deep-rewiring">
-<h2>Deep rewiring<a class="headerlink" href="#deep-rewiring" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="deep-rewiring">
+<h2>Deep rewiring<a class="headerlink" href="#deep-rewiring" title="Link to this heading">¶</a></h2>
 <p>In the article <a class="reference external" href="https://arxiv.org/abs/1711.05136">Training very sparse network with Deep Rewiring</a> , <a class="reference external" href="http://guillaume.bellec.eu/">G. Bellec</a> et al. introduce two algorithms allowing to train models with very low connectivy (less than 2%).
 The latter are called Deep-R and Soft Deep-R.
 The first one induced strong constraints on the network : we have a limited number of connectivity for each iteration of the training.
@@ -237,12 +227,6 @@ We used the default parameters (for example 10 epochs and a batch size of 10).</
 <li><p>script_mnist_soft_deep_rewiring.py is the implementation of soft Deep-R.</p></li>
 </ul>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 24%" />
-<col style="width: 23%" />
-<col style="width: 27%" />
-<col style="width: 25%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Model</p></th>
 <th class="head"><p>CPU consumption (Joules)</p></th>
@@ -269,26 +253,26 @@ We used the default parameters (for example 10 epochs and a batch size of 10).</
 </tbody>
 </table>
 <a class="reference internal image-reference" href="../_images/conso_dr.png"><img alt="../_images/conso_dr.png" class="align-center" src="../_images/conso_dr.png" style="width: 600pt;" /></a>
-</div>
-<div class="section" id="pruning">
-<h2>Pruning<a class="headerlink" href="#pruning" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="pruning">
+<h2>Pruning<a class="headerlink" href="#pruning" title="Link to this heading">¶</a></h2>
 <p>A solution for improving the size and the computation time is called pruning. It consists in selecting some neurons and removing others before, during or after the training of a model.
 In this documentation, we decided to implement two solutions called SNIP (by <a class="reference external" href="https://arxiv.org/absS/1810.02340">Namhoon Lee &amp; al.</a>) and Force (by <a class="reference external" href="https://arxiv.org/absS/2006.09081">Pau de Jorge &amp; al.</a>) who both prune a model once at initialization and achieve a deletion of 95 to 99.5% parameters without losing much precision.</p>
-</div>
-<div class="section" id="snip">
-<h2>SNIP<a class="headerlink" href="#snip" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="snip">
+<h2>SNIP<a class="headerlink" href="#snip" title="Link to this heading">¶</a></h2>
 <p>For our experiments, we used an <a class="reference external" href="https://github.com/mil-ad/snip">unofficial implementation</a> using <a class="reference external" href="https://pytorch.org/">PyTorch</a> because the code proposed by the author was implemented in an old tensorflow version, which doesn’t allow the use of a GPU. We decided to test two architectures and each one with a specific dataset : respectively LeNet5-Caffe with MNIST dataset and vgg-D with CIFAR-10.
 To make sure our experiment is not influenced by the random initialization of parameters, we run three times the whole training process with a different seed. At the end, we plot the precision, the computation time and of course the total energy consumption of the GPU and the machine thanks to the use of AIPowerMeter and a wattmeter.</p>
-<table class="colwidths-given docutils align-default" id="id2">
-<caption><span class="caption-text">Results of our experiments with SNIP</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Results of our experiments with SNIP</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <colgroup>
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 18%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
+<col style="width: 13.6%" />
+<col style="width: 13.6%" />
+<col style="width: 18.2%" />
+<col style="width: 13.6%" />
+<col style="width: 13.6%" />
+<col style="width: 13.6%" />
+<col style="width: 13.6%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Architecture</p></th>
@@ -337,9 +321,9 @@ To make sure our experiment is not influenced by the random initialization of pa
 </table>
 <p>We can observe the same results in precision as the paper between the original architecture and the pruned one, but our experiment cannot conclude on a significative improvement in computation time nor an economy in energy.
 To understand those results, we argue that the implementation only put the value of every pruned neuron at zero, and then having a high sparsity.</p>
-</div>
-<div class="section" id="force">
-<h2>Force<a class="headerlink" href="#force" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="force">
+<h2>Force<a class="headerlink" href="#force" title="Link to this heading">¶</a></h2>
 <p>Force can be seen as an iterative SNIP as described by the authors of the algorithm. In this section,
 the results of the model in term of energy consumption is described. AIPowerMeter can be used like in the previous examples
 to infer the energy consumption. In this experiment, a wattmeter was also used.</p>
@@ -348,12 +332,12 @@ Pruning is then a great solution to reduce the size of a neural network. However
 consumption, there is no clear differences between the pruned model and the full model. We infer that the reason for that is
 that the optimisation algorithm is not implemented to deal with sparse matrixes. Thus, we do not obtain any gain in time complexity
 and in energy consumption.</p>
-<table class="colwidths-given docutils align-default" id="id3">
-<caption><span class="caption-text">Results of our experiments with Force</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Results of our experiments with Force</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Pruning level</p></th>
@@ -372,8 +356,8 @@ and in energy consumption.</p>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -448,7 +432,7 @@ and in energy consumption.</p>
       &copy;2022, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

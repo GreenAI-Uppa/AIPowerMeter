@@ -102,11 +102,12 @@ and the console output should looks like:
 
 
 
-**TIPS and use cases**
+TIPS and use cases
+__________________
 
-- We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . `exp_deep_learning.py` is a good one to start with. 
+- We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . The script `exp_deep_learning.py` is a simple one to start with with torch. The script `exp_matmul.py` only requires numpy.
 
-- You can measure the consumption of a console command, for example, to evaluate "exp_deep_learning.py"
+- OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command, for example, to evaluate "exp_deep_learning.py"
 
 .. code-block:: console
   

@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Machine and Deep Learning Benchmarks with wattmeters &#8212; AI Power Meter  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=cb25574f" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Bibliography" href="../bibliography.html" />
@@ -34,36 +31,36 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="machine-and-deep-learning-benchmarks-with-wattmeters">
-<h1>Machine and Deep Learning Benchmarks with wattmeters<a class="headerlink" href="#machine-and-deep-learning-benchmarks-with-wattmeters" title="Permalink to this heading">¶</a></h1>
-<div class="section" id="omegawatt-power-meters">
-<h2>OmegaWatt Power meters<a class="headerlink" href="#omegawatt-power-meters" title="Permalink to this heading">¶</a></h2>
+  <section id="machine-and-deep-learning-benchmarks-with-wattmeters">
+<h1>Machine and Deep Learning Benchmarks with wattmeters<a class="headerlink" href="#machine-and-deep-learning-benchmarks-with-wattmeters" title="Link to this heading">¶</a></h1>
+<section id="omegawatt-power-meters">
+<h2>OmegaWatt Power meters<a class="headerlink" href="#omegawatt-power-meters" title="Link to this heading">¶</a></h2>
 <p>The AIPM measurements which rely on RAPL and nvidia-smi only measure a subset of the computer components (GPU, CPU) and ignore others (fans, hard drive). The power consumption of the whole computer might increase up to 30% with respect to these measures. We describe here how to install and use an <a class="reference external" href="http://omegawatt.fr">OmegaWatt</a> set of power meters to evaluate this global consumption. The raw material described in this section is a box (see images below) that measures voltage and active power of (up to) 3 servers. This material is commonly used in data centers in order to monitor several different machines. This box measures at two different frequencies the active power (in Watts) and the voltage as follows:</p>
 <ul class="simple">
 <li><p>at a low frequency regime (up to 1 second), the box saves measurements (at least the past 3 years) that could be downloaded in tsv format by connecting a laptop to the wifi of the box, and using a simple web interface,</p></li>
 <li><p>at a high frequency (10 ms), time series are sent via a ethernet cable and a small chip to be readable in a laptop using a given software named <strong>wattmeter_rapid1</strong> that creates a log at this high frequency.</p></li>
 </ul>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/wattmeters.png" src="../_images/wattmeters.png" />
-</div>
-</div>
-<div class="section" id="tracking-at-low-frequency-from-wifi">
-<h2>Tracking at Low Frequency from wifi<a class="headerlink" href="#tracking-at-low-frequency-from-wifi" title="Permalink to this heading">¶</a></h2>
+</figure>
+</section>
+<section id="tracking-at-low-frequency-from-wifi">
+<h2>Tracking at Low Frequency from wifi<a class="headerlink" href="#tracking-at-low-frequency-from-wifi" title="Link to this heading">¶</a></h2>
 <p>The OmegaWatt box has its own wifi and you can connect to acquire the power readings from the different devices which are connected to this box. The recordings are updated in live on a web page.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/recording_wifi.png" src="../_images/recording_wifi.png" />
-</div>
+</figure>
 <p>For more details, you can refer to the french OmegaWatt documentation <a class="reference download internal" download="" href="../_downloads/1364f531f65f32da832bb14f9b50e65b/MV2_guide4.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a></p>
-</div>
-<div class="section" id="track-with-high-frequency-measures">
-<h2>Track with High Frequency measures<a class="headerlink" href="#track-with-high-frequency-measures" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="track-with-high-frequency-measures">
+<h2>Track with High Frequency measures<a class="headerlink" href="#track-with-high-frequency-measures" title="Link to this heading">¶</a></h2>
 <p><strong>Compilation and execution of wattmeter_rapid1</strong>:</p>
 <p>To compile the wattmeter from OmegaWatt, you need to use the following command :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -std<span class="o">=</span>c11 -o wattmetre-read wattmetre_main.c wattmetre_lib.c -lm
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc<span class="w"> </span>-std<span class="o">=</span>c11<span class="w"> </span>-o<span class="w"> </span>wattmetre-read<span class="w"> </span>wattmetre_main.c<span class="w"> </span>wattmetre_lib.c<span class="w"> </span>-lm
 </pre></div>
 </div>
 <p>Once you get the executable file “wattmetre-read”, you can execute it whenever you want to track your consumption :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./wattmetre-read --tty<span class="o">=</span>/dev/ttyUSB0 --nb<span class="o">=</span><span class="m">6</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./wattmetre-read<span class="w"> </span>--tty<span class="o">=</span>/dev/ttyUSB0<span class="w"> </span>--nb<span class="o">=</span><span class="m">6</span>
 </pre></div>
 </div>
 <p>And this should provides a similar output (you can keep it in a logfile using the linux redirection symbol <strong>&gt;</strong>) :</p>
@@ -77,30 +74,30 @@
 </div>
 <p>Definition of each column :</p>
 <dl class="field-list simple">
-<dt class="field-odd">#timestamp</dt>
+<dt class="field-odd">#timestamp<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(float) time of the current frame</p>
 </dd>
-<dt class="field-even">#frame_is_ok</dt>
+<dt class="field-even">#frame_is_ok<span class="colon">:</span></dt>
 <dd class="field-even"><p>(boolean) do we have data from the current frame</p>
 </dd>
-<dt class="field-odd">#U1</dt>
+<dt class="field-odd">#U1<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(float) tension in Volt for phase 1</p>
 </dd>
-<dt class="field-even">#U2</dt>
+<dt class="field-even">#U2<span class="colon">:</span></dt>
 <dd class="field-even"><p>(float) tension in Volt for phase 2</p>
 </dd>
-<dt class="field-odd">#U3</dt>
+<dt class="field-odd">#U3<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(float) tension in Volt for phase 3</p>
 </dd>
-<dt class="field-even">#currentn</dt>
+<dt class="field-even">#currentn<span class="colon">:</span></dt>
 <dd class="field-even"><p>(float) current of the machine connected to socket <strong>n</strong> in Ampere</p>
 </dd>
-<dt class="field-odd">#activepown</dt>
+<dt class="field-odd">#activepown<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(float) active power of the machine connected to socket <strong>n</strong> in Watt</p>
 </dd>
 </dl>
 <p><em>Remark:</em> if you have trouble to access to <em>/dev/ttyUSB0</em>, we should use the following command :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo chmod <span class="m">666</span> /dev/ttyUSB0
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">666</span><span class="w"> </span>/dev/ttyUSB0
 </pre></div>
 </div>
 <p>To record your experiment, one quick and dirty way is to call these commands from your python code as explained in the following.</p>
@@ -121,8 +118,8 @@
 <p>This time we need to add an ssh connection to start the tracking, and copy the result afterwards.
 Please, make sure to copy your ssh public key to the remote machine allowing the script to connect to the destination without the need of the password.
 To copy your public key, you just need to run the two following commands (or only the second if you have already generated a RSA key)</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen -t rsa -b <span class="m">2048</span>
-<span class="gp">$ </span>ssh-copy-id -i ~/.ssh/id_rsa.pub username@example.org
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa<span class="w"> </span>-b<span class="w"> </span><span class="m">2048</span>
+<span class="gp">$ </span>ssh-copy-id<span class="w"> </span>-i<span class="w"> </span>~/.ssh/id_rsa.pub<span class="w"> </span>username@example.org
 </pre></div>
 </div>
 <p>Instead of <cite>os</cite>, we used the <cite>subprocess</cite> package (as earlier, don’t forget to import subprocess), but it’s the same principle :</p>
@@ -134,9 +131,9 @@ To copy your public key, you just need to run the two following commands (or onl
 <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;scp&#39;</span><span class="p">,</span> <span class="s1">&#39;username@example.org:/path/to/logfile&#39;</span><span class="p">,</span> <span class="s1">&#39;/local/path/&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="benchmarks">
-<h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="benchmarks">
+<h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading">¶</a></h2>
 <p>First tests have been realized to compare measurements done with AIPowerMeter and OmegaWatt Power meters.
 The measures with the Power Meter are stored in a logfile and looks like :</p>
 <a class="reference internal image-reference" href="../_images/gcc_watt.png"><img alt="../_images/gcc_watt.png" class="align-center" src="../_images/gcc_watt.png" style="width: 400pt;" /></a>
@@ -159,8 +156,8 @@ Let’s zoom in on the hatched part which corresponds to the epoch 5 to 11.</p>
 <p>In order to “correct” the excessive variance of the wattmeter, we have represented in dark blue the moving average, with a step of 200, calculated on our data.
 The observation of these 5 epochs allows us to observe a clear descent of the consumption between some epoch. The  wattmeter is more precise and shows us that the consumption is not constant during an epoch.</p>
 <p>A complete jupyter-notebook is available <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/docsrc/experiments/measure.ipynb">here</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -230,7 +227,7 @@ The observation of these 5 epochs allows us to observe a clear descent of the co
       &copy;2022, GreenAIUppa.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
