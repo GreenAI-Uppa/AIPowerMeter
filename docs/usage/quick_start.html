@@ -115,8 +115,9 @@ You can then get a summary of the recordings</p>
 <h2>TIPS and use cases<a class="headerlink" href="#tips-and-use-cases" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>We store examples in <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">this folder</a> . The script <cite>exp_deep_learning.py</cite> is a simple one to start with with torch. The script <cite>exp_matmul.py</cite> only requires numpy.</p></li>
-<li><p>OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command, for example, to evaluate “exp_deep_learning.py”</p></li>
+<li><p>OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command.</p></li>
 </ul>
+<p>For example, to evaluate “python examples/exp_deep_learning.py”, you should run:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m deep_learning_power_measure --output_folder &quot;/home/paul/test&quot; --cmd  &quot;python examples/exp_deep_learning.py&quot;</span>
 </pre></div>
 </div>

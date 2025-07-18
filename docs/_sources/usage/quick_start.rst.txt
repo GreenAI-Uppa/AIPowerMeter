@@ -107,7 +107,9 @@ TIPS and use cases
 
 - We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . The script `exp_deep_learning.py` is a simple one to start with with torch. The script `exp_matmul.py` only requires numpy.
 
-- OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command, for example, to evaluate "exp_deep_learning.py"
+- OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command. 
+
+For example, to evaluate "python examples/exp_deep_learning.py", you should run:
 
 .. code-block:: console
   
