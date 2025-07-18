@@ -8,6 +8,7 @@ import argparse
 def main():
     """small function mainly used to record power consumption of a command by calling directly the module deep_learning_power_measure
     for an example, please see the end section in the quickstart documentation : "TIPS and use cases"
+    https://greenai-uppa.github.io/AIPowerMeter/usage/quick_start.html#tips-and-use-cases
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--cmd", help="the running command you want to monitor",type=str)
