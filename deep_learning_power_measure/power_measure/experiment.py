@@ -4,6 +4,12 @@ this module contains mainly two classes
     - ExpResult is used to process and format the recordings.
 
 Both classes uses a driver attribute to communicate with a database, or read and write in json files
+
+
+The module can be used as a script to print the details of an experiment
+
+python -m deep_learning_power_measure.power_measure.experiment --output_folder AIPowerMeter/measure_power/
+
 """
 from functools import wraps
 import os
@@ -20,8 +26,10 @@ import pandas as pd
 import datetime
 import psutil
 from . import rapl_power
+from . import parsers
 from . import gpu_power
 import signal
+import argparse
 
 STOP_MESSAGE = "Stop"
 EXP_DONE = "Done"
@@ -221,7 +229,6 @@ def processify(func):
         queue.put(p.pid)
         return p, queue
     return wrapper
-
 
 class Experiment():
     """
@@ -837,3 +844,14 @@ class ExpResults():
             pow_machine2 = self.total_('#activepow2')
             pow_machine3 = self.total_('#activepow3')
             print(f"consumption from machine 1: {pow_machine1} joules, consumption from machine 2: {pow_machine2} joules, consumption from machine 3: {pow_machine3} joules")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output_folder", help="directory where the energy consumption records have been saved",type=str,
+                         default="power_measure")
+    args = parser.parse_args()
+    output_folder = args.output_folder
+    driver = parsers.JsonParser(output_folder)
+    exp_result = ExpResults(driver)
+    exp_result.print()

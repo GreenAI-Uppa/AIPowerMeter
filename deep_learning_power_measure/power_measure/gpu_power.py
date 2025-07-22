@@ -69,7 +69,7 @@ def get_gpu_use_pmon(nsample=1):
         if re.match(r"#.* gpu ", x):
             position = i
     if position == -1:
-        raise ValueError("Problem with output in nvidia-smi pmon -c 10")
+        raise ValueError("No pid running on gpu found, problem with output in nvidia-smi pmon -c 10")
     out_str_pruned.insert(0, out_str_pruned.pop(position).strip())
     out_str_final = "\n".join(out_str_pruned)
     out_str_final = out_str_final.replace("-", "0")
