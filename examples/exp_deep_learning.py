@@ -38,7 +38,7 @@ net.to(DEVICE)
 data = data.to(DEVICE)
 
 # this parser will be in charge to write the results to a json file
-driver = parsers.JsonParser(args.output_folder)
+driver = parsers.JsonParser(args.output_folder, meta_data="Simple experiment with a convnet and fake input data")
 # instantiating the experiment.
 exp = experiment.Experiment(driver)
 

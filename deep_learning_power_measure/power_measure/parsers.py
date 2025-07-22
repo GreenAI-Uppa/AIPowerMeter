@@ -10,13 +10,14 @@ import logging
 SEGMENT_END = "END OF RECORDING SEGMENT"
 class JsonParser():
     """write and parse the measurement recording from and to json files"""
-    def __init__(self, location : str):
+    def __init__(self, location : str, meta_data=''):
         """
         JSonParser will save the recordings of the experiment as json files
         folder : the location where the json will be saved, it will be created if it does not exist
         cont : if set to False and the parameter folder is an existing directory, then previous recordings will be erased. If set to True, new recordings will be appended to existing ones
         """
         self.folder = location
+        self.metadata_filename = self.folder + '/metadata.json'
         self.wattmeter_logfile = os.path.join(self.folder, 'omegawatt.csv')
         self.wattemeter_exec = "/home/ntirel/libs/wattmeter_rapid_omegawatt/wattmetre-read"
         self.power_metric_filename = self.folder + '/power_metrics.json'
@@ -24,8 +25,22 @@ class JsonParser():
         self.model_card_file = os.path.join(self.folder,'model_summary.json')
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
+        # save metadata
+        if not os.path.isfile(self.metadata_filename):
+            if isinstance(meta_data, str):
+                self.metadata = {'description':meta_data}
+            if not isinstance(self.metadata,dict):
+                raise Exception("meta_data argument of JsonParser must be of type str or dict, found: "+str(self.metadata.__class__))
+            self.metadata['date'] = datetime.datetime.today().__str__()
+            json.dump(self.metadata,open(self.metadata_filename,'w'))
 
-
+    def get_description(self):
+        metadata = json.load(open(self.metadata_filename))
+        description = metadata['description']
+        if description == "":
+            return None
+        return description
+    
     def erase(self):
         """delete the recordings"""
         if  os.path.isdir(self.folder):
@@ -62,7 +77,7 @@ class JsonParser():
         #os.system(f"libs/wattmeter_rapid_omegawatt/wattmetre-read --tty=/dev/ttyUSB0 --nb=6 > {self.wattmeter_logfile} 2>&1 & echo $! > /tmp/pid")
 
     def save_exp_metrics(self, metrics):
-        """save experiment (accuracy, latency,...) related metrics"""
+        """save experiment (accuracy,...) related metrics"""
         if not os.path.isdir(self.folder):
             os.makedirs(self.folder)
         exp_metric_fileout = open(self.exp_metric_filename,'a')

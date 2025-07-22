@@ -77,7 +77,7 @@ You can then get a summary of the recordings
 .. code-block:: python
 
   from deep_learning_power_measure.power_measure import experiment, parsers
-  driver = parsers.JsonParser("output_folder")
+  driver = parsers.JsonParser("output_folder",meta_data="small description of your experiment, providing a dictionnary is also possible")
   exp_result = experiment.ExpResults(driver)
   exp_result.print()
 

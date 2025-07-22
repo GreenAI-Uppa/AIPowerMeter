@@ -19,7 +19,7 @@ from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
 import numpy as np
-import warnings
+import warnings, logging
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd
@@ -257,9 +257,9 @@ class Experiment():
         self.nvidia_available, msg_nvidia = gpu_power.is_nvidia_compatible() 
         self.wattmeter_available = os.path.isfile(self.db_driver.wattemeter_exec) if (self.db_driver.wattemeter_exec is not None) else False
         if not self.rapl_available:
-            print("RAPL not available: " + msg_rapl)
+            warnings.warn("RAPL not available: " + msg_rapl, category=RuntimeWarning)
         else:
-            print(msg_rapl)
+            logging.info(msg_rapl)
         if self.wattmeter_available:
             print("wattmeter available at: "+self.db_driver.wattemeter_exec)
         elif self.db_driver.wattemeter_exec is None:
@@ -267,15 +267,15 @@ class Experiment():
         else:
             print("power meter not avaible: "+self.db_driver.wattemeter_exec," does not exist")
         if not self.nvidia_available:
-            print("nvidia not available: " + msg_nvidia)
+            warnings.warn("nvidia not available: " + msg_nvidia, category=RuntimeWarning)
         else:
             print(msg_nvidia)
             self.gpu_logs = []
             self.min_gpu_powers = gpu_power.get_min_power()
             self.pid_per_gpu = {} # {gpu_id : {pid, last_time_active}}
         if not self.rapl_available and not self.nvidia_available:
-            msg = "\n\n Neither rapl and nvidia are available, I can't measure anything related to Energy consumption.\n\n "
-            warnings.warn(msg)
+            msg = "\n\n Neither rapl and nvidia are available, I can't measure anything related to Energy consumption.\n\n If it's the intented behavior safely ignore the message"
+            warnings.warn(msg,category=RuntimeWarning)
 
     def log_usage(self, metric_gpu, pid_list, time_window=3, waiting_phase=20):
         """
@@ -296,7 +296,7 @@ class Experiment():
         # update the list of pids running on the different gpus
         # remove the ones older than 20 seconds, because at that time, this pid does not have an influence on the consumption anymore
         for gpu_id, pid_cats in self.pid_per_gpu.items():
-            for cat, pid_last_times in pid_cats.items():
+            for _, pid_last_times in pid_cats.items():
                 for pid in list(pid_last_times):
                     last_seen = pid_last_times[pid]
                     if now - last_seen > waiting_phase:
@@ -464,7 +464,7 @@ class Experiment():
 class ExpResults():
     """
     Process the power recording from an experiment.
-    The actual reading of the recording is done by the fb_driver attribute.
+    The actual reading of the recording is done by the db_driver attribute.
     """
     def __init__(self, db_driver):
         self.db_driver = db_driver
@@ -776,6 +776,9 @@ class ExpResults():
         simple print of the experiment summary
         """
         print("============================================ EXPERIMENT SUMMARY ============================================")
+        d = self.db_driver.get_description()
+        print(d) if d != None else None
+        print()
         d, s, e = self.get_exp_duration()
         print('Experiment duration: ', d, 'seconds.', ' Start:',datetime.datetime.fromtimestamp(s), ' end',datetime.datetime.fromtimestamp(e))
         if self.cpu_metrics is not None:
