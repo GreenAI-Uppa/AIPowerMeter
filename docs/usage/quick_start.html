@@ -114,15 +114,30 @@ You can then get a summary of the recordings</p>
 <section id="tips-and-use-cases">
 <h2>TIPS and use cases<a class="headerlink" href="#tips-and-use-cases" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>We store examples in <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">this folder</a> . The script <cite>exp_deep_learning.py</cite> is a simple one to start with with torch. The script <cite>exp_matmul.py</cite> only requires numpy.</p></li>
-<li><p>OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command.</p></li>
+<li><p>Check examples in <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples">this folder</a> . The script <cite>exp_deep_learning.py</cite> is a simple one to start with with torch. The script <cite>exp_matmul.py</cite> only requires numpy.</p></li>
+<li><p>OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command. For example, to evaluate “python examples/exp_deep_learning.py”, you should run:</p></li>
 </ul>
-<p>For example, to evaluate “python examples/exp_deep_learning.py”, you should run:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m deep_learning_power_measure --output_folder &quot;/home/paul/test&quot; --cmd  &quot;python examples/exp_deep_learning.py&quot;</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>Record separetely the consumption of your training, and test phases of your deep learning experiments from <a class="reference external" href="https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py">this example</a></p></li>
+<li><p>If you want to accumulate the consumption from multiple program runs, for instance, if you are interested about the whole consumption of your project, or the consumption of a model trained through multiple trials.</p></li>
+</ul>
+<p>What we do is to accumulate the recordings into the same folder, by setting the <cite>cont</cite> parameter to <cite>True</cite></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m deep_learning_power_measure --cmd &quot;python exp_deep_learning.py&quot; --output_folder power_measure --cont True</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Visualise the recorded results from the command line</p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>get<span class="w"> </span>a<span class="w"> </span>summary
+<span class="go">python -m deep_learning_power_measure.power_measure.experiment --output_folder power_measure/</span>
+<span class="gp"># </span>plot<span class="w"> </span>the<span class="w"> </span>metrics<span class="w"> </span>over<span class="w"> </span><span class="nb">time</span>
+<span class="go">python -m deep_learning_power_measure.power_measure.experiment --output_folder power_measure/ --curve intel_power,total_dram_power</span>
+</pre></div>
+</div>
+<ul class="simple">
 <li><p>Set permanently the access to the RAPL files</p></li>
 </ul>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt install sysfsutils</span>

@@ -105,11 +105,11 @@ and the console output should looks like:
 TIPS and use cases
 ------------------
 
-- We store examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . The script `exp_deep_learning.py` is a simple one to start with with torch. The script `exp_matmul.py` only requires numpy.
+- Check examples in `this folder <https://github.com/GreenAI-Uppa/AIPowerMeter/tree/main/examples>`_ . The script `exp_deep_learning.py` is a simple one to start with with torch. The script `exp_matmul.py` only requires numpy.
 
-- OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command. 
 
-For example, to evaluate "python examples/exp_deep_learning.py", you should run:
+
+- OTHER LANGUAGES THAN PYTHON : You can measure the consumption of a console command. For example, to evaluate "python examples/exp_deep_learning.py", you should run:
 
 .. code-block:: console
   
@@ -117,6 +117,23 @@ For example, to evaluate "python examples/exp_deep_learning.py", you should run:
 
 
 - Record separetely the consumption of your training, and test phases of your deep learning experiments from `this example <https://github.com/GreenAI-Uppa/AIPowerMeter/blob/main/examples/record_train_val_test.py>`_
+
+- If you want to accumulate the consumption from multiple program runs, for instance, if you are interested about the whole consumption of your project, or the consumption of a model trained through multiple trials. 
+
+What we do is to accumulate the recordings into the same folder, by setting the `cont` parameter to `True`
+
+.. code-block:: console
+
+  python -m deep_learning_power_measure --cmd "python exp_deep_learning.py" --output_folder power_measure --cont True
+
+- Visualise the recorded results from the command line
+
+.. code-block:: console
+
+  # get a summary 
+  python -m deep_learning_power_measure.power_measure.experiment --output_folder power_measure/
+  # plot the metrics over time
+  python -m deep_learning_power_measure.power_measure.experiment --output_folder power_measure/ --curve intel_power,total_dram_power
 
 - Set permanently the access to the RAPL files
 
@@ -126,3 +143,4 @@ For example, to evaluate "python examples/exp_deep_learning.py", you should run:
     echo "mode class/powercap/intel-rapl:0/energy_uj = 0444" >> /etc/sysfs.conf 
 
 then reboot
+
