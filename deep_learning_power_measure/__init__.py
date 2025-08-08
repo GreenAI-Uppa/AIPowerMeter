@@ -12,6 +12,7 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--cmd", help="the running command you want to monitor",type=str)
+    parser.add_argument("--cont", help="whether or not to erase existing results or append new results to an existing recording folder.",type=bool)
     parser.add_argument("--output_folder", help="directory to save the energy consumption records",type=str, default="power_measure")
     parser.add_argument("--period", help="time interval used to compute the cpu usage", type=float, default=0.1)
     parser.add_argument("--measurement_period", help="time interval between two recordings for all the metrics (energy, cpu usage, etc). Increase this parameter to reduce the size of the generated jsons", type=float, default=2)
@@ -21,7 +22,7 @@ def main():
     output_folder = args.output_folder 
     cmd = args.cmd
     driver = parsers.JsonParser(output_folder)
-    exp = experiment.Experiment(driver)
+    exp = experiment.Experiment(driver, cont=args.cont)
     p, q = exp.measure_yourself(period=args.period, measurement_period=args.measurement_period)
     ## calling the experiment script
     try:

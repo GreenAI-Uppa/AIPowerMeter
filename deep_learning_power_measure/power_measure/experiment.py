@@ -247,7 +247,7 @@ class Experiment():
             model is a pytorch model from nn.Module, and input_size is a tuple of int,
             for instance, you can provide  input_size = (64, 3, 32, 32) if you are processing
             3 channels images with a batch size of 64.
-        cont : whether or not to erase existing results or append new results.
+        cont : whether or not to erase existing results or append new results to an existing recording folder.
         """
         self.db_driver = driver
         if not cont:
@@ -853,8 +853,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output_folder", help="directory where the energy consumption records have been saved",type=str,
                          default="power_measure")
+    parser.add_argument("--curve", help="directory where the energy consumption records have been saved",type=str,
+                         default=None)#intel_power
+    
     args = parser.parse_args()
     output_folder = args.output_folder
     driver = parsers.JsonParser(output_folder)
     exp_result = ExpResults(driver)
     exp_result.print()
+    if args.curve != None:
+        exp_result.display_curves([args.curve])
