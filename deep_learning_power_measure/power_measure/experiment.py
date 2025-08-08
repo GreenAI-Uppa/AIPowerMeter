@@ -19,6 +19,7 @@ from multiprocessing import Process, Queue
 from queue import Empty as EmptyQueueException
 import time
 import numpy as np
+import random
 import warnings, logging
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -659,10 +660,22 @@ class ExpResults():
             if curve is None:
                 continue
             if isinstance(curve,list):
+                color = [random.uniform(0,1) for a in range(3)]
+                for i, segment in enumerate(curve):
+                    df = pd.DataFrame([c for c in segment])
+                    df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
+                    df['date_datetime'] = pd.to_datetime(df['date_datetime'])
+                    if i == 0:
+                        ax.plot(df['date_datetime'], df['value'], label=metric_name, color=color)
+                    else:
+                        ax.plot(df['date_datetime'], df['value'], color=color)
+                        
+                """
                 df = pd.DataFrame([c for segment in curve for c in segment])
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                 df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                 ax.plot(df['date_datetime'], df['value'], label=metric_name)
+                """
             else: # compute the average for each device
                 for device_id, metric in curve.items():
                     df = pd.DataFrame(metric)
@@ -685,7 +698,7 @@ class ExpResults():
         #if curve is None:
         #    raise Exception('invalide metric name')
         if isinstance(curve,list):
-            df = pd.DataFrame( [item for sublist in curve for item in sublist] )
+            df = pd.DataFrame( [item for segment in curve for item in segment] )
             df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
             df['date_datetime'] = pd.to_datetime(df['date_datetime'])
             ax.plot(df['date_datetime'], df['value'], label=metric_name1)
@@ -862,4 +875,5 @@ if __name__ == "__main__":
     exp_result = ExpResults(driver)
     exp_result.print()
     if args.curve != None:
-        exp_result.display_curves([args.curve])
+        print(args.curve.split(','))
+        exp_result.display_curves(args.curve.split(','))
