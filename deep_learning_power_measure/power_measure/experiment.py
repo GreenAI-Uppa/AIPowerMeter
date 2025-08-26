@@ -461,7 +461,7 @@ class Experiment():
                     return
             except EmptyQueueException:
                 pass
-        
+
 class ExpResults():
     """
     Process the power recording from an experiment.
@@ -575,7 +575,6 @@ class ExpResults():
     def get_gpu_usage_duration(self):
         curve = self.get_curve('per_gpu_absolute_percent_usage')
         return get_usage_duration(curve)
-        
 
     def get_exp_duration(self, start=None, end=None):
         """
@@ -612,7 +611,7 @@ class ExpResults():
                 else:
                     totals[device_id] = None
             return dict([ (device_id, tot/duration if s!=e else tot) ] )
-        else:            
+        else:
             if total is None:
                 return None
             return total/duration if s!=e else total
@@ -669,7 +668,6 @@ class ExpResults():
                         ax.plot(df['date_datetime'], df['value'], label=metric_name, color=color)
                     else:
                         ax.plot(df['date_datetime'], df['value'], color=color)
-                        
                 """
                 df = pd.DataFrame([c for segment in curve for c in segment])
                 df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
@@ -771,6 +769,7 @@ class ExpResults():
             summary['cpu']['rel_cpu_power'] = self.total_('per_process_cpu_power',start=start, end=end)
             summary['cpu']['mem_use_abs'] = self.average_('per_process_mem_use_abs',start=start, end=end)
             summary['cpu']['mem_use_uss'] = self.average_('per_process_mem_use_uss',start=start, end=end)            
+            summary['cpu']['max_total_mem_use'] = self.max_('total_mem_use',start=start, end=end)            
             summary['cpu']['absolute_cpu_time_per_pid'] = self.total_('absolute_cpu_time_per_pid',start=start, end=end)
             summary['cpu']['relative_cpu_use'] = self.average_('per_process_cpu_uses',start=start, end=end)
 
@@ -807,6 +806,8 @@ class ExpResults():
             mem_use_abs = self.average_('per_process_mem_use_abs')
             mem_use_uss = self.average_('per_process_mem_use_uss')
             cpu_total_time = self.total_('absolute_cpu_time_per_pid')
+            total_mem_use = self.max_('total_mem_use')
+            
             if cpu_total_time is not None:
                 print('CPU time usage of your experiment:', cpu_total_time,'seconds')
             if total_dram_power is None and mem_use_abs is None:
@@ -814,7 +815,7 @@ class ExpResults():
             elif total_dram_power is None:
                 print("RAM consumption not available. Your usage was ",humanize_bytes(mem_use_abs), 'among which',humanize_bytes(mem_use_uss),'is unique to your experiment (ie. USS memory)')
             else:
-                print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'among which',humanize_bytes(mem_use_uss),'is unique to your experiment (ie. USS memory)')
+                print("Total RAM consumption:", total_dram_power, "joules, your experiment consumption: ", rel_dram_power, "joules, for an average of",humanize_bytes(mem_use_abs), 'among which',humanize_bytes(mem_use_uss),'is unique to your experiment (ie. USS memory). The max amount of RAM used during your experiment was:',humanize_bytes(total_mem_use))
             if total_cpu_power is None:
                 print("detailed CPU consumption not available")
             else:

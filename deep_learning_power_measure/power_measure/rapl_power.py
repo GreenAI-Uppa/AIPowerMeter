@@ -304,6 +304,7 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, me
     if memory_usage:
         mem_pss_per_process, mem_uss_per_process = get_mem_uses(process_list)
         mem_uses = get_relative_mem_use(mem_pss_per_process)
+        mem_total = psutil.virtual_memory().used
     if measure_rapl:
         s2 = sample.take_sample()
         power_metrics = get_power(s2 - s1)
@@ -320,6 +321,7 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, me
         metrics['per_process_mem_use_percent'] = mem_uses
         if len(mem_uss_per_process) > 0:
             metrics['per_process_mem_use_uss'] = mem_uss_per_process
+        metrics['total_mem_use'] = mem_total
     if measure_rapl:
         metrics['intel_power']  = power_metrics['intel_power']
         metrics['psys_power'] = power_metrics['psys_power']

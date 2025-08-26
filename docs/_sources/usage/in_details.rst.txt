@@ -162,21 +162,19 @@ Currently, the following metrics are supported
    'power_draw_gpu']
 
 
-model complexity
-----------------
+About Generative AI
+-------------------
 
-We use a wrapper for `torchinfo <https://pypi.org/project/torchinfo/>`_ to extract statistics about your model, essentially number of parameters and mac operation counts.
-To obtain them, add additional parameters:
+For ollama, or any external llm server :  the python script call an external call to a server which actually run the llm. Currently, AIPowerMeter does not track this call, and thus the cpu related metrics specifics to your experiment will be innacurate. So in this case, and actually with any program which rely on external tools on your machine, you follow this protocol:
+ 
+- turn off every program you can
+- trust the global/total metrics : total_intel_power, total_ram_consumption, total ram usage, and so on.
 
-.. code-block:: python
+Anyway, isolating the consumption of a program should is always inacurrate (see :ref:`multiple`).
 
-  net = ... the model you are using for your experiment
-  input_size = ... (batch_size, *data_point_shape)
-  exp = experiment.Experiment(driver, model=net, input_size=input_size)
+The GPU is already measured overall, assuming your experiment is the only one running on the GPU, so this part is fine.
 
-
-You can log the number of parameters and the number of multiply and add (mac) operations of your model. 
-Currently, only pytorch is supported.
+When you can't (or don't want to) run the model on your own machine: check `EcoLogits <https://github.com/genai-impact>`_ for a tool which enables you to measure the impact of cloud instances (chatgpt, azur, and so on). They rely on approximations to estimate closed models, extrapolating from known models, using public leaderboard, or comparing prices.
 
 .. _docker:
 
