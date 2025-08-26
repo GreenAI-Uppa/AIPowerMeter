@@ -1,6 +1,6 @@
-# Measure the efficiency of your deep learning
+# Profile the energy of your deep learning experiments 
 
-Record the energy consumption of your cpu and gpu. Check [our documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
+Record energy consumption of your cpu and gpu as well as cpu/gpu memory and usage. Check [our documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
 
 This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker). A popular package is also [Code Carbon](https://github.com/mlco2/codecarbon)
 
