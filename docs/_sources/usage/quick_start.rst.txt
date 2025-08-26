@@ -39,8 +39,9 @@ Installation
 .. code-block:: console
 
    $ git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
+   $ cd AIPowerMeter
    $ pip install -r requirements.txt
-   $ python setup.py install
+   $ python -m pip install . 
 
 The power recording part is independant of the model type, it is desirable to monitor the number of parameters and mac operations of your experiment. 
 

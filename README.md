@@ -2,7 +2,7 @@
 
 Record the energy consumption of your cpu and gpu. Check [our documentation](https://greenai-uppa.github.io/AIPowerMeter/) for usage.
 
-This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker) 
+This repo is largely inspired from this [experiment Tracker](https://github.com/Breakend/experiment-impact-tracker). A popular package is also [Code Carbon](https://github.com/mlco2/codecarbon)
 
 ## Requirements
 
@@ -20,6 +20,8 @@ Empty folder? If your cpu is very recent, it is worth to check the most recent l
 ## Installation
 
 ```
+git clone https://github.com/GreenAI-Uppa/AIPowerMeter.git
+cd AIPowerMeter
 pip install -r requirements.txt
 pip install --force-reinstall --no-cache-dir .
 ```

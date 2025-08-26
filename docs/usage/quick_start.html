@@ -56,8 +56,9 @@ Again, not all gpu cards (for ex: Jetson Nano board) include the required sensor
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/GreenAI-Uppa/AIPowerMeter.git
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>AIPowerMeter
 <span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<span class="gp">$ </span>python<span class="w"> </span>setup.py<span class="w"> </span>install
+<span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 <p>The power recording part is independant of the model type, it is desirable to monitor the number of parameters and mac operations of your experiment.</p>
