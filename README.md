@@ -35,8 +35,6 @@ sudo chmod -R 755 /sys/class/powercap/intel-rapl/
 > some examples requires pytorch or tensorflow.
 ## Usage
 
-See `examples/example_exp_deep_learning.py`.
-
 Essentially, you instantiate an experiment and place the code you want to measure between a start and stop signal.
 
 ```
@@ -61,4 +59,6 @@ driver = parsers.JsonParser(output_folder)
 exp_result = experiment.ExpResults(driver)
 exp_result.print()
 ``` 
+
+See also `examples/example_exp_deep_learning.py` and other tips to monitor a bash command, get some energy plots [on this page](https://greenai-uppa.github.io/AIPowerMeter/usage/quick_start.html#tips-and-use-cases)
 
