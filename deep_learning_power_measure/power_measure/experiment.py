@@ -26,7 +26,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 import datetime
 import psutil
-from . import rapl_power
+from . import rapl_power, rapl
 from . import parsers
 from . import gpu_power
 import signal
@@ -311,6 +311,7 @@ class Experiment():
             metrics = {}
 
             metrics['temperature'] = psutil.sensors_temperatures()
+            process_list = rapl_power.get_processes(pid_list)
             mem_pss_per_process, mem_uss_per_process = rapl_power.get_mem_uses(process_list)
             mem_uses = rapl_power.get_relative_mem_use(mem_pss_per_process)
             mem_total = psutil.virtual_memory().used
@@ -352,8 +353,9 @@ class Experiment():
                 metrics['cpu'].update(power_metrics)
                 intel_power_use = rapl_power.get_rel_power(cpu_uses, power_metrics['intel_power'])
                 metrics['cpu']['rel_intel_power'] = intel_power_use
-                cpu_power_use = rapl_power.get_rel_power(cpu_uses, power_metrics['total_cpu_power'])
-                metrics['cpu']['per_process_cpu_power'] = cpu_power_use
+                if 'total_cpu_power' in power_metrics:
+                    cpu_power_use = rapl_power.get_rel_power(cpu_uses, power_metrics['total_cpu_power'])
+                    metrics['cpu']['per_process_cpu_power'] = cpu_power_use
 
             if len(mem_uss_per_process) > 0:
                 metrics['cpu']['per_process_mem_use_uss'] = mem_uss_per_process
@@ -729,23 +731,23 @@ class ExpResults():
             print()
             print()
             print("GPU")
-            abs_nvidia_power = self.total_('nvidia_draw_absolute')
+            abs_nvidia_power = self.total_('nvidia_power')
             print("nvidia total consumption:",abs_nvidia_power, "joules")
-            nvidia_mem_use_abs = self.max_("nvidia_mem_use")
+            nvidia_mem_use_abs = self.max_("per_gpu_nvidia_memory")
             print('Max memory used:')
             for device_id, mx in nvidia_mem_use_abs.items():
                 if mx is None:
                     print('    gpu:',device_id, 'memory used not available')
                 else:
                     print('    gpu:',device_id,":", humanize_bytes(mx))
-            nvidia_average_sm = self.average_("nvidia_sm_use")
             print('Average GPU usage:')
+            nvidia_average_sm = self.average_("per_gpu_nvidia_use_rate")
             for device_id, mx in nvidia_average_sm.items():
                 if mx is None:
                     print('    gpu:',device_id, 'sm usage not available')
                 else:
                     print('    gpu: {}: {:0.3f} %'.format(device_id, mx*100))
-            per_gpu_attributable_power = self.total_('per_gpu_attributable_power')
+            per_gpu_attributable_power = self.total_('per_gpu_nvidia_power')
             print('Attributable usage per GPU')
             for device_id, mx in per_gpu_attributable_power.items():
                 if device_id == 'all':

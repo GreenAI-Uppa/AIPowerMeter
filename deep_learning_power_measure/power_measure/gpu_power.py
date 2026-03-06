@@ -13,20 +13,39 @@ import pandas as pd
 import pynvml
 
 def get_gpu_sample():
+    """
+    return output like:
+    {'time': 1772787539.2619398,
+     'nvidia_power': 328857377.051,
+     'nvidia_memory': 3859677184,
+     'per_gpu_nvidia_power': {0: 194950183.792, 1: 133907193.259},
+     'per_gpu_nvidia_use_rate': {0: 0, 1: 0},
+     'per_gpu_nvidia_memory': {0: 3216441344, 1: 643235840}}
+    power is in joules accumulated since the start of the driver, memory in bytes, rate in percentage of sm usage
+    """
     pynvml.nvmlInit()
     gpu_sample = {'time':time.time(),
                   "nvidia_power":0,
-                      "nvidia_memory":0}
-    handles = [pynvml.nvmlDeviceGetHandleByIndex(i) for i in pynvml.nvmlDeviceGetCount()]    
+                  "nvidia_memory":0,
+                  "per_gpu_nvidia_power":{},"per_gpu_nvidia_use_rate":{},"per_gpu_nvidia_memory":{}}
+    handles = [pynvml.nvmlDeviceGetHandleByIndex(i) for i in range(pynvml.nvmlDeviceGetCount())]    
     for i,handle in enumerate(handles):
         gpu_sample['per_gpu_nvidia_power'][i] = pynvml.nvmlDeviceGetTotalEnergyConsumption(handle) / 1000
         gpu_sample['per_gpu_nvidia_use_rate'][i] = pynvml.nvmlDeviceGetUtilizationRates(handle).gpu
         gpu_sample['per_gpu_nvidia_memory'][i] = pynvml.nvmlDeviceGetMemoryInfo(handle).used
         gpu_sample['nvidia_power'] += gpu_sample['per_gpu_nvidia_power'][i]
         gpu_sample['nvidia_memory'] += gpu_sample['per_gpu_nvidia_memory'][i]    
+    gpu_sample['nvidia_use_rate'] = sum(gpu_sample['per_gpu_nvidia_use_rate'].values())/len(gpu_sample['per_gpu_nvidia_use_rate'])
     return gpu_sample
 
 def get_diff_gpu_sample(s1,s2):
+    """
+    take the difference between two gpu samples
+
+    the power is expressed in watt
+    sm usage rate and memory is the average between the two values
+
+    """
     diff = {}
     for idi, value in s1.items():
         if idi == 'time':
@@ -34,15 +53,15 @@ def get_diff_gpu_sample(s1,s2):
         if isinstance(value,dict):
             diff[idi] = {}
             for k in value:
-                if 'power' in k:
+                if 'power' in idi:
                     diff[idi][k] = (s2[idi][k] - s1[idi][k]) /( s2['time'] - s1['time'])
                 else:
                     diff[idi][k] = (s2[idi][k] + s1[idi][k])/2
         else:
-            if 'power' in k:
+            if 'power' in idi:
                 diff[idi] = (s2[idi] - s1[idi]) /( s2['time'] - s1['time'])
             else:
-                diff[idi] = (s2[idi][k] + s1[idi][k])/2
+                diff[idi] = (s2[idi] + s1[idi])/2
     return diff
 
 def is_nvidia_compatible():
@@ -53,21 +72,12 @@ def is_nvidia_compatible():
     msg = "nvidia NOT available for energy consumption\n"
     if which("nvidia-smi") is None:
         return (False, msg+"nvidia-smi program is not in the path")
-    # make sure that nvidia-smi doesn't just return no devices
-    p = Popen(["nvidia-smi"], stdout=PIPE)
-    stdout, _ = p.communicate()
-    output = stdout.decode("UTF-8")
-    if "no devices" in output.lower():
-        return (False, msg+"nvidia-smi did not found GPU device on this machine")
-    if "NVIDIA-SMI has failed".lower() in output.lower():
-        return (False, msg+output)
-    xml = get_nvidia_xml()
-    for _, gpu in enumerate(xml.findall("gpu")):
-        try:
-            get_gpu_data(gpu)
-        except RuntimeError as e:
-            return (False, msg+e.__str__())
-        break
+    try:
+        pynvml.nvmlInit()
+    except pynvml.NVMLError:
+        return (False, msg+"pynvml failed to initialize")
+    if pynvml.nvmlDeviceGetCount() == 0:
+        return (False, msg+"0 gpus found by pynvml")
     msg = "GPU power will be measured with nvidia"
     return True, msg
 
@@ -278,8 +288,8 @@ def get_nvidia_gpu_power(pid_list=None, nsample = 1):
             per_gpu_relative_percent_usage[gpu_id] =  this_exp_sm / all_sm
 
     data_return_values_with_headers = {
-        "nvidia_draw_absolute": absolute_power, # total nvidia power draw
-        "per_gpu_power_draw": per_gpu_power_draw,
+        "nvidia_power": absolute_power, # total nvidia power draw
+        "per_gpu_nvidia_power": per_gpu_power_draw,
         "per_gpu_attributable_mem_use": per_gpu_per_pid_mem_use,
         "per_gpu_per_pid_utilization_absolute": per_gpu_per_pid_utilization_absolute, # absolute % of sm used per gpu per pid
         "per_gpu_absolute_percent_usage": per_gpu_absolute_percent_usage, # absolute % of sm used per gpu by the experiment
