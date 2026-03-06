@@ -86,7 +86,7 @@ def get_processes(pid_list):
             # so maybe rising a warning is not a good option
     return process_list
 
-def get_power(diff):
+def get_diff_power_draw(diff):
     """return the power accumulation of the provided pair of rapl samples for
     the different RAPL domains
 
@@ -140,9 +140,9 @@ def get_power(diff):
             'psys_power':psys_power
             }
     if 'ram' in domains_found or 'dram' in domains_found:
-        power_metrics['dram_power'] = total_dram_power
+        power_metrics['total_dram_power'] = total_dram_power
     if 'core' in domains_found or 'cpu' in domains_found:
-        power_metrics['cpu_power'] = total_cpu_power
+        power_metrics['total_cpu_power'] = total_cpu_power
     if 'uncore' in domains_found:
         power_metrics['uncore_power'] = total_uncore_power
     return power_metrics
@@ -307,7 +307,7 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, me
         mem_total = psutil.virtual_memory().used
     if measure_rapl:
         s2 = sample.take_sample()
-        power_metrics = get_power(s2 - s1)
+        power_metrics = get_diff_power_draw(s2 - s1)
     if measure_rapl and measure_cpu_usage:
         intel_power_use = get_rel_power(cpu_uses, power_metrics['intel_power'])
         metrics['rel_intel_power'] = intel_power_use
@@ -328,13 +328,13 @@ def get_metrics(pid_list, period = 2.0, memory_usage=True, measure_rapl=True, me
         if 'uncore_power' in power_metrics:
             metrics['uncore_power'] = power_metrics['uncore_power'],
         if 'cpu_power' in power_metrics:
-            cpu_power = power_metrics['cpu_power']
-            metrics['total_cpu_power'] = cpu_power        
+            cpu_power = power_metrics['total_cpu_power']
+            metrics['total_cpu_power'] = cpu_power
             if measure_cpu_usage:
                 cpu_power_use = get_rel_power(cpu_uses, cpu_power)
                 metrics['per_process_cpu_power'] = cpu_power_use
         if 'dram_power' in power_metrics:
-            dram_power = power_metrics['dram_power']
+            dram_power = power_metrics['total_dram_power']
             metrics['total_dram_power'] = dram_power
             if memory_usage:
                 dram_power_use = get_rel_power(mem_uses, dram_power)

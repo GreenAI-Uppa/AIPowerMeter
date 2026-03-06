@@ -1,6 +1,7 @@
 """This module parses the xml provided by nvidia-smi to obtain the consumption, memory and SM used for each gpu and each pid."""
 
 from subprocess import PIPE, Popen
+import time
 import re
 import subprocess
 from collections import OrderedDict
@@ -9,6 +10,40 @@ from xml.etree.ElementTree import fromstring
 from shutil import which
 import numpy as np
 import pandas as pd
+import pynvml
+
+def get_gpu_sample():
+    pynvml.nvmlInit()
+    gpu_sample = {'time':time.time(),
+                  "nvidia_power":0,
+                      "nvidia_memory":0}
+    handles = [pynvml.nvmlDeviceGetHandleByIndex(i) for i in pynvml.nvmlDeviceGetCount()]    
+    for i,handle in enumerate(handles):
+        gpu_sample['per_gpu_nvidia_power'][i] = pynvml.nvmlDeviceGetTotalEnergyConsumption(handle) / 1000
+        gpu_sample['per_gpu_nvidia_use_rate'][i] = pynvml.nvmlDeviceGetUtilizationRates(handle).gpu
+        gpu_sample['per_gpu_nvidia_memory'][i] = pynvml.nvmlDeviceGetMemoryInfo(handle).used
+        gpu_sample['nvidia_power'] += gpu_sample['per_gpu_nvidia_power'][i]
+        gpu_sample['nvidia_memory'] += gpu_sample['per_gpu_nvidia_memory'][i]    
+    return gpu_sample
+
+def get_diff_gpu_sample(s1,s2):
+    diff = {}
+    for idi, value in s1.items():
+        if idi == 'time':
+            continue
+        if isinstance(value,dict):
+            diff[idi] = {}
+            for k in value:
+                if 'power' in k:
+                    diff[idi][k] = (s2[idi][k] - s1[idi][k]) /( s2['time'] - s1['time'])
+                else:
+                    diff[idi][k] = (s2[idi][k] + s1[idi][k])/2
+        else:
+            if 'power' in k:
+                diff[idi] = (s2[idi] - s1[idi]) /( s2['time'] - s1['time'])
+            else:
+                diff[idi] = (s2[idi][k] + s1[idi][k])/2
+    return diff
 
 def is_nvidia_compatible():
     """

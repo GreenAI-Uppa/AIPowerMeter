@@ -278,80 +278,6 @@ class Experiment():
             msg = "\n\n Neither rapl and nvidia are available, I can't measure anything related to Energy consumption.\n\n If it's the intented behavior safely ignore the message"
             warnings.warn(msg,category=RuntimeWarning)
 
-    def log_usage(self, metric_gpu, pid_list, time_window=3, waiting_phase=20):
-        """
-        record the last gpu usage, and remove the usage after a
-
-        time_window : in seconds : after this duration, we remove recordings
-        from the log
-        waiting_phase : in seconds. The gpu remains under high voltage idle state
-        during this period after the last pid has finished its computation
-        """
-        now = time.time()
-        log = {"timestamp": now }
-        log["per_gpu_power_draw"] = metric_gpu["per_gpu_power_draw"]
-        log["per_gpu_estimated_attributable_utilization"] = metric_gpu["per_gpu_estimated_attributable_utilization"]
-        self.gpu_logs = [t for t in self.gpu_logs if now - t['timestamp'] < time_window]
-        self.gpu_logs.append(log)
-
-        # update the list of pids running on the different gpus
-        # remove the ones older than 20 seconds, because at that time, this pid does not have an influence on the consumption anymore
-        for gpu_id, pid_cats in self.pid_per_gpu.items():
-            for _, pid_last_times in pid_cats.items():
-                for pid in list(pid_last_times):
-                    last_seen = pid_last_times[pid]
-                    if now - last_seen > waiting_phase:
-                        del pid_last_times[pid]
-        # add the pids running at the moment
-        for gpu_id, usage in metric_gpu["per_gpu_per_pid_utilization_absolute"].items():
-            for pid, u in usage.items():
-                if u == 0:
-                    continue
-                if gpu_id not in self.pid_per_gpu:
-                    self.pid_per_gpu[gpu_id] = {'pid_this_exp':{}, 'other_pids':{}}
-                if pid in pid_list:
-                    self.pid_per_gpu[gpu_id]['pid_this_exp'][pid] = now
-                else:
-                    self.pid_per_gpu[gpu_id]['other_pids'][pid] = now
-
-    def allocate_gpu_power(self, per_gpu_power_draw):
-        """
-        computing attributable power and use
-        We average the gpu use and power over a time window and share it among
-        the different processes
-
-        There is a fix power that is used by the gpu as soon as it is used. This part
-        is shared equally among all the active pids regardless of their amount of
-        stream multiprocessor used
-
-        Note that the gpu is set at this mininum voltage for a time window of
-        around 20 seconds after inactivity.
-        """
-        per_gpu_attributable_power = {}
-        per_gpu_attributable_sm_use = {}
-        if len(self.pid_per_gpu) == 0:
-            return {'all': 0}, {}
-        for gpu_id in self.pid_per_gpu:
-            this_gpu_power_draw = per_gpu_power_draw[gpu_id]
-            use_curve =  [[ {'date': t['timestamp'], 'value': t['per_gpu_estimated_attributable_utilization'][gpu_id] } for t in self.gpu_logs ]]
-            tot = total(use_curve)
-            duration = use_curve[0][-1]['date'] - use_curve[0][0]['date']
-            if duration != 0:
-                this_gpu_relative_use = tot / duration # average use of the gpu over the time window
-            else:
-                this_gpu_relative_use = 0
-            per_gpu_attributable_sm_use[gpu_id] = this_gpu_relative_use
-            all_pids_on_this_gpu = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) + len(self.pid_per_gpu[gpu_id]['other_pids'])
-            if all_pids_on_this_gpu == 0:
-                prop_active_pid = 0
-            else:
-                prop_active_pid = len(self.pid_per_gpu[gpu_id]['pid_this_exp']) / all_pids_on_this_gpu
-            usage_power = (this_gpu_power_draw - self.min_gpu_powers[gpu_id])
-            fix_power = self.min_gpu_powers[gpu_id] * prop_active_pid
-            per_gpu_attributable_power[gpu_id] = usage_power * this_gpu_relative_use + fix_power
-        per_gpu_attributable_power['all'] = sum(per_gpu_attributable_power.values())
-        return per_gpu_attributable_power, per_gpu_attributable_sm_use
-
     @processify
     def measure_from_pid_list(self, queue, pid_list, period=1):
         """record power use for the processes given in pid_list"""
@@ -365,47 +291,6 @@ class Experiment():
         current_pid = queue.get()
         self.measure(queue, None, current_pid=current_pid, period=period, measurement_period=measurement_period)
 
-    def monitor_machine(self, pid_args=None, parent_pid = 1, period=1, measurement_period=2):
-        """
-        performs power use recording
-
-        queue : queue used to communicate to the thread which ask
-        for the recording
-        period : waiting time between two RAPL samples.
-        pid_args : list of pid : will monitor exclusively these pids. If set to None, will update the list of pid starting from current_pid
-        parent_pid : root process from which we collect subprocesses to be monitored. Used only if pid_args is set to None
-        """
-        time_at_last_measure = 0
-        monitoring_process_pid = os.getppid()
-        while True:
-            time.sleep(measurement_period)
-            #if time.time() - time_at_last_measure < period:
-            #    continue
-            time_at_last_measure = time.time()
-            if pid_args is None:
-                # will obtain the pid from the parents, ie the script from which the measure function has been called
-                pid_list = get_pid_list(monitoring_process_pid, parent_pid=parent_pid)
-            else:
-                # the user specified a set of process he wants to monitor
-                pid_list = pid_args
-            # there have a buffer and allocate per pid with lifo
-            # with time
-            metrics = {}
-            if self.nvidia_available:
-                # launch in separate threads because they won't have the same frequency
-                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
-                self.log_usage(metrics_gpu, pid_list)
-            if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=True, measure_cpu_usage=True, period=period)
-            else:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=False, measure_cpu_usage=True, period=period)
-            if self.nvidia_available:
-                per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
-                metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
-                metrics['gpu'] = metrics_gpu
-            summarize_metrics()
-            self.db_driver.save_power_metrics(metrics)
-
     def measure(self, queue, pid_args, current_pid = None, period=1, measurement_period=2):
         """
         performs power use recording
@@ -416,11 +301,6 @@ class Experiment():
         pid_args : list of pid : will monitor exclusively these pids. If set to None, will update the list of pid starting from current_pid
         current_pid : root process from which we collect subprocesses to be monitored. Used only if pid_args is set to None
         """
-        session_id = time.time()
-        time_at_last_measure = 0
-        if self.wattmeter_available:
-            ## launch power meter recording
-            proc = self.db_driver.save_wattmeter_metrics()
         while True:
             if pid_args is None:
                 # will obtain the pid from the parents, ie the script from which the measure function has been called
@@ -428,25 +308,57 @@ class Experiment():
             else:
                 # the user specified a set of process he wants to monitor
                 pid_list = pid_args
-            # there have a buffer and allocate per pid with lifo
-            # with time
             metrics = {}
-            if self.nvidia_available:
-                # launch in separate threads because they won't have the same frequency
-                metrics_gpu = gpu_power.get_nvidia_gpu_power(pid_list)
-                self.log_usage(metrics_gpu, pid_list)
+
             metrics['temperature'] = psutil.sensors_temperatures()
+            mem_pss_per_process, mem_uss_per_process = rapl_power.get_mem_uses(process_list)
+            mem_uses = rapl_power.get_relative_mem_use(mem_pss_per_process)
+            mem_total = psutil.virtual_memory().used
+            process_list = rapl_power.get_processes(pid_list)
+            
+            if self.nvidia_available:
+                gpu1 = gpu_power.get_gpu_sample()
+
             if self.rapl_available:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=True, measure_cpu_usage=True, period=period)
-            else:
-                metrics['cpu'] = rapl_power.get_metrics(pid_list, memory_usage=True, measure_rapl=False, measure_cpu_usage=True, period=period)
-            if time.time() - time_at_last_measure > measurement_period:
-                time_at_last_measure = time.time()
-                if self.nvidia_available:
-                    per_gpu_attributable_power, _ = self.allocate_gpu_power(metrics_gpu['per_gpu_power_draw'])
-                    metrics_gpu['per_gpu_attributable_power'] = per_gpu_attributable_power
-                    metrics['gpu'] = metrics_gpu
-                self.db_driver.save_power_metrics(metrics)
+                sample = rapl.RAPLSample()
+                s1 = sample.take_sample()
+
+
+            infos1, zombies = rapl_power.get_info_time(process_list)       
+        
+            time.sleep(period)
+
+            if self.nvidia_available:
+                gpu2 = gpu_power.get_gpu_sample()
+
+            if self.rapl_available:
+                s2 = sample.take_sample()
+
+            infos2, zombies = rapl_power.get_info_time(process_list, zombies)
+            cpu_uses, absolute_cpu_time_per_pid = rapl_power.get_percent_uses(infos1, infos2, zombies, process_list)
+            
+            metrics['cpu'] = {'per_process_cpu_uses': cpu_uses,
+                              'absolute_cpu_time_per_pid': absolute_cpu_time_per_pid,
+                              'per_process_mem_use_abs' : mem_pss_per_process,
+                              'per_process_mem_use_percent' : mem_uses,
+                              'total_mem_use' : mem_total}
+            
+            if self.nvidia_available:
+                metrics['gpu'] = gpu_power.get_diff_gpu_sample(gpu1, gpu2)
+
+
+            if self.rapl_available:
+                power_metrics = rapl_power.get_diff_power_draw(s2 - s1)
+                metrics['cpu'].update(power_metrics)
+                intel_power_use = rapl_power.get_rel_power(cpu_uses, power_metrics['intel_power'])
+                metrics['cpu']['rel_intel_power'] = intel_power_use
+                cpu_power_use = rapl_power.get_rel_power(cpu_uses, power_metrics['total_cpu_power'])
+                metrics['cpu']['per_process_cpu_power'] = cpu_power_use
+
+            if len(mem_uss_per_process) > 0:
+                metrics['cpu']['per_process_mem_use_uss'] = mem_uss_per_process
+
+            self.db_driver.save_power_metrics(metrics)
             try:
                 message = queue.get(block=False)
                 # so there are two types of expected messages.
@@ -480,7 +392,7 @@ class ExpResults():
         """
         Return a list of the available metrics, clustered into four groups 'CPU', 'GPU', 'Experiment', 'wattmeter
         """
-        metrics = {'CPU':[],'GPU':[],'Experiment':[],'wattmeter':[]}
+        metrics = {'CPU':[],'GPU':[],'Experiment':[]}
         if self.cpu_metrics is not None:
             for k in self.cpu_metrics:
                 metrics['CPU'].append(k)
@@ -490,9 +402,6 @@ class ExpResults():
         if self.exp_metrics is not None:
             for k in self.exp_metrics:
                 metrics['Experiment'].append(k)
-        if self.wattmeter_metrics is not None:
-            for k in self.wattmeter_metrics:
-                metrics['wattmeter'].append(k)
         return metrics
 
     def print_metrics(self):
@@ -668,19 +577,13 @@ class ExpResults():
                         ax.plot(df['date_datetime'], df['value'], label=metric_name, color=color)
                     else:
                         ax.plot(df['date_datetime'], df['value'], color=color)
-                """
-                df = pd.DataFrame([c for segment in curve for c in segment])
-                df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
-                df['date_datetime'] = pd.to_datetime(df['date_datetime'])
-                ax.plot(df['date_datetime'], df['value'], label=metric_name)
-                """
             else: # compute the average for each device
                 for device_id, metric in curve.items():
                     df = pd.DataFrame(metric)
                     df['date_datetime'] = [ datetime.datetime.fromtimestamp(d) for d in df['date'] ]
                     df['date_datetime'] = pd.to_datetime(df['date_datetime'])
                     ax.plot(df['date_datetime'], df['value'],label=metric_name+":"+device_id)
-        ax.format_xdata = mdates.DateFormatter('%H:%M:%S')
+        ax.format_xdata = mdates.DateFormatter("%d/%m/%y %H:%M")
         plt.xticks(rotation=45)
         plt.legend()
         if saveto:
@@ -775,13 +678,13 @@ class ExpResults():
 
         if self.gpu_metrics is not None:
             summary['gpu'] = {}
-            summary['gpu']['abs_nvidia_power'] = self.total_('nvidia_draw_absolute',start=start, end=end)
-            summary['gpu']['rel_nvidia_power'] = self.total_('nvidia_attributable_power',start=start, end=end)
-            summary['gpu']['nvidia_mem_use_abs'] = self.max_("nvidia_mem_use",start=start, end=end)
-            summary['gpu']['nvidia_average_sm'] = self.average_("nvidia_sm_use",start=start, end=end)
-            summary['gpu']['per_gpu_attributable_power'] = self.total_('per_gpu_attributable_power',start=start, end=end)
+            summary['gpu']['nvidia_power'] = self.total_('nvidia_power',start=start, end=end)
+            summary['gpu']['nvidia_use_rate'] = self.max_("nvidia_memory",start=start, end=end)
+            summary['gpu']['nvidia_memory'] = self.average_("nvidia_use_rate",start=start, end=end)
+            summary['gpu']['per_gpu_power'] = self.total_('per_gpu_nvidia_power')
+            summary['gpu']['per_gpu_nvidia_memory'] = self.max_('per_gpu_nvidia_memory')
+            summary['gpu']['per_gpu_nvidia_use_rate'] = self.average_('per_gpu_nvidia_use_rate')
         return summary
-            
     
     def print(self):
         """
@@ -827,8 +730,7 @@ class ExpResults():
             print()
             print("GPU")
             abs_nvidia_power = self.total_('nvidia_draw_absolute')
-            rel_nvidia_power = self.total_('nvidia_attributable_power')
-            print("nvidia total consumption:",abs_nvidia_power, "joules, your consumption: ",rel_nvidia_power,"joules")
+            print("nvidia total consumption:",abs_nvidia_power, "joules")
             nvidia_mem_use_abs = self.max_("nvidia_mem_use")
             print('Max memory used:')
             for device_id, mx in nvidia_mem_use_abs.items():
@@ -852,16 +754,6 @@ class ExpResults():
                     print('    gpu:',device_id, 'power draw not available')
                 else:
                     print('    gpu: {}: {:0.3f} joules'.format(device_id, mx))
-            
-        if self.wattmeter_metrics is not None:
-            print()
-            print()
-            print("Recorded by the wattmeter")
-            pow_machine1 = self.total_('#activepow1')
-            pow_machine2 = self.total_('#activepow2')
-            pow_machine3 = self.total_('#activepow3')
-            print(f"consumption from machine 1: {pow_machine1} joules, consumption from machine 2: {pow_machine2} joules, consumption from machine 3: {pow_machine3} joules")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
